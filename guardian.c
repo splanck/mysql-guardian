@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include "guardian.h"
+#include "mysql.h"
 
 int colourSupport = 0;
 int canChangeColours = 0;
@@ -72,7 +73,8 @@ int mainMenu() {
 
 		if(choice == KEY_UP)
 			highlight--;
-		else if(choice == KEY_DOWN)
+		
+		if(choice == KEY_DOWN)
 			highlight++;
 
 		if(highlight == 3)
@@ -86,6 +88,13 @@ int mainMenu() {
 
 		attroff(COLOR_PAIR(1));
 	}
+
+	if(highlight == 0)
+	{
+		getDBInfo();
+	}
+
+	getch();
 
 	return 0;
 }
