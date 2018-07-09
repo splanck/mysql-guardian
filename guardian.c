@@ -7,6 +7,11 @@
 #include "fileio.h"
 #include "interface.h"
 
+#define VERSION "0.01"
+
+int colourSupport = 0;
+int canChangeColours = 0;
+
 int main(int argc, char **argv) {
 	initialiseLog();
 	
