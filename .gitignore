@@ -1,2 +1,3 @@
 *.o
 mysql-guardian
+mysql-guardian.log

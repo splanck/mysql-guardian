@@ -1,1 +1,1 @@
-char* getDBInfo();
+void getDBInfo();
