@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <my_global.h>
 #include <mysql.h>
+#include "fileio.h"
 
 extern char db_hostname[80];
 extern char db_username[80];
@@ -21,18 +22,34 @@ int createConfigDB() {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
+      	writeToLog("Cannot connect to MySQL Server.");
+      	
+      	char log[200];
+      	strcpy(log, "Error: ");
+      	strcat(log, db_error);
+      	writeToLog(log);
+
       	return 1;
   	}  
 
   	if (mysql_query(conn, "CREATE DATABASE mysql_guardian")) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
+
+      	writeToLog("Cannot create configuration database.");
+      	
+      	char log[200];
+      	strcpy(log, "Error: ");
+      	strcat(log, db_error);
+      	writeToLog(log);
       	
       	return 1;
   	}
 
   	mysql_close(conn);
   	
+  	writeToLog("Created configuration database.");
+
   	return 0;
 }
 
@@ -46,6 +63,13 @@ int createConfigTables() {
 		"mysql_guardian", 0, NULL, 0) == NULL) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
+      	
+      	writeToLog("Cannot connect to MySQL Server.");
+      	
+      	char log[200];
+      	strcpy(log, "Error: ");
+      	strcat(log, db_error);
+      	writeToLog(log);
       	
       	return 1;
   	}  
@@ -61,8 +85,17 @@ int createConfigTables() {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
+      	writeToLog("Cannot create configuration tables.");
+      	
+      	char log[200];
+      	strcpy(log, "Error: ");
+      	strcat(log, db_error);
+      	writeToLog(log);
+
       	return 1;
   	}
+
+  	writeToLog("Created configuration tables.");
 
   	mysql_close(conn);
 }

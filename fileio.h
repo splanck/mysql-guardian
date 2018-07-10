@@ -1,3 +1,3 @@
-int writeToLog(char logEntry[80]);
+int writeToLog(char logEntry[200]);
 int readConfig();
 int readConfig2();

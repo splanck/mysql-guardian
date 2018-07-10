@@ -8,7 +8,7 @@ extern char db_hostname[80];
 extern char db_username[25];
 extern char db_password[25];
 
-int writeToLog(char logEntry[80]) {
+int writeToLog(char logEntry[200]) {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 
