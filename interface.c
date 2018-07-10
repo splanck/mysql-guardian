@@ -121,9 +121,9 @@ void setupTerminal() {
 	initscr();
 	noecho();
 
-	if(has_colors()) {
+	if(has_colors()) 
+	{
 		colourSupport = 1;
-
 		start_color();
 	}
 
