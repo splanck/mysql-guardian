@@ -4,7 +4,7 @@
 #include <time.h>
 
 extern char db_hostname[80];
-extern char db_usernamme[25];
+extern char db_username[25];
 extern char db_password[25];
 
 int writeToLog(char logEntry[80]) {
@@ -49,7 +49,7 @@ int readConfig() {
   	str = strtok(host_buffer, " ");
 	strcpy(strtok(host_buffer, " "), db_hostname);
 	str = strtok(username_buffer, " ");
-	strcpy(strtok(username_buffer, " "), db_usernamme);
+	strcpy(strtok(username_buffer, " "), db_username);
 	str = strtok(password_buffer, " ");
 	strcpy(strtok(password_buffer, " "), db_password);
   	

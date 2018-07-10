@@ -1,1 +1,2 @@
 void getDBInfo();
+void showConfig();

@@ -1,3 +1,4 @@
 *.o
 mysql-guardian
 mysql-guardian.log
+.mysql-guardian_rc

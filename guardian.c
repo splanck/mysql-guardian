@@ -12,7 +12,7 @@
 int colourSupport = 0;
 int canChangeColours = 0;
 char db_hostname[80];
-char db_usernamme[25];
+char db_username[25];
 char db_password[25];
 
 int main(int argc, char **argv) {
@@ -46,7 +46,11 @@ void initialiseLog() {
 }
 
 void getConfig() {
-	readConfig();
+	if(readConfig()) {
+		printf("Could not read configuration file. Exiting,\n\r");
+
+		exit(1);
+	}
 }
 
 void cleanUpTasks() {

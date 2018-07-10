@@ -37,8 +37,8 @@ int mainMenu() {
 	keypad(menuWin, true);
 
 	char* choices[] = {
-  		"Verify a server is online",
-  		"List databases on a server",
+  		"Show MySQL Version",
+  		"Show Current Configuration",
   		"Exit Program"
 	};
 
@@ -82,6 +82,10 @@ int mainMenu() {
 	if(highlight == 0)
 	{
 		getDBInfo();
+	}
+
+	if(highlight == 1){
+		showConfig();
 	}
 
 	getch();
