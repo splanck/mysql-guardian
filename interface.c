@@ -6,6 +6,7 @@
 
 extern int colourSupport;
 extern int canChangeColours;
+extern char db_error[1000];
 
 int mainMenu() {
 	clear();
@@ -24,9 +25,9 @@ int mainMenu() {
 	refresh();
 	
 	int height = 10;
-	int width = 30;
+	int width = 40;
 	int starty = 5;
-	int startx = 40;
+	int startx = 35;
 
 	WINDOW *menuWin = newwin(height, width, starty, startx);
 	box(menuWin, 0, 0);
@@ -39,7 +40,8 @@ int mainMenu() {
 	char* choices[] = {
   		"Show MySQL Version",
   		"Show Current Configuration",
-  		"Exit Program"
+  		"Create Configuration Database",
+  		"Exit"
 	};
 
 	int choice = 0;
@@ -49,11 +51,11 @@ int mainMenu() {
 	{
 		attron(COLOR_PAIR(1));
 
-		for(int i = 0; i < 3; i++) {
+		for(int i = 0; i < 4; i++) {
 			if(i == highlight)
 				wattron(menuWin, A_REVERSE);
 
-			mvwprintw(menuWin, i + 2, 1, choices[i]);
+			mvwprintw(menuWin, i + 2, 2, choices[i]);
 			wattroff(menuWin, A_REVERSE);
 		}
 
@@ -67,11 +69,11 @@ int mainMenu() {
 		if(choice == KEY_DOWN)
 			highlight++;
 
-		if(highlight == 3)
+		if(highlight == 4)
 			highlight = 0;
 
 		if(highlight == -1)
-			highlight = 3;
+			highlight = 4;
 
 		if(choice == 10)
 			break;
@@ -80,17 +82,39 @@ int mainMenu() {
 	}
 
 	if(highlight == 0)
-	{
 		getDBInfo();
+
+	if(highlight == 1)
+		showConfig();
+
+	if(highlight == 2) {
+		int dbsuccess = createConfigDB();
+
+		if(dbsuccess) {
+			mvprintw(1, 0, "Could not create configuration database.\n\r");
+			mvprintw(2, 0, "Error: %s", db_error);
+		}
+		else {
+			mvprintw(1, 0, "Configuration database created successfully.\n\r");	
+
+			int tblsuccess = createConfigTables();
+
+			if(tblsuccess) {
+				mvprintw(2, 0, "Could not create configuration tables.\n\r");
+				mvprintw(3, 0, "Error: %s", db_error);
+			}
+			else {
+				mvprintw(2, 0, "Configuration tables created successfully.\n\r");	
+			}
+		}
 	}
 
-	if(highlight == 1){
-		showConfig();
-	}
+	if(highlight == 3)
+		return 0;
 
 	getch();
 
-	return 0;
+	mainMenu();
 }
 
 void setupTerminal() {

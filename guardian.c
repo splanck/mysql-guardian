@@ -14,6 +14,7 @@ int canChangeColours = 0;
 char db_hostname[80];
 char db_username[25];
 char db_password[25];
+char db_error[1000];
 
 int main(int argc, char **argv) {
 	initialiseLog();

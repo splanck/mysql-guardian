@@ -6,11 +6,69 @@
 #include <mysql.h>
 
 extern char db_hostname[80];
-extern char db_username[25];
-extern char db_password[25];
+extern char db_username[80];
+extern char db_password[80];
+extern char db_error[1000];
+
+int createConfigDB() {
+	MYSQL *conn = mysql_init(NULL);
+
+  	if (conn == NULL) 
+  		return 1;
+
+  	if (mysql_real_connect(conn, db_hostname, db_username, db_password, 
+		NULL, 0, NULL, 0) == NULL) {
+      	strcpy(db_error, mysql_error(conn));
+      	mysql_close(conn);
+      	
+      	return 1;
+  	}  
+
+  	if (mysql_query(conn, "CREATE DATABASE mysql_guardian")) {
+      	strcpy(db_error, mysql_error(conn));
+      	mysql_close(conn);
+      	
+      	return 1;
+  	}
+
+  	mysql_close(conn);
+  	
+  	return 0;
+}
+
+int createConfigTables() {
+	MYSQL *conn = mysql_init(NULL);
+
+  	if (conn == NULL) 
+  		return 1;
+
+  	if (mysql_real_connect(conn, db_hostname, db_username, db_password, 
+		"mysql_guardian", 0, NULL, 0) == NULL) {
+      	strcpy(db_error, mysql_error(conn));
+      	mysql_close(conn);
+      	
+      	return 1;
+  	}  
+
+  	if (mysql_query(conn, "DROP TABLE IF EXISTS Servers")) {
+      	strcpy(db_error, mysql_error(conn));
+      	mysql_close(conn);
+      	
+      	return 1;
+  	}
+
+  	if (mysql_query(conn, "CREATE TABLE Servers(Id INT, Hostname TEXT, Port INT)")) {
+      	strcpy(db_error, mysql_error(conn));
+      	mysql_close(conn);
+      	
+      	return 1;
+  	}
+
+  	mysql_close(conn);
+}
 
 void getDBInfo() {
-	mvprintw(1, 0, "%s", mysql_get_client_info());
+	mvprintw(1, 0, "MySQL Server Version: %s", mysql_get_client_info());
 }
 
 void showConfig() {
