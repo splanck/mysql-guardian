@@ -11,10 +11,14 @@
 
 int colourSupport = 0;
 int canChangeColours = 0;
+char db_hostname[80];
+char db_usernamme[25];
+char db_password[25];
 
 int main(int argc, char **argv) {
 	initialiseLog();
-	
+	getConfig();
+
 	setupTerminal();
 	mainMenu();
 	
@@ -39,6 +43,10 @@ void initialiseLog() {
 
 	writeToLog(str);
 	writeToLog("MySQL Guardian has started.");
+}
+
+void getConfig() {
+	readConfig();
 }
 
 void cleanUpTasks() {

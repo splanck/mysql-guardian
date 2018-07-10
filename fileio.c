@@ -3,6 +3,10 @@
 #include <string.h>
 #include <time.h>
 
+extern char db_hostname[80];
+extern char db_usernamme[25];
+extern char db_password[25];
+
 int writeToLog(char logEntry[80]) {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
@@ -20,4 +24,34 @@ int writeToLog(char logEntry[80]) {
 	fclose(logFile);
 
 	return 0;
+}
+
+int readConfig() {
+	char host_buffer[1000];
+	char username_buffer[1000];
+	char password_buffer[1000];
+
+	FILE *configFile;
+
+	configFile = fopen(".mysql-guardian_rc", "r");
+
+	if (!configFile)
+		return 1;
+
+	fgets(host_buffer, 1000, configFile);
+	fgets(username_buffer, 1000, configFile);
+	fgets(password_buffer, 1000, configFile);
+
+	fclose(configFile);
+
+  	char *str;
+
+  	str = strtok(host_buffer, " ");
+	strcpy(strtok(host_buffer, " "), db_hostname);
+	str = strtok(username_buffer, " ");
+	strcpy(strtok(username_buffer, " "), db_usernamme);
+	str = strtok(password_buffer, " ");
+	strcpy(strtok(password_buffer, " "), db_password);
+  	
+  	return 0;
 }
