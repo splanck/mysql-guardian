@@ -1,1 +1,13 @@
-/*This is just a test*/ 
+/* main.c */
+main function
+
+/* interface.c */
+ncurses code 
+
+/* MySQL.c */
+database server access
+
+/* fileio.c */
+functions that read or write to file
+
+
