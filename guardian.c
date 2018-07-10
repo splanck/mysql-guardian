@@ -48,7 +48,7 @@ void initialiseLog() {
 void getConfig() {
 	if(readConfig()) {
 		printf("Could not read configuration file. Exiting,\n\r");
-
+		
 		exit(1);
 	}
 }

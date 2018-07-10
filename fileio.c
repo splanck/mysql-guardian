@@ -47,11 +47,11 @@ int readConfig() {
   	char *str;
 
   	str = strtok(host_buffer, " ");
-	strcpy(strtok(host_buffer, " "), db_hostname);
+	strcpy(db_hostname, strtok(NULL, " "));
 	str = strtok(username_buffer, " ");
-	strcpy(strtok(username_buffer, " "), db_username);
+	strcpy(db_username, strtok(NULL, " "));
 	str = strtok(password_buffer, " ");
-	strcpy(strtok(password_buffer, " "), db_password);
-  	
+	strcpy(db_password, strtok(NULL, " "));
+
   	return 0;
 }
