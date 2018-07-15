@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include "mysql.h"
+#include "interface.h"
 
 extern int colourSupport;
 extern int canChangeColours;
@@ -41,6 +42,7 @@ int mainMenu() {
   		"Show MySQL Version",
   		"Show Current Configuration",
   		"Create Configuration Database",
+  		"Add Server to Monitoring",
   		"Exit"
 	};
 
@@ -51,7 +53,7 @@ int mainMenu() {
 	{
 		attron(COLOR_PAIR(1));
 
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < 5; i++) {
 			if(i == highlight)
 				wattron(menuWin, A_REVERSE);
 
@@ -69,7 +71,7 @@ int mainMenu() {
 		if(choice == KEY_DOWN)
 			highlight++;
 
-		if(highlight == 4)
+		if(highlight == 5)
 			highlight = 0;
 
 		if(highlight == -1)
@@ -87,34 +89,74 @@ int mainMenu() {
 	if(highlight == 1)
 		showConfig();
 
-	if(highlight == 2) {
-		int dbsuccess = createConfigDB();
-
-		if(dbsuccess) {
-			mvprintw(1, 0, "Could not create configuration database.\n\r");
-			mvprintw(2, 0, "Error: %s", db_error);
-		}
-		else {
-			mvprintw(1, 0, "Configuration database created successfully.\n\r");	
-
-			int tblsuccess = createConfigTables();
-
-			if(tblsuccess) {
-				mvprintw(2, 0, "Could not create configuration tables.\n\r");
-				mvprintw(3, 0, "Error: %s", db_error);
-			}
-			else {
-				mvprintw(2, 0, "Configuration tables created successfully.\n\r");	
-			}
-		}
-	}
+	if(highlight == 2) 
+		createDB();
 
 	if(highlight == 3)
+		addServer();
+
+	if(highlight == 4)
 		return 0;
 
 	getch();
 
 	mainMenu();
+}
+
+void addServer() {
+	char serverName[80];
+
+	askQuestion("Server Name: ", serverName);
+
+	printw("%s", serverName);
+}
+
+void createDB() {
+	int dbsuccess = createConfigDB();
+
+	if(dbsuccess) {
+		mvprintw(1, 0, "Could not create configuration database.\n\r");
+		mvprintw(2, 0, "Error: %s", db_error);
+	}
+	else {
+		mvprintw(1, 0, "Configuration database created successfully.\n\r");	
+
+		int tblsuccess = createConfigTables();
+
+		if(tblsuccess) {
+			mvprintw(2, 0, "Could not create configuration tables.\n\r");
+			mvprintw(3, 0, "Error: %s", db_error);
+		}
+		else {
+			mvprintw(2, 0, "Configuration tables created successfully.\n\r");	
+		}
+	}
+}
+
+void askQuestion(char questionText[80], char *answer) {
+	int height = 4;
+	int width = 80;
+	int starty = 15;
+	int startx = 20;
+
+	char input[80];
+
+	init_pair(3, COLOR_WHITE, COLOR_MAGENTA);
+
+	WINDOW *questionWin = newwin(height, width, starty, startx);
+	box(questionWin, 0, 0);
+
+	wbkgd(questionWin, COLOR_PAIR(3));
+
+	wmove(questionWin, 1, 1);
+	mvwprintw(questionWin, 1, 1, questionText);
+	wrefresh(questionWin);
+
+	echo();
+	wgetstr(questionWin, input);
+	noecho();
+
+	strcpy(answer, input);
 }
 
 void setupTerminal() {

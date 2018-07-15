@@ -81,7 +81,7 @@ int createConfigTables() {
       	return 1;
   	}
 
-  	if (mysql_query(conn, "CREATE TABLE Servers(Id INT, Hostname TEXT, Port INT)")) {
+  	if (mysql_query(conn, "CREATE TABLE Servers(Id INT, Hostname TEXT, Port INT, Username TEXT, Password TEXT)")) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
