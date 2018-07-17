@@ -31,13 +31,13 @@ extern char db_password[25];
 
 // Writes an entry into the mysql_guardian.log file. It accepts a char array
 // as the string to be written to the log.
-int writeToLog(char logEntry[200]) {
+int writeLog(char logEntry[200], char filename[80]) {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 
 	FILE *logFile;
 
-	logFile = fopen("mysql-guardian.log", "a");
+	logFile = fopen(filename, "a");
 
 	if(!logFile)
 		return 1;
@@ -48,6 +48,20 @@ int writeToLog(char logEntry[200]) {
 	fclose(logFile);
 
 	return 0;
+}
+
+// Calls writeLog function to write a log entry to the general log file.
+// Returns true if an error occurred.
+int writeToLog(char logEntry[200])
+{
+	return writeLog(logEntry, "mysql-guardian.log");
+}
+
+// Calls writeLog function to write a log entry to the SQL command log file.
+// Returns true if an error occurred.
+int writeToSQLLog(char logEntry[200])
+{
+	return writeLog(logEntry, "mysql-guardian-sql.log");
 }
 
 // Reads the .mysql-guardian_rc configuration file and stores its valies 
