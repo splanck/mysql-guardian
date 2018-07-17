@@ -97,14 +97,14 @@ int createConfigTables() {
       	return 1;
   	}  
 
-  	if (mysql_query(conn, "DROP TABLE IF EXISTS Servers")) {
+  	if (mysql_query(conn, "DROP TABLE IF EXISTS servers")) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
       	return 1;
   	}
 
-  	if (mysql_query(conn, "CREATE TABLE Servers(Id INT, Hostname TEXT, Port INT, Username TEXT, Password TEXT)")) {
+  	if (mysql_query(conn, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)")) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
@@ -150,7 +150,7 @@ int addServerToTable() {
 	char* strPort = malloc(length + 1);
 	snprintf(strPort, length + 1, "%d", newPort);
 
-  	strcpy(sqlInsert, "INSERT INTO Servers VALUES(1, '");
+  	strcpy(sqlInsert, "INSERT INTO servers(hostname, port, username, password) VALUES('");
   	strcat(sqlInsert, newHostname);
   	strcat(sqlInsert, "', ");
   	strcat(sqlInsert, strPort);
