@@ -1,6 +1,8 @@
 /*
 	Copyright (c) 2018 - Stephen Planck and Alistair Packer
 
+	guardian.c - Contains startup and initialisation functions.
+
 	This file is part of MySQL Guardian.
 
     MySQL Guardian is free software: you can redistribute it and/or modify
@@ -28,13 +30,16 @@
 
 #define VERSION "0.01"
 
-int colourSupport = 0;
-int canChangeColours = 0;
-char db_hostname[80];
-char db_username[25];
-char db_password[25];
-char db_error[1000];
+int colourSupport = 0;		// True if terminal supports ncurses colour
+int canChangeColours = 0;	// True if terminal supports ncurses change colour 
+char db_hostname[80];		// Global variable for monitoring server hostname
+char db_username[25];		// Global variable for monitoring server user login
+char db_password[25];		// Global variable for monitoring server password
+char db_error[1000];		// Global variable to store database error messages
 
+// Calls functions to initialise the log, read configuration file, setup
+// ncurses terminal, and display the main menu. Also performs clean up tasks
+// upon exit.
 int main(int argc, char **argv) {
 	initialiseLog();
 	getConfig();
@@ -48,6 +53,7 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+// Writes start up message to log fiile.
 void initialiseLog() {
 	char str[80];
 	strcpy(str, "MySQL Guardian v");
@@ -65,6 +71,7 @@ void initialiseLog() {
 	writeToLog("MySQL Guardian has started.");
 }
 
+// Reads MySQL monitoring server configuration into memory using getConfig()
 void getConfig() {
 	if(readConfig()) {
 		printf("Could not read configuration file. Exiting,\n\r");
@@ -73,6 +80,7 @@ void getConfig() {
 	}
 }
 
+// Writes shutdown message to log file.
 void cleanUpTasks() {
 	writeToLog("MySQL Guardian has stopped.");
 }

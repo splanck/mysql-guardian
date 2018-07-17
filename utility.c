@@ -1,6 +1,8 @@
 /*
     Copyright (c) 2018 - Stephen Planck and Alistair Packer
 
+    utility.c - Contains utility functions used throughout the code.
+
     This file is part of MySQL Guardian.
 
     MySQL Guardian is free software: you can redistribute it and/or modify
@@ -21,6 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Utility functioon to remove characters from strings. Accepts a char as the
+// character to be removed and a char pointer as source string.
 void remove_char_from_string(char c, char *str) {
     int i = 0;
     int len = strlen(str) + 1;

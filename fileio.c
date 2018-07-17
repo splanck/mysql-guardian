@@ -1,6 +1,8 @@
 /*
 	Copyright (c) 2018 - Stephen Planck and Alistair Packer
 
+	fileio.c - Contains functions that read and write to the filesystem.
+
 	This file is part of MySQL Guardian.
 
     MySQL Guardian is free software: you can redistribute it and/or modify
@@ -27,6 +29,8 @@ extern char db_hostname[80];
 extern char db_username[25];
 extern char db_password[25];
 
+// Writes an entry into the mysql_guardian.log file. It accepts a char array
+// as the string to be written to the log.
 int writeToLog(char logEntry[200]) {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
@@ -46,6 +50,8 @@ int writeToLog(char logEntry[200]) {
 	return 0;
 }
 
+// Reads the .mysql-guardian_rc configuration file and stores its valies 
+// into global variables.
 int readConfig() {
 	char host_buffer[1000];
 	char username_buffer[1000];
@@ -84,6 +90,7 @@ int readConfig() {
   	return 0;
 }
 
+// Improved read config function that is not yet working.
 int readConfig2() {
 	char buffer[1000];
 

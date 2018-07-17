@@ -1,6 +1,8 @@
 /*
 	Copyright (c) 2018 - Stephen Planck and Alistair Packer
 
+	mysql.c - Contains functions that directly interact with the database.
+
 	This file is part of MySQL Guardian.
 
     MySQL Guardian is free software: you can redistribute it and/or modify
@@ -34,6 +36,7 @@ extern int newPort;
 extern char newUsername[80];
 extern char newPassword[80];
 
+// Creates configuration database on the monitoring server.
 int createConfigDB() {
 	MYSQL *conn = mysql_init(NULL);
 
@@ -76,6 +79,7 @@ int createConfigDB() {
   	return 0;
 }
 
+// Creates the servers table on the monitoring server.
 int createConfigTables() {
 	MYSQL *conn = mysql_init(NULL);
 
@@ -123,6 +127,7 @@ int createConfigTables() {
   	mysql_close(conn);
 }
 
+// Adds a new server into the servers table on the monitoring server.
 int addServerToTable() {
 	MYSQL *conn = mysql_init(NULL);
 
@@ -182,12 +187,14 @@ int addServerToTable() {
   	mysql_close(conn);
 }
 
+// Gets and displays the MySQL server version to the screen.
 void getDBInfo() {
 	mvprintw(1, 0, "MySQL Server Version: %s", mysql_get_client_info());
 
 	getch();
 }
 
+// Displays monitoring server configuration values to the screen.
 void showConfig() {
 	mvprintw(2, 0, "Hostname: %s", db_hostname);
 	mvprintw(3, 0, "Username: %s", db_username);

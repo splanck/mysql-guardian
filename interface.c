@@ -1,6 +1,8 @@
 /*
 	Copyright (c) 2018 - Stephen Planck and Alistair Packer
 
+	interface.c - Contains functions to implement ncurses user interface.
+
 	This file is part of MySQL Guardian.
 
     MySQL Guardian is free software: you can redistribute it and/or modify
@@ -28,12 +30,14 @@ extern int colourSupport;
 extern int canChangeColours;
 extern char db_error[1000];
 
-char newHostname[80] = "";
-int newPort = 3306;
-char newUsername[80] = "";
-char newPassword[80] = "";
-int addServerHighlight;
+char newHostname[80] = "";		// Stores new hostname for add server window
+int newPort = 3306;				// Stores new port for add server window
+char newUsername[80] = "";		// Stores new username for add server window
+char newPassword[80] = "";		// Stores new password for add server window
+int addServerHighlight;			// ID for currently highlighted field on add server window
 
+// Displays main menu, implements lightbar navigation, and calls functions
+// to execute selected menu item.
 int mainMenu() {
 	clear();
 
@@ -126,6 +130,8 @@ int mainMenu() {
 	mainMenu();
 }
 
+// Initialises new server variables, calls addServerMenu() to gather values,
+// and calls addServerToTable() to add new server to servers table.
 void addServer() {
 	strcpy(newHostname, "");
 	newPort = 3306;
@@ -156,6 +162,9 @@ void addServer() {
 	}
 }
 
+// Displays add server menu to connect data for new server, implements
+// lightbar navigation, accepts values from the user, and stores them in
+// global variables.
 int addServerMenu() {
 	int height = 8;
 	int width = 80;
@@ -287,6 +296,8 @@ int addServerMenu() {
 	return 0;
 }
 
+// Calls createConfigDB() and createConfigTables() to create monitoring 
+// database and server table. It then displays the results.
 void createDB() {
 	int dbsuccess = createConfigDB();
 
@@ -311,6 +322,9 @@ void createDB() {
 	getch();
 }
 
+// Function to display a window to the user to ask a question. It accepts
+// a char array with the desired question and a char pointer to store the 
+// response. Function not used yet.
 void askQuestion(char questionText[80], char *answer) {
 	int height = 4;
 	int width = 80;
@@ -337,6 +351,7 @@ void askQuestion(char questionText[80], char *answer) {
 	strcpy(answer, input);
 }
 
+// Initialises ncurses library and determines terminal colour capabilities.
 void setupTerminal() {
 	initscr();
 	noecho();
@@ -353,6 +368,7 @@ void setupTerminal() {
 	}
 }
 
+// Disables ncurses before exit.
 void cleanUpTerminal() {
 	endwin();
 }
