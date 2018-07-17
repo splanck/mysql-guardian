@@ -58,12 +58,15 @@ int createConfigDB() {
       	return 1;
   	}  
 
-  	if (mysql_query(conn, "CREATE DATABASE mysql_guardian")) {
+	char sqlcmd[500];
+	strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
+  	
+  	if (mysql_query(conn, sqlcmd)) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
 
       	writeToLog("Cannot create configuration database.");
-      	
+
       	char log[200];
       	strcpy(log, "Error: ");
       	strcat(log, db_error);
@@ -71,6 +74,8 @@ int createConfigDB() {
       	
       	return 1;
   	}
+
+  	writeToSQLLog(sqlcmd);
 
   	mysql_close(conn);
   	
@@ -101,19 +106,26 @@ int createConfigTables() {
       	return 1;
   	}  
 
-  	if (mysql_query(conn, "DROP TABLE IF EXISTS servers")) {
+  	char sqlcmd[500];
+	strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
+
+  	if (mysql_query(conn, sqlcmd)) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
       	return 1;
   	}
 
-  	if (mysql_query(conn, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)")) {
+  	writeToSQLLog(sqlcmd);
+
+  	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)");
+
+  	if (mysql_query(conn, sqlcmd)) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
       	writeToLog("Cannot create configuration tables.");
-      	
+
       	char log[200];
       	strcpy(log, "Error: ");
       	strcat(log, db_error);
@@ -123,6 +135,7 @@ int createConfigTables() {
   	}
 
   	writeToLog("Created configuration tables.");
+	writeToSQLLog(sqlcmd);
 
   	mysql_close(conn);
 }
@@ -149,30 +162,29 @@ int addServerToTable() {
       	return 1;
   	}
 
-  	char sqlInsert[500];
+  	char sqlcmd[500];
 
 	int length = snprintf(NULL, 0, "%d", newPort);
 	char* strPort = malloc(length + 1);
 	snprintf(strPort, length + 1, "%d", newPort);
 
-  	strcpy(sqlInsert, "INSERT INTO servers(hostname, port, username, password) VALUES('");
-  	strcat(sqlInsert, newHostname);
-  	strcat(sqlInsert, "', ");
-  	strcat(sqlInsert, strPort);
-  	strcat(sqlInsert, ", '");
-  	strcat(sqlInsert, newUsername);
-  	strcat(sqlInsert, "', '");
-  	strcat(sqlInsert, newPassword);
-  	strcat(sqlInsert, "')");
+  	strcpy(sqlcmd, "INSERT INTO servers(hostname, port, username, password) VALUES('");
+  	strcat(sqlcmd, newHostname);
+  	strcat(sqlcmd, "', ");
+  	strcat(sqlcmd, strPort);
+  	strcat(sqlcmd, ", '");
+  	strcat(sqlcmd, newUsername);
+  	strcat(sqlcmd, "', '");
+  	strcat(sqlcmd, newPassword);
+  	strcat(sqlcmd, "')");
 
   	free(strPort);
 
-  	if (mysql_query(conn, sqlInsert)) {
+  	if (mysql_query(conn, sqlcmd)) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
       	writeToLog("Cannot add server to database.");
-      	writeToLog(sqlInsert);
       	
       	char log[200];
       	strcpy(log, "Error: ");
@@ -183,7 +195,8 @@ int addServerToTable() {
   	}
 
   	writeToLog("Server added to monitoring.");
-
+	writeToSQLLog(sqlcmd);
+	
   	mysql_close(conn);
 }
 

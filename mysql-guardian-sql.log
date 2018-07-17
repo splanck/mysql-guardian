@@ -1,0 +1,6 @@
+2018-7-18 5:43:50: CREATE DATABASE mysql_guardian
+2018-7-18 5:47:28: INSERT INTO servers(hostname, port, username, password) VALUES('dumbsvr', 9999, 'jimmy', 'goon')
+2018-7-18 5:48:58: CREATE DATABASE mysql_guardian
+2018-7-18 5:48:58: DROP TABLE IF EXISTS servers
+2018-7-18 5:48:58: CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)
+2018-7-18 5:49:14: INSERT INTO servers(hostname, port, username, password) VALUES('localhost', 3306, 'root', 'kcnalp9271')
