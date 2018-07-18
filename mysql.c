@@ -70,6 +70,7 @@ int createConfigDB() {
       	strcpy(log, "Error: ");
       	strcat(log, db_error);
       	writeToLog(log);
+      	writeToSQLLog(sqlcmd);
       	
       	return 1;
   	}
@@ -111,6 +112,7 @@ int createConfigTables() {
   	if (mysql_query(conn, sqlcmd)) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
+      	writeToSQLLog(sqlcmd);
       	
       	return 1;
   	}
@@ -129,6 +131,7 @@ int createConfigTables() {
       	strcpy(log, "Error: ");
       	strcat(log, db_error);
       	writeToLog(log);
+      	writeToSQLLog(sqlcmd);
 
       	return 1;
   	}
@@ -189,6 +192,7 @@ int addServerToTable() {
       	strcpy(log, "Error: ");
       	strcat(log, db_error);
       	writeToLog(log);
+      	writeToSQLLog(sqlcmd);
 
       	return 1;
   	}
