@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
+#include <signal.h>
 #include "guardian.h"
 #include "mysql.h"
 #include "fileio.h"
@@ -45,6 +46,9 @@ int main(int argc, char **argv) {
 	getConfig();
 
 	setupTerminal();
+
+	signal(SIGWINCH, resizeHandler);
+	
 	mainMenu();
 	
 	cleanUpTerminal();

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
+#include <signal.h>
 #include "mysql.h"
 #include "interface.h"
 
@@ -349,6 +350,13 @@ void askQuestion(char questionText[80], char *answer) {
 	noecho();
 
 	strcpy(answer, input);
+}
+
+// Signal handler for terminal window resizing. Needs implemented.
+void resizeHandler(int sig)
+{
+	int nh, nw;
+	getmaxyx(stdscr, nh, nw);  /* get the new screen size */
 }
 
 // Initialises ncurses library and determines terminal colour capabilities.
