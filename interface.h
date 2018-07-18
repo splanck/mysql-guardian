@@ -25,3 +25,5 @@ void addServer();
 int addServerMenu();
 void askQuestion(char questionText[80], char *answer);
 void resizeHandler(int);
+void showConfig();
+void showDBVersion();

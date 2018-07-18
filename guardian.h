@@ -20,3 +20,12 @@
 void initialiseLog();
 void cleanUpTasks();
 void getConfig();
+
+typedef struct server dbserver;
+
+struct server {
+	char *hostname;
+	int port;
+	char *username;
+	char *password;
+};

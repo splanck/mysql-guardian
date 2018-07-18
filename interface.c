@@ -5,18 +5,18 @@
 
 	This file is part of MySQL Guardian.
 
-    MySQL Guardian is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    any later version.
+	MySQL Guardian is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 2 of the License, or
+	any later version.
 
-    MySQL Guardian is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	MySQL Guardian is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -24,12 +24,14 @@
 #include <string.h>
 #include <ncurses.h>
 #include <signal.h>
+#include "guardian.h"
 #include "mysql.h"
 #include "interface.h"
 
 extern int colourSupport;
 extern int canChangeColours;
 extern char db_error[1000];
+extern dbserver configServer;
 
 char newHostname[80] = "";		// Stores new hostname for add server window
 int newPort = 3306;				// Stores new port for add server window
@@ -114,7 +116,7 @@ int mainMenu() {
 	}
 
 	if(highlight == 0)
-		getDBInfo();
+		showDBVersion();
 
 	if(highlight == 1)
 		showConfig();
@@ -350,6 +352,25 @@ void askQuestion(char questionText[80], char *answer) {
 	noecho();
 
 	strcpy(answer, input);
+}
+
+// Displays monitoring server configuration values to the screen.
+void showConfig() {
+	mvprintw(2, 0, "Hostname: %s", configServer.hostname);
+	mvprintw(3, 0, "Username: %s", configServer.username);
+	mvprintw(4, 0, "Password: %s", configServer.password);
+
+	getch();
+}
+
+void showDBVersion() {
+	char *dbversion = malloc(100);
+
+	getDBVersion(dbversion);
+
+	mvprintw(1, 0, "MySQL Server Version: %s", dbversion);
+
+	getch();
 }
 
 // Signal handler for terminal window resizing. Needs implemented.

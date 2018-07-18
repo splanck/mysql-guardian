@@ -5,18 +5,18 @@
 
 	This file is part of MySQL Guardian.
 
-    MySQL Guardian is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    any later version.
+	MySQL Guardian is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 2 of the License, or
+	any later version.
 
-    MySQL Guardian is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	MySQL Guardian is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -24,10 +24,6 @@
 #include <string.h>
 #include <time.h>
 #include "utility.h"
-
-extern char db_hostname[80];
-extern char db_username[25];
-extern char db_password[25];
 
 // Writes an entry into the mysql_guardian.log file. It accepts a char array
 // as the string to be written to the log.
@@ -66,11 +62,11 @@ int writeToSQLLog(char logEntry[200])
 
 // Reads the .mysql-guardian_rc configuration file and stores its valies 
 // into global variables.
-int readConfig() {
+int readConfig(char *hostname, char *username, char *password) {
 	char host_buffer[1000];
 	char username_buffer[1000];
 	char password_buffer[1000];
-
+	
 	FILE *configFile;
 
 	configFile = fopen(".mysql-guardian_rc", "r");
@@ -89,17 +85,17 @@ int readConfig() {
   	str = strtok(host_buffer, " ");
   	str = strtok(NULL, " ");
   	remove_char_from_string('\n', str);
-	strcpy(db_hostname, str);
+	strcpy(hostname, str);
 
 	str = strtok(username_buffer, " ");
   	str = strtok(NULL, " ");
   	remove_char_from_string('\n', str);
-	strcpy(db_username, str);
+	strcpy(username, str);
 
 	str = strtok(password_buffer, " ");
   	str = strtok(NULL, " ");
   	remove_char_from_string('\n', str);
-	strcpy(db_password, str);
+	strcpy(password, str);
 
   	return 0;
 }
@@ -107,6 +103,9 @@ int readConfig() {
 // Improved read config function that is not yet working.
 int readConfig2() {
 	char buffer[1000];
+	char cfg_hostname[80];
+	char cfg_username[25];
+	char cfg_password[25];
 
 	FILE *configFile;
 
@@ -121,11 +120,11 @@ int readConfig2() {
 		str = strtok(buffer, " ");
 
 		if(strcmp(str, "Hostname"))
-			strcpy(db_hostname, strtok(NULL, " "));
+			strcpy(cfg_hostname, strtok(NULL, " "));
 		else if(strcmp(str, "Username"))
-			strcpy(db_username, strtok(NULL, " "));
+			strcpy(cfg_username, strtok(NULL, " "));
 		else if(strcmp(str, "Password"))
-			strcpy(db_password, strtok(NULL, " "));
+			strcpy(cfg_password, strtok(NULL, " "));
 	}
 
 	fclose(configFile);

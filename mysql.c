@@ -25,16 +25,15 @@
 #include <ncurses.h>
 #include <my_global.h>
 #include <mysql.h>
+#include "guardian.h"
 #include "fileio.h"
 
-extern char db_hostname[80];
-extern char db_username[80];
-extern char db_password[80];
 extern char db_error[1000];
 extern char newHostname[80];
 extern int newPort;
 extern char newUsername[80];
 extern char newPassword[80];
+extern dbserver configServer;
 
 // Creates configuration database on the monitoring server.
 int createConfigDB() {
@@ -43,8 +42,8 @@ int createConfigDB() {
   	if (conn == NULL) 
   		return 1;
 
-  	if (mysql_real_connect(conn, db_hostname, db_username, db_password, 
-		NULL, 0, NULL, 0) == NULL) {
+  	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
+  		configServer.password, NULL, 0, NULL, 0) == NULL) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
@@ -91,8 +90,8 @@ int createConfigTables() {
   	if (conn == NULL) 
   		return 1;
 
-  	if (mysql_real_connect(conn, db_hostname, db_username, db_password, 
-		"mysql_guardian", 0, NULL, 0) == NULL) {
+  	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
+  		configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
@@ -147,8 +146,8 @@ int addServerToTable() {
   	if (conn == NULL) 
   		return 1;
 
-  	if (mysql_real_connect(conn, db_hostname, db_username, db_password, 
-		"mysql_guardian", 0, NULL, 0) == NULL) {
+  	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
+  		configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
@@ -201,17 +200,6 @@ int addServerToTable() {
 }
 
 // Gets and displays the MySQL server version to the screen.
-void getDBInfo() {
-	mvprintw(1, 0, "MySQL Server Version: %s", mysql_get_client_info());
-
-	getch();
-}
-
-// Displays monitoring server configuration values to the screen.
-void showConfig() {
-	mvprintw(2, 0, "Hostname: %s", db_hostname);
-	mvprintw(3, 0, "Username: %s", db_username);
-	mvprintw(4, 0, "Password: %s", db_password);
-
-	getch();
+void getDBVersion(char *dbversion) {
+	strcpy(dbversion, mysql_get_client_info());
 }
