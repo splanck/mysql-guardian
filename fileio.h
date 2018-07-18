@@ -20,5 +20,5 @@
 int writeLog(char logEntry[200], char filename[80]);
 int writeToLog(char logEntry[200]);
 int writeToSQLLog(char logEntry[200]);
-int readConfig();
+int readConfig(char *hostname, char *username, char *password);
 int readConfig2();
