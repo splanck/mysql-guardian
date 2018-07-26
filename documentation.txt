@@ -1,6 +1,6 @@
 /* main.c */
 main function
-
+test
 /* interface.c */
 ncurses code 
 
