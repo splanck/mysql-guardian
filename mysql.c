@@ -1,9 +1,9 @@
 /*
-	Copyright (c) 2018 - Stephen Planck and Alistair Packer
-
-	mysql.c - Contains functions that directly interact with the database.
-
-	This file is part of MySQL Guardian.
+    Copyright (c) 2018 - Stephen Planck and Alistair Packer
+    
+    mysql.c - Contains functions that directly interact with the database.
+    
+    This file is part of MySQL Guardian.
 
     MySQL Guardian is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,13 +37,13 @@ extern dbserver configServer;
 
 // Creates configuration database on the monitoring server.
 int createConfigDB() {
-	MYSQL *conn = mysql_init(NULL);
+    MYSQL *conn = mysql_init(NULL);
 
   	if (conn == NULL) 
-  		return 1;
+  		  return 1;
 
   	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-  		configServer.password, NULL, 0, NULL, 0) == NULL) {
+  		  configServer.password, NULL, 0, NULL, 0) == NULL) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
@@ -57,8 +57,8 @@ int createConfigDB() {
       	return 1;
   	}  
 
-	char sqlcmd[500];
-	strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
+    char sqlcmd[500];
+    strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
   	
   	if (mysql_query(conn, sqlcmd)) {
       	strcpy(db_error, mysql_error(conn));
@@ -86,13 +86,13 @@ int createConfigDB() {
 
 // Creates the servers table on the monitoring server.
 int createConfigTables() {
-	MYSQL *conn = mysql_init(NULL);
+    MYSQL *conn = mysql_init(NULL);
 
   	if (conn == NULL) 
-  		return 1;
+  		  return 1;
 
   	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-  		configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
+  		  configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
@@ -107,7 +107,7 @@ int createConfigTables() {
   	}  
 
   	char sqlcmd[500];
-	strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
+    strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
 
   	if (mysql_query(conn, sqlcmd)) {
       	strcpy(db_error, mysql_error(conn));
@@ -137,20 +137,20 @@ int createConfigTables() {
   	}
 
   	writeToLog("Created configuration tables.");
-	writeToSQLLog(sqlcmd);
+    writeToSQLLog(sqlcmd);
 
   	mysql_close(conn);
 }
 
 // Adds a new server into the servers table on the monitoring server.
 int addServerToTable() {
-	MYSQL *conn = mysql_init(NULL);
+    MYSQL *conn = mysql_init(NULL);
 
   	if (conn == NULL) 
   		return 1;
 
   	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-  		configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
+  		  configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
       	strcpy(db_error, mysql_error(conn));
       	mysql_close(conn);
       	
@@ -166,9 +166,9 @@ int addServerToTable() {
 
   	char sqlcmd[500];
 
-	int length = snprintf(NULL, 0, "%d", newPort);
-	char* strPort = malloc(length + 1);
-	snprintf(strPort, length + 1, "%d", newPort);
+    int length = snprintf(NULL, 0, "%d", newPort);
+    char* strPort = malloc(length + 1);
+    snprintf(strPort, length + 1, "%d", newPort);
 
   	strcpy(sqlcmd, "INSERT INTO servers(hostname, port, username, password) VALUES('");
   	strcat(sqlcmd, newHostname);
@@ -198,12 +198,69 @@ int addServerToTable() {
   	}
 
   	writeToLog("Server added to monitoring.");
-	writeToSQLLog(sqlcmd);
+    writeToSQLLog(sqlcmd);
 	
   	mysql_close(conn);
 }
 
+// Determines the number of servers in the monitoring database and returns the
+// value as an int.
+int getMonitoredServers() {
+    MYSQL *conn = mysql_init(NULL);
+
+    if (conn == NULL) 
+        return 1;
+
+    if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
+        strcpy(db_error, mysql_error(conn));
+        mysql_close(conn);
+        
+        writeToLog("Cannot connect to MySQL Server.");
+        
+        char log[200];
+        strcpy(log, "Error: ");
+        strcat(log, db_error);
+        writeToLog(log);
+        
+        return 1;
+    }
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "SELECT COUNT(ID) FROM servers");
+
+    if (mysql_query(conn, sqlcmd)) {
+        strcpy(db_error, mysql_error(conn));
+        mysql_close(conn);
+        
+        writeToLog("Cannot determine number of servers in monitoring table.");
+
+        char log[200];
+        strcpy(log, "Error: ");
+        strcat(log, db_error);
+        writeToLog(log);
+        writeToSQLLog(sqlcmd);
+
+        return -1;
+    }
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result); 
+
+    int rows = atoi(row[0]);
+
+    mysql_free_result(result);
+
+    writeToSQLLog(sqlcmd);
+
+    mysql_close(conn);
+
+    return rows;
+}
+
 // Gets and displays the MySQL server version to the screen.
 void getDBVersion(char *dbversion) {
-	strcpy(dbversion, mysql_get_client_info());
+    strcpy(dbversion, mysql_get_client_info());
 }
