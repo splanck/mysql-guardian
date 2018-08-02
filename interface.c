@@ -75,6 +75,7 @@ int mainMenu() {
   		"Show Current Configuration",
   		"Create Configuration Database",
   		"Add Server to Monitoring",
+  		"Count Servers in Monitoring",
   		"Exit"
 	};
 
@@ -85,7 +86,7 @@ int mainMenu() {
 	{
 		attron(COLOR_PAIR(1));
 
-		for(int i = 0; i < 5; i++) {
+		for(int i = 0; i < 6; i++) {
 			if(i == highlight)
 				wattron(menuWin, A_REVERSE);
 
@@ -103,11 +104,11 @@ int mainMenu() {
 		if(choice == KEY_DOWN)
 			highlight++;
 
-		if(highlight == 5)
+		if(highlight == 6)
 			highlight = 0;
 
 		if(highlight == -1)
-			highlight = 4;
+			highlight = 5;
 
 		if(choice == 10)
 			break;
@@ -128,9 +129,22 @@ int mainMenu() {
 		addServer();
 
 	if(highlight == 4)
+		countServers();
+
+	if(highlight == 5)
 		return 0;
 
 	mainMenu();
+}
+
+// Count servers in monitoring and display the count.
+
+void countServers() {
+	int x = getMonitoredServers();
+
+	mvprintw(1, 0, "Total servers in monitoring: %d\n\r", x);
+
+	getch();
 }
 
 // Initialises new server variables, calls addServerMenu() to gather values,
