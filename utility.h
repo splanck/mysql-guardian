@@ -17,4 +17,14 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+struct myserver {
+    int id;
+    char *hostname;
+    int port;
+    char *username;
+    char *password;
+    struct myserver *next;
+};
+
+void addServerNode(int id, char *hostname, int port, char *username, char *password);
 void remove_char_from_string(char c, char *str);

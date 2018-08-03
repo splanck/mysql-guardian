@@ -22,6 +22,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "utility.h"
+
+struct myserver *pFirst = NULL;
+struct myserver *pLast = NULL;
+
+// Adds a server to the end of the linked list based on the parameters passed.
+void addServerNode(int id, char *hostname, int port, char *username, char *password) {
+    struct myserver *pNewNode = malloc(sizeof(struct myserver));
+
+    strcpy(pNewNode->hostname, hostname);
+    strcpy(pNewNode->username, username);
+    strcpy(pNewNode->password, password);
+    
+    pNewNode->id = id;
+    pNewNode->port = port;
+    pNewNode->next = NULL;
+
+    if(pFirst == NULL) {
+        pFirst = pLast = pNewNode;
+    }
+    else {
+        pLast->next = pNewNode;
+        pLast = pNewNode;
+    }
+}
 
 // Utility functioon to remove characters from strings. Accepts a char as the
 // character to be removed and a char pointer as source string.
