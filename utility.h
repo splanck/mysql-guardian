@@ -19,10 +19,10 @@
 
 struct myserver {
     int id;
-    char *hostname;
+    char hostname[80];
     int port;
-    char *username;
-    char *password;
+    char username[25];
+    char password[25];
     struct myserver *next;
 };
 

@@ -27,6 +27,7 @@
 #include <mysql.h>
 #include "guardian.h"
 #include "fileio.h"
+#include "utility.h"
 
 extern char db_error[1000];
 extern char newHostname[80];
@@ -205,7 +206,7 @@ int addServerToTable() {
 
 // Determines the number of servers in the monitoring database and returns the
 // value as an int.
-int getMonitoredServers() {
+int getMonitoredServersCount() {
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) 
@@ -258,6 +259,86 @@ int getMonitoredServers() {
     mysql_close(conn);
 
     return rows;
+}
+
+int populateMonitoredServersList() {
+    MYSQL *conn = mysql_init(NULL);
+
+    if (conn == NULL) 
+        return 1;
+
+    if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
+        strcpy(db_error, mysql_error(conn));
+        mysql_close(conn);
+        
+        writeToLog("Cannot connect to MySQL Server.");
+        
+        char log[200];
+        strcpy(log, "Error: ");
+        strcat(log, db_error);
+        writeToLog(log);
+        
+        return 1;
+    }
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "SELECT id, hostname, port, username, password FROM servers");
+
+    if (mysql_query(conn, sqlcmd)) {
+        strcpy(db_error, mysql_error(conn));
+        mysql_close(conn);
+        
+        writeToLog("Cannot determine number of servers in monitoring table.");
+
+        char log[200];
+        strcpy(log, "Error: ");
+        strcat(log, db_error);
+        writeToLog(log);
+        writeToSQLLog(sqlcmd);
+
+        return -1;
+    }
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    if(result == NULL) {
+        strcpy(db_error, mysql_error(conn));
+        mysql_close(conn);
+        
+        writeToLog("Cannot determine number of servers in monitoring table.");
+
+        char log[200];
+        strcpy(log, "Error: ");
+        strcat(log, db_error);
+        writeToLog(log);
+        writeToSQLLog(sqlcmd);
+
+        return -1;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    
+    MYSQL_ROW row;
+
+    while (row = mysql_fetch_row(result)) 
+    { 
+        int id = atoi(row[0]);
+        char *hostname = row[1];
+        int port = atoi(row[2]);
+        char *username = row[3];
+        char *password = row[4];
+
+        addServerNode(id, hostname, port, username, password);
+    }
+
+    mysql_free_result(result);
+
+    writeToSQLLog(sqlcmd);
+
+    mysql_close(conn);
+
+    return 0;
 }
 
 // Gets and displays the MySQL server version to the screen.

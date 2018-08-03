@@ -27,11 +27,15 @@
 #include "guardian.h"
 #include "mysql.h"
 #include "interface.h"
+#include "utility.h"
 
 extern int colourSupport;
 extern int canChangeColours;
 extern char db_error[1000];
 extern dbserver configServer;
+
+extern struct myserver *pFirst;
+extern struct myserver *pLast;
 
 char newHostname[80] = "";		// Stores new hostname for add server window
 int newPort = 3306;				// Stores new port for add server window
@@ -75,7 +79,7 @@ int mainMenu() {
   		"Show Current Configuration",
   		"Create Configuration Database",
   		"Add Server to Monitoring",
-  		"Count Servers in Monitoring",
+  		"Show Monitored Servers List",
   		"Exit"
 	};
 
@@ -129,7 +133,7 @@ int mainMenu() {
 		addServer();
 
 	if(highlight == 4)
-		countServers();
+		showServersList();
 
 	if(highlight == 5)
 		return 0;
@@ -139,11 +143,25 @@ int mainMenu() {
 
 // Count servers in monitoring and display the count.
 
-void countServers() {
-	int x = getMonitoredServers();
+void showServersList() {
+	if(pFirst == NULL) {
+		int success = populateMonitoredServersList();		
+	}
 
-	mvprintw(1, 0, "Total servers in monitoring: %d\n\r", x);
+	struct myserver *pTemp = pFirst;
 
+	mvprintw(1, 0, "Server List:");
+	
+	int i = 0;
+
+	while(pTemp != NULL) {
+		mvprintw(i + 3, 0, "%s %d %s %s", pTemp->hostname, pTemp->port, pTemp->username,
+			pTemp->password);
+
+		pTemp = pTemp->next;
+		i++;
+	}
+	
 	getch();
 }
 

@@ -27,4 +27,4 @@ void askQuestion(char questionText[80], char *answer);
 void resizeHandler(int);
 void showConfig();
 void showDBVersion();
-void countServers();
+void showServersList();

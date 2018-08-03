@@ -20,5 +20,6 @@
 int createConfigDB();
 int createConfigTables();
 int addServerToTable();
-int getMonitoredServers();
+int getMonitoredServersCount();
+int populateMonitoredServersList();
 void getDBVersion(char *dbversion);
