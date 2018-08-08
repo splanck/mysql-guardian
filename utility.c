@@ -22,7 +22,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <netinet/ip_icmp.h>
+#include <time.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <time.h>
 #include "utility.h"
+
+struct ping_packet {
+    struct icmphdr hdr;
+    char msg[PING_PKT_S-sizeof(struct icmphdr)];
+};
 
 struct myserver *pFirst = NULL;
 struct myserver *pLast = NULL;
@@ -59,4 +75,159 @@ void remove_char_from_string(char c, char *str) {
             strncpy(&str[i], &str[i + 1], len - i);
         }
     }
+}
+
+// Calculates checksum for packet and returns the result.
+unsigned short checkSum(void *buffer, int len) {    
+    unsigned short *buf = buffer;
+    unsigned int sum = 0;
+    unsigned short result;
+ 
+    for (sum = 0; len > 1; len -= 2)
+        sum += *buf++;
+    
+    if (len == 1)
+        sum += *(unsigned char*)buf;
+    
+    sum = (sum >> 16) + (sum & 0xFFFF);
+    sum += (sum >> 16);
+    
+    result = ~sum;
+    
+    return result;
+}
+
+// Accepts a hostname, performs a DNS lookup and returns the IP address if
+// found. Otherwise returns NULL.
+char *DNSLookup(char *addr_host, struct sockaddr_in *addr_con) {
+    struct hostent *host_entity;
+    
+    char *ip = (char*) malloc(NI_MAXHOST*sizeof(char));
+ 
+    if ((host_entity = gethostbyname(addr_host)) == NULL)
+        return NULL;
+     
+    strcpy(ip, inet_ntoa(*(struct in_addr *) host_entity->h_addr));
+ 
+    (*addr_con).sin_family = host_entity->h_addrtype;
+    (*addr_con).sin_port = htons (PORT_NO);
+    (*addr_con).sin_addr.s_addr  = *(long*)host_entity->h_addr;
+ 
+    return ip;
+}
+
+// Accepts an IP address, performs a reverse DNS lookup for the hostname,
+// and returns it. Otherwise returns NULL.
+char* reverseDNSLookup(char *ip_addr) {
+    struct sockaddr_in temp_addr;    
+
+    socklen_t len;
+
+    char buf[NI_MAXHOST];
+    char *ret_buf;
+ 
+    temp_addr.sin_family = AF_INET;
+    temp_addr.sin_addr.s_addr = inet_addr(ip_addr);
+
+    len = sizeof(struct sockaddr_in);
+ 
+    if (getnameinfo((struct sockaddr *) &temp_addr, len, buf, sizeof(buf), NULL, 0, NI_NAMEREQD))
+        return NULL;
+
+    ret_buf = (char*)malloc((strlen(buf) +1)*sizeof(char));
+    strcpy(ret_buf, buf);
+    
+    return ret_buf;
+}
+ 
+// Pings a host to determine if it is online and returns 0 if it can be reached
+// or returns a -1 it the server is unreachable.
+int sendPing(int p_sockfd, struct sockaddr_in *p_addr, char *p_dom, char *p_ip, char *rev_host) {
+    int success = 0;
+    int retries = 0;
+    int ttl_val = 64;
+    int msg_count = 0;
+    int i = 1;
+    int addr_len = 1;
+    int msg_received_count = 0;
+     
+    struct ping_packet pckt;
+    struct sockaddr_in r_addr;
+    struct timeval tv_out;
+ 
+    if (setsockopt(p_sockfd, SOL_IP, IP_TTL, &ttl_val, sizeof(ttl_val)) != 0)
+        return -1;
+ 
+    setsockopt(p_sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv_out, sizeof tv_out);
+ 
+    while(1) {
+        bzero(&pckt, sizeof(pckt));
+         
+        pckt.hdr.type = ICMP_ECHO;
+        pckt.hdr.un.echo.id = getpid();
+         
+        for (i = 0; i < sizeof(pckt.msg) - 1; i++)
+            pckt.msg[i] = i+'0';
+         
+        pckt.msg[i] = 0;
+        pckt.hdr.un.echo.sequence = msg_count++;
+        pckt.hdr.checksum = checkSum(&pckt, sizeof(pckt));
+ 
+        if (sendto(p_sockfd, &pckt, sizeof(pckt), 0, (struct sockaddr*) p_addr, 
+            sizeof(*p_addr)) <= 0) {
+            success = 0;
+        }
+ 
+        addr_len = sizeof(r_addr);
+ 
+        if (recvfrom(p_sockfd, &pckt, sizeof(pckt), 0, 
+             (struct sockaddr*)&r_addr, &addr_len) <= 0 && msg_count > 1) {
+            retries++;
+            success = 0;
+        }
+        else {
+            if(!(pckt.hdr.type == 69 && pckt.hdr.code == 0)) {
+                success = 0;
+                retries++;
+            }
+            else {
+                success = 1;
+                
+                return 0;
+            }
+        }
+
+        if(retries == 3)
+            return -1;
+    }
+}
+ 
+// Accepts a server host name and checks to see if it is reachable. Returns
+// 0 on success and -1 on failure.
+int pingServer(char *hostname) {
+    struct sockaddr_in addr_con;
+
+    int sockfd;
+    int addrlen = sizeof(addr_con);
+    
+    char *ip_addr;
+    char *reverse_host;
+    char net_buf[NI_MAXHOST];
+ 
+    ip_addr = DNSLookup(hostname, &addr_con);
+    
+    if(ip_addr == NULL)
+        return -1;
+ 
+    reverse_host = reverseDNSLookup(ip_addr);
+
+    sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    
+    if(sockfd < 0)
+        return -1;
+ 
+    if(sendPing(sockfd, &addr_con, reverse_host, ip_addr, hostname) == 0) 
+        return 0;
+    else
+        return -1;
 }

@@ -17,6 +17,11 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#define PING_PKT_S 64
+#define PORT_NO 0 
+#define PING_SLEEP_RATE 1000000
+#define RECV_TIMEOUT 1 
+
 struct myserver {
     int id;
     char hostname[80];
@@ -28,3 +33,6 @@ struct myserver {
 
 void addServerNode(int id, char *hostname, int port, char *username, char *password);
 void remove_char_from_string(char c, char *str);
+unsigned short checkSum(void *buffer, int len);
+char* reverseDNSLookup(char *ip_addr);
+int pingServer(char *hostname);

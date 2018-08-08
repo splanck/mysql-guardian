@@ -28,3 +28,4 @@ void resizeHandler(int);
 void showConfig();
 void showDBVersion();
 void showServersList();
+void checkServerOnline();

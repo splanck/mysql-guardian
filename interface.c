@@ -61,9 +61,9 @@ int mainMenu() {
 	attroff(COLOR_PAIR(1));
 	refresh();
 	
-	int height = 9;
+	int height = 11;
 	int width = 40;
-	int starty = 5;
+	int starty = 3;
 	int startx = 35;
 
 	WINDOW *menuWin = newwin(height, width, starty, startx);
@@ -80,6 +80,7 @@ int mainMenu() {
   		"Create Configuration Database",
   		"Add Server to Monitoring",
   		"Show Monitored Servers List",
+  		"Check localhost",
   		"Exit"
 	};
 
@@ -90,7 +91,7 @@ int mainMenu() {
 	{
 		attron(COLOR_PAIR(1));
 
-		for(int i = 0; i < 6; i++) {
+		for(int i = 0; i < 7; i++) {
 			if(i == highlight)
 				wattron(menuWin, A_REVERSE);
 
@@ -108,11 +109,11 @@ int mainMenu() {
 		if(choice == KEY_DOWN)
 			highlight++;
 
-		if(highlight == 6)
+		if(highlight == 7)
 			highlight = 0;
 
 		if(highlight == -1)
-			highlight = 5;
+			highlight = 6;
 
 		if(choice == 10)
 			break;
@@ -136,13 +137,28 @@ int mainMenu() {
 		showServersList();
 
 	if(highlight == 5)
+		checkServerOnline();
+
+	if(highlight == 6)
 		return 0;
 
 	mainMenu();
 }
 
-// Count servers in monitoring and display the count.
+void checkServerOnline() {
+	int checkSuccess = pingServer("localhost");
 
+	if(checkSuccess == 0) {
+		mvprintw(1, 0, "Server is online.\n\r");
+	}
+	else {
+		mvprintw(1, 0, "Server is not reachable.\n\r");
+	}
+
+	getch();
+}
+
+// Count servers in monitoring and display the count.
 void showServersList() {
 	if(pFirst == NULL) {
 		int success = populateMonitoredServersList();		
