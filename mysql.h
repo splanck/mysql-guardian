@@ -17,6 +17,10 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <mysql.h>
+
+MYSQL* connectDB(char *hostname, char *username, char *password, char *database);
+int executeQuery(MYSQL *conn, char *sql, char *errorMsg);
 int createConfigDB();
 int createConfigTables();
 int addServerToTable();

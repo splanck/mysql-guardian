@@ -36,47 +36,75 @@ extern char newUsername[80];
 extern char newPassword[80];
 extern dbserver configServer;
 
-// Creates configuration database on the monitoring server.
-int createConfigDB() {
+// Accepts a hostname, username, password, and database name and returns a pointer 
+// to a new MYSQL connnection. Pass in a NULL value for the database name if you
+// don't want to connect to a specific database. Function returns NULL if connection
+// was unsuccessful.
+MYSQL* connectDB(char *hostname, char *username, char *password, char *database) {
     MYSQL *conn = mysql_init(NULL);
 
-  	if (conn == NULL) 
-  		  return 1;
+    if (conn == NULL) 
+        return NULL;
 
-  	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-  		  configServer.password, NULL, 0, NULL, 0) == NULL) {
-      	strcpy(db_error, mysql_error(conn));
-      	mysql_close(conn);
-      	
-      	writeToLog("Cannot connect to MySQL Server.");
-      	
-      	char log[200];
-      	strcpy(log, "Error: ");
-      	strcat(log, db_error);
-      	writeToLog(log);
+    if (mysql_real_connect(conn, hostname, username, password, database, 0, NULL, 0) == NULL) {
+        strcpy(db_error, mysql_error(conn));
+        mysql_close(conn);
+        
+        writeToLog("Cannot connect to MySQL Server.");
+        
+        char log[200];
+        strcpy(log, "Error: ");
+        strcat(log, db_error);
+        writeToLog(log);
 
-      	return 1;
-  	}  
+        return NULL;
+    }  
+
+    return conn;
+}
+
+// Accepts a pointer to a MYSQL connection, a SQL statement to execute against the
+// database, and an error message to print to the log on failure. Executes the
+// provided SQL statement and returns 0 on success or 1 on failure.
+int executeQuery(MYSQL *conn, char *sql, char *errorMsg) {
+    if (mysql_query(conn, sql)) {
+        strcpy(db_error, mysql_error(conn));
+        mysql_close(conn);
+
+        if(errorMsg != NULL)
+            writeToLog(errorMsg);
+
+        char log[200];
+        strcpy(log, "Error: ");
+        strcat(log, db_error);
+        writeToLog(log);
+        writeToSQLLog(sql);
+        
+        return 1;
+    }
+    else {
+        writeToSQLLog(sql);
+
+        return 0;
+    }
+}
+
+// Creates configuration database on the monitoring server.
+int createConfigDB() {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, NULL);
+
+    if(conn == NULL)
+        return 1;
 
     char sqlcmd[500];
+    char errorMsg[100];
+
     strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
+    strcpy(errorMsg, "Cannot create configuration database.");
   	
-  	if (mysql_query(conn, sqlcmd)) {
-      	strcpy(db_error, mysql_error(conn));
-      	mysql_close(conn);
-
-      	writeToLog("Cannot create configuration database.");
-
-      	char log[200];
-      	strcpy(log, "Error: ");
-      	strcat(log, db_error);
-      	writeToLog(log);
-      	writeToSQLLog(sqlcmd);
-      	
-      	return 1;
-  	}
-
-  	writeToSQLLog(sqlcmd);
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
 
   	mysql_close(conn);
   	
@@ -87,83 +115,38 @@ int createConfigDB() {
 
 // Creates the servers table on the monitoring server.
 int createConfigTables() {
-    MYSQL *conn = mysql_init(NULL);
-
-  	if (conn == NULL) 
-  		  return 1;
-
-  	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-  		  configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
-      	strcpy(db_error, mysql_error(conn));
-      	mysql_close(conn);
-      	
-      	writeToLog("Cannot connect to MySQL Server.");
-      	
-      	char log[200];
-      	strcpy(log, "Error: ");
-      	strcat(log, db_error);
-      	writeToLog(log);
-      	
-      	return 1;
-  	}  
-
-  	char sqlcmd[500];
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+    
+    if(conn == NULL)
+        return 1;
+  	
+    char sqlcmd[500];
     strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
 
-  	if (mysql_query(conn, sqlcmd)) {
-      	strcpy(db_error, mysql_error(conn));
-      	mysql_close(conn);
-      	writeToSQLLog(sqlcmd);
-      	
-      	return 1;
-  	}
-
-  	writeToSQLLog(sqlcmd);
+    if(executeQuery(conn, sqlcmd, NULL) == 1)
+        return 1;
 
   	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)");
 
-  	if (mysql_query(conn, sqlcmd)) {
-      	strcpy(db_error, mysql_error(conn));
-      	mysql_close(conn);
-      	
-      	writeToLog("Cannot create configuration tables.");
-
-      	char log[200];
-      	strcpy(log, "Error: ");
-      	strcat(log, db_error);
-      	writeToLog(log);
-      	writeToSQLLog(sqlcmd);
-
-      	return 1;
-  	}
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot create configuration database.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
 
   	writeToLog("Created configuration tables.");
-    writeToSQLLog(sqlcmd);
 
   	mysql_close(conn);
 }
 
 // Adds a new server into the servers table on the monitoring server.
 int addServerToTable() {
-    MYSQL *conn = mysql_init(NULL);
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
 
-  	if (conn == NULL) 
-  		return 1;
-
-  	if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-  		  configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
-      	strcpy(db_error, mysql_error(conn));
-      	mysql_close(conn);
-      	
-      	writeToLog("Cannot connect to MySQL Server.");
-      	
-      	char log[200];
-      	strcpy(log, "Error: ");
-      	strcat(log, db_error);
-      	writeToLog(log);
-      	
-      	return 1;
-  	}
+    if(conn == NULL)
+        return 1;
 
   	char sqlcmd[500];
 
@@ -183,23 +166,13 @@ int addServerToTable() {
 
   	free(strPort);
 
-  	if (mysql_query(conn, sqlcmd)) {
-      	strcpy(db_error, mysql_error(conn));
-      	mysql_close(conn);
-      	
-      	writeToLog("Cannot add server to database.");
-      	
-      	char log[200];
-      	strcpy(log, "Error: ");
-      	strcat(log, db_error);
-      	writeToLog(log);
-      	writeToSQLLog(sqlcmd);
-
-      	return 1;
-  	}
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot add server to database.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
 
   	writeToLog("Server added to monitoring.");
-    writeToSQLLog(sqlcmd);
 	
   	mysql_close(conn);
 }
@@ -207,43 +180,20 @@ int addServerToTable() {
 // Determines the number of servers in the monitoring database and returns the
 // value as an int.
 int getMonitoredServersCount() {
-    MYSQL *conn = mysql_init(NULL);
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
 
-    if (conn == NULL) 
+    if(conn == NULL)
         return 1;
-
-    if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-        configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
-        strcpy(db_error, mysql_error(conn));
-        mysql_close(conn);
-        
-        writeToLog("Cannot connect to MySQL Server.");
-        
-        char log[200];
-        strcpy(log, "Error: ");
-        strcat(log, db_error);
-        writeToLog(log);
-        
-        return 1;
-    }
 
     char sqlcmd[500];
     strcpy(sqlcmd, "SELECT COUNT(ID) FROM servers");
-
-    if (mysql_query(conn, sqlcmd)) {
-        strcpy(db_error, mysql_error(conn));
-        mysql_close(conn);
-        
-        writeToLog("Cannot determine number of servers in monitoring table.");
-
-        char log[200];
-        strcpy(log, "Error: ");
-        strcat(log, db_error);
-        writeToLog(log);
-        writeToSQLLog(sqlcmd);
-
-        return -1;
-    }
+    
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot determine number of servers in monitoring table.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
 
     MYSQL_RES *result = mysql_store_result(conn);
 
@@ -253,52 +203,29 @@ int getMonitoredServersCount() {
     int rows = atoi(row[0]);
 
     mysql_free_result(result);
-
-    writeToSQLLog(sqlcmd);
-
     mysql_close(conn);
 
     return rows;
 }
 
+// Retrieves a list of servers in monitoring from the servers table in the 
+// monitoring database and populates a linked list by calling the addServerNode function.
+// Return 0 if successful and -1 if an error occurs.
 int populateMonitoredServersList() {
-    MYSQL *conn = mysql_init(NULL);
-
-    if (conn == NULL) 
-        return 1;
-
-    if (mysql_real_connect(conn, configServer.hostname, configServer.username, 
-        configServer.password, "mysql_guardian", 0, NULL, 0) == NULL) {
-        strcpy(db_error, mysql_error(conn));
-        mysql_close(conn);
-        
-        writeToLog("Cannot connect to MySQL Server.");
-        
-        char log[200];
-        strcpy(log, "Error: ");
-        strcat(log, db_error);
-        writeToLog(log);
-        
-        return 1;
-    }
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+    
+    if(conn == NULL)
+        return -1;
 
     char sqlcmd[500];
     strcpy(sqlcmd, "SELECT id, hostname, port, username, password FROM servers");
 
-    if (mysql_query(conn, sqlcmd)) {
-        strcpy(db_error, mysql_error(conn));
-        mysql_close(conn);
-        
-        writeToLog("Cannot determine number of servers in monitoring table.");
-
-        char log[200];
-        strcpy(log, "Error: ");
-        strcat(log, db_error);
-        writeToLog(log);
-        writeToSQLLog(sqlcmd);
-
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot retrieve list of servers in monitoring.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return -1;
-    }
 
     MYSQL_RES *result = mysql_store_result(conn);
 
@@ -306,13 +233,12 @@ int populateMonitoredServersList() {
         strcpy(db_error, mysql_error(conn));
         mysql_close(conn);
         
-        writeToLog("Cannot determine number of servers in monitoring table.");
+        writeToLog("Cannot retrieve list of servers in monitoring.");
 
         char log[200];
         strcpy(log, "Error: ");
         strcat(log, db_error);
         writeToLog(log);
-        writeToSQLLog(sqlcmd);
 
         return -1;
     }
@@ -333,9 +259,6 @@ int populateMonitoredServersList() {
     }
 
     mysql_free_result(result);
-
-    writeToSQLLog(sqlcmd);
-
     mysql_close(conn);
 
     return 0;
