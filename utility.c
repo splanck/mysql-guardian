@@ -35,11 +35,6 @@
 #include <time.h>
 #include "utility.h"
 
-struct ping_packet {
-    struct icmphdr hdr;
-    char msg[PING_PKT_S-sizeof(struct icmphdr)];
-};
-
 struct myserver *pFirst = NULL;
 struct myserver *pLast = NULL;
 
@@ -210,23 +205,23 @@ int pingServer(char *hostname) {
     int sockfd;
     int addrlen = sizeof(addr_con);
     
-    char *ip_addr;
+    char *ip;
     char *reverse_host;
     char net_buf[NI_MAXHOST];
  
-    ip_addr = DNSLookup(hostname, &addr_con);
+    ip = DNSLookup(hostname, &addr_con);
     
-    if(ip_addr == NULL)
+    if(ip == NULL)
         return -1;
  
-    reverse_host = reverseDNSLookup(ip_addr);
+    reverse_host = reverseDNSLookup(ip);
 
     sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     
     if(sockfd < 0)
         return -1;
  
-    if(sendPing(sockfd, &addr_con, reverse_host, ip_addr, hostname) == 0) 
+    if(sendPing(sockfd, &addr_con, reverse_host, ip, hostname) == 0) 
         return 0;
     else
         return -1;

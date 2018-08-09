@@ -17,6 +17,8 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <netinet/ip_icmp.h>
+
 #define PING_PKT_S 64
 #define PORT_NO 0 
 #define PING_SLEEP_RATE 1000000
@@ -29,6 +31,11 @@ struct myserver {
     char username[25];
     char password[25];
     struct myserver *next;
+};
+
+struct ping_packet {
+    struct icmphdr hdr;
+    char msg[PING_PKT_S-sizeof(struct icmphdr)];
 };
 
 void addServerNode(int id, char *hostname, int port, char *username, char *password);
