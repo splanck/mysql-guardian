@@ -146,7 +146,7 @@ int createConfigTables() {
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
 
-    strcpy(sqlcmd, "INSERT INTO users(username, password, admin) VALUES('admin','admin',true')");
+    strcpy(sqlcmd, "INSERT INTO users(username, password, admin) VALUES('admin','admin',true)");
     strcpy(errorMsg, "Cannot create admin user account.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
