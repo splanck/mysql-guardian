@@ -213,9 +213,7 @@ int getMonitoredServersCount() {
         return 1;
 
     MYSQL_RES *result = mysql_store_result(conn);
-
-    MYSQL_ROW row;
-    row = mysql_fetch_row(result); 
+    MYSQL_ROW row = mysql_fetch_row(result); 
 
     int rows = atoi(row[0]);
 
@@ -304,9 +302,7 @@ int authenticateUser(char *username, char *password) {
         return 1;
 
     MYSQL_RES *result = mysql_store_result(conn);
-
-    MYSQL_ROW row;
-    row = mysql_fetch_row(result); 
+    MYSQL_ROW row = mysql_fetch_row(result); 
 
     if(atoi(row[0]) > 0)
         authenticated = 1;
