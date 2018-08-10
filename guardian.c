@@ -41,6 +41,8 @@ dbserver configServer;		// Struct to store config database server.
 // ncurses terminal, and display the main menu. Also performs clean up tasks
 // upon exit.
 int main(int argc, char **argv) {
+	signal(SIGWINCH, resizeHandler);
+	
 	initialiseLog();
 
 	if(argc > 1) {
@@ -50,11 +52,7 @@ int main(int argc, char **argv) {
 	}
 
 	getConfig();
-
 	setupTerminal();
-
-	signal(SIGWINCH, resizeHandler);
-	
 	mainMenu();
 	
 	cleanUpTerminal();
@@ -107,7 +105,8 @@ void getConfig() {
 	char *password = malloc(25);
 
 	if(readConfig(hostname, username, password)) {
-		printf("Could not read configuration file. Exiting,\n\r");
+		printf("Could not read configuration file. Use the -init parameter to create one.\n\r");
+		printf("Exiting,\n\r");
 		
 		exit(1);
 	}
