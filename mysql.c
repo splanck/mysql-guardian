@@ -122,15 +122,32 @@ int createConfigTables() {
         return 1;
   	
     char sqlcmd[500];
+    char errorMsg[100];
+    
     strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
 
     if(executeQuery(conn, sqlcmd, NULL) == 1)
         return 1;
 
-  	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)");
+    strcpy(sqlcmd, "DROP TABLE IF EXISTS users");
 
-    char errorMsg[100];
-    strcpy(errorMsg, "Cannot create configuration database.");
+    if(executeQuery(conn, sqlcmd, NULL) == 1)
+        return 1;
+
+  	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)");
+    strcpy(errorMsg, "Cannot create server table in monitoring database.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    strcpy(sqlcmd, "CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, username TEXT, password TEXT, admin BOOLEAN)");
+    strcpy(errorMsg, "Cannot create users table in monitoring database.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    strcpy(sqlcmd, "INSERT INTO users(username, password, admin) VALUES('admin','admin',true')");
+    strcpy(errorMsg, "Cannot create admin user account.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
@@ -262,6 +279,42 @@ int populateMonitoredServersList() {
     mysql_close(conn);
 
     return 0;
+}
+
+int authenticateUser(char *username, char *password) {
+    int authenticated = 0;
+
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+
+    if(conn == NULL)
+        return 1;
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "SELECT COUNT(ID) FROM users WHERE username = '");
+    strcat(sqlcmd, username);
+    strcat(sqlcmd, "' AND password = '");
+    strcat(sqlcmd, password);
+    strcat(sqlcmd, "'");
+    
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot authenticate user login.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result); 
+
+    if(atoi(row[0]) > 0)
+        authenticated = 1;
+
+    mysql_free_result(result);
+    mysql_close(conn);
+
+    return authenticated;
 }
 
 // Gets and displays the MySQL server version to the screen.

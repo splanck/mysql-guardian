@@ -42,6 +42,13 @@ dbserver configServer;		// Struct to store config database server.
 // upon exit.
 int main(int argc, char **argv) {
 	initialiseLog();
+
+	if(argc > 1) {
+		if(strcmp(argv[1], "init\n")) {
+			initialiseSetup();
+		}
+	}
+
 	getConfig();
 
 	setupTerminal();
@@ -54,6 +61,25 @@ int main(int argc, char **argv) {
 	cleanUpTasks();
 
 	return 0;
+}
+
+void initialiseSetup() {
+	char hostname[80] = "";
+	char username[80] = "";		
+	char password[80] = "";		
+
+	printf("Configure Monitoring Server\n\n");
+	printf("Server Hostname: ");
+	scanf("%s", &hostname);
+
+	printf("Root Username: ");
+	scanf("%s", &username);
+
+	printf("Root Password: ");
+	scanf("%s", &password);
+
+	if(createConfigFile(hostname, username, password) == 1)
+		printf("Could not create configuration file.\n");
 }
 
 // Writes start up message to log fiile.

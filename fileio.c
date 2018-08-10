@@ -60,6 +60,25 @@ int writeToSQLLog(char logEntry[200])
 	return writeLog(logEntry, "mysql-guardian-sql.log");
 }
 
+// Accepts a hostname, username, and password for the monitoring server and generates a
+// .mysql-guardian_rc configuration file.
+int createConfigFile(char *hostname, char *username, char *password) {
+	FILE *cfgFile;
+
+	cfgFile = fopen(".mysql-guardian_rc", "a");
+
+	if(!cfgFile)
+		return 1;
+
+	fprintf(cfgFile, "Hostname %s\n", hostname);
+	fprintf(cfgFile, "Username %s\n", username);
+	fprintf(cfgFile, "Password %s\n", password);
+	
+	fclose(cfgFile);
+
+	return 0;
+}
+
 // Reads the .mysql-guardian_rc configuration file and stores its valies 
 // into global variables.
 int readConfig(char *hostname, char *username, char *password) {

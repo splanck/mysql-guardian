@@ -18,6 +18,7 @@
 */
 
 void initialiseLog();
+void initialiseSetup();
 void cleanUpTasks();
 void getConfig();
 
