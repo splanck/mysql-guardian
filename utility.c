@@ -56,6 +56,50 @@ void addServerNode(int id, char *hostname, int port, char *username, char *passw
     }
 }
 
+// Adds a database to the end of a server's linked list of dataabases. Parameters are
+// a pointer to the server and the database name.
+void addDatabaseNode(struct myserver *svr, char *dbname) {
+    struct mydatabase *pNewNode = malloc(sizeof(struct mydatabase));
+
+    strcpy(pNewNode->dbname, dbname);
+
+    pNewNode->firstTable = NULL;
+    pNewNode->lastTable = NULL;
+    pNewNode->next = NULL;
+
+    struct mydatabase *first = svr->firstDatabase;
+    struct mydatabase *last = svr->lastDatabase;
+
+    if(first == NULL) {
+        first = last = pNewNode;
+    }
+    else {
+        last->next = pNewNode;
+        last = pNewNode;
+    }
+}
+
+// Adds a table to the end of a database's linked list of tables. Parameters are
+// a pointer to the database and the table name.
+void addTableNode(struct mydatabase *db, char *tblname) {
+    struct mytable *pNewNode = malloc(sizeof(struct mytable));
+
+    strcpy(pNewNode->tblname, tblname);
+
+    pNewNode->next = NULL;
+
+    struct mytable *first = db->firstTable;
+    struct mytable *last = db->lastTable;
+
+    if(first == NULL) {
+        first = last = pNewNode;
+    }
+    else {
+        last->next = pNewNode;
+        last = pNewNode;
+    }
+}
+
 // Utility functioon to remove characters from strings. Accepts a char as the
 // character to be removed and a char pointer as source string.
 void remove_char_from_string(char c, char *str) {

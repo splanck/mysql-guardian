@@ -279,6 +279,9 @@ int populateMonitoredServersList() {
     return 0;
 }
 
+// Accepts a usernamd and password as parameters and attempts to authenticate these
+// credentials against the monitoring database's users table. Returns 0 if authentication
+// was successful, otherwise returns 1.
 int authenticateUser(char *username, char *password) {
     int authenticated = 0;
 

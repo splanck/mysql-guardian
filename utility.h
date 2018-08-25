@@ -30,7 +30,21 @@ struct myserver {
     int port;
     char username[25];
     char password[25];
+    struct mydatabase *firstDatabase;
+    struct mydatabase *lastDatabase;
     struct myserver *next;
+};
+
+struct mydatabase {
+    char dbname[50];
+    struct mytable *firstTable;
+    struct mytable *lastTable;
+    struct mydatabase *next;
+};
+
+struct mytable {
+    char tblname[50];
+    struct mytable *next;
 };
 
 struct ping_packet {
