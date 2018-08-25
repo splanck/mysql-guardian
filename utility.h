@@ -53,6 +53,8 @@ struct ping_packet {
 };
 
 void addServerNode(int id, char *hostname, int port, char *username, char *password);
+void addDatabaseNode(struct myserver *svr, char *dbname);
+void addTableNode(struct mydatabase *db, char *tblname);
 void remove_char_from_string(char c, char *str);
 unsigned short checkSum(void *buffer, int len);
 char* reverseDNSLookup(char *ip_addr);

@@ -28,6 +28,7 @@
 #include "guardian.h"
 #include "fileio.h"
 #include "utility.h"
+#include "mysql.h"
 
 extern char db_error[1000];
 extern char newHostname[80];
@@ -68,17 +69,7 @@ MYSQL* connectDB(char *hostname, char *username, char *password, char *database)
 // provided SQL statement and returns 0 on success or 1 on failure.
 int executeQuery(MYSQL *conn, char *sql, char *errorMsg) {
     if (mysql_query(conn, sql)) {
-        strcpy(db_error, mysql_error(conn));
-        mysql_close(conn);
-
-        if(errorMsg != NULL)
-            writeToLog(errorMsg);
-
-        char log[200];
-        strcpy(log, "Error: ");
-        strcat(log, db_error);
-        writeToLog(log);
-        writeToSQLLog(sql);
+        handleDBError(conn, errorMsg, sql);
         
         return 1;
     }
@@ -87,6 +78,27 @@ int executeQuery(MYSQL *conn, char *sql, char *errorMsg) {
 
         return 0;
     }
+}
+
+// Handles database connection errors. Accepts a database connection, an error message,
+// and a SQL statement as parameters. Closes the connection, writes the error message to
+// the mysql-guardian.log file and writes the SQL statement to the mysql-guardian-sql.log
+// file.
+void handleDBError(MYSQL *conn, char *errorMsg, char *sql) {
+    strcpy(db_error, mysql_error(conn));
+    mysql_close(conn);
+        
+    if(errorMsg != NULL)
+        writeToLog(errorMsg);
+
+    if(sql != NULL)
+        writeToSQLLog(sql);
+
+    char log[200];
+    strcpy(log, "Error: ");
+    strcat(log, db_error);
+
+    writeToLog(log);
 }
 
 // Creates configuration database on the monitoring server.
@@ -245,15 +257,7 @@ int populateMonitoredServersList() {
     MYSQL_RES *result = mysql_store_result(conn);
 
     if(result == NULL) {
-        strcpy(db_error, mysql_error(conn));
-        mysql_close(conn);
-        
-        writeToLog("Cannot retrieve list of servers in monitoring.");
-
-        char log[200];
-        strcpy(log, "Error: ");
-        strcat(log, db_error);
-        writeToLog(log);
+        handleDBError(conn, errorMsg, NULL);
 
         return -1;
     }
@@ -262,8 +266,7 @@ int populateMonitoredServersList() {
     
     MYSQL_ROW row;
 
-    while (row = mysql_fetch_row(result)) 
-    { 
+    while (row = mysql_fetch_row(result)) { 
         int id = atoi(row[0]);
         char *hostname = row[1];
         int port = atoi(row[2]);
@@ -271,6 +274,47 @@ int populateMonitoredServersList() {
         char *password = row[4];
 
         addServerNode(id, hostname, port, username, password);
+    }
+
+    mysql_free_result(result);
+    mysql_close(conn);
+
+    return 0;
+}
+
+int populateServerDatabasesList(struct myserver *svr) {
+    MYSQL *conn = connectDB(svr->hostname, svr->username, svr->password, NULL);
+
+    if(conn == NULL)
+        return 1;
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "show databases");
+
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot retrieve list of databases for server ");
+    strcat(errorMsg, svr->hostname);
+    strcat(errorMsg, ".");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    if(result == NULL) {
+        handleDBError(conn, errorMsg, sqlcmd);
+
+        return -1;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    
+    MYSQL_ROW row;
+
+    while (row = mysql_fetch_row(result))  { 
+        char *dbname = row[0];
+
+        addDatabaseNode(svr, dbname);
     }
 
     mysql_free_result(result);
