@@ -46,6 +46,8 @@ void addServerNode(int id, char *hostname, int port, char *username, char *passw
     pNewNode->id = id;
     pNewNode->port = port;
     pNewNode->next = NULL;
+	pNewNode->firstDatabase = NULL;
+	pNewNode->lastDatabase = NULL;
 
     if(pFirst == NULL) {
         pFirst = pLast = pNewNode;
@@ -67,15 +69,12 @@ void addDatabaseNode(struct myserver *svr, char *dbname) {
     pNewNode->lastTable = NULL;
     pNewNode->next = NULL;
 
-    struct mydatabase *first = svr->firstDatabase;
-    struct mydatabase *last = svr->lastDatabase;
-
-    if(first == NULL) {
-        first = last = pNewNode;
+    if(svr->firstDatabase == NULL) {
+        svr->firstDatabase = svr->lastDatabase = pNewNode;
     }
     else {
-        last->next = pNewNode;
-        last = pNewNode;
+        svr->lastDatabase->next = pNewNode;
+        svr->lastDatabase = pNewNode;
     }
 }
 
@@ -92,11 +91,11 @@ void addTableNode(struct mydatabase *db, char *tblname) {
     struct mytable *last = db->lastTable;
 
     if(first == NULL) {
-        first = last = pNewNode;
+        db->firstTable = db->lastTable = pNewNode;
     }
     else {
-        last->next = pNewNode;
-        last = pNewNode;
+        db->lastTable->next = pNewNode;
+        db->lastTable = pNewNode;
     }
 }
 

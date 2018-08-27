@@ -38,7 +38,8 @@ int writeLog(char logEntry[200], char filename[80]) {
 	if(!logFile)
 		return 1;
 
-	fprintf(logFile, "%d-%d-%d %d:%d:%d: ", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	fprintf(logFile, "%d-%d-%d %d:%d:%d: ", tm.tm_year + 1900, tm.tm_mon + 1, 
+		tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 	fprintf(logFile, "%s\n", logEntry);
 
 	fclose(logFile);

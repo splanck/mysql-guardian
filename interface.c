@@ -25,9 +25,9 @@
 #include <ncurses.h>
 #include <signal.h>
 #include "guardian.h"
+#include "utility.h"
 #include "mysql.h"
 #include "interface.h"
-#include "utility.h"
 
 extern int colourSupport;
 extern int canChangeColours;
@@ -80,6 +80,7 @@ int mainMenu() {
   		"Create Configuration Database",
   		"Add Server to Monitoring",
   		"Show Monitored Servers List",
+		"Show Monitored Databases List",
   		"Check localhost",
   		"Exit"
 	};
@@ -91,7 +92,7 @@ int mainMenu() {
 	{
 		attron(COLOR_PAIR(1));
 
-		for(int i = 0; i < 7; i++) {
+		for(int i = 0; i < 8; i++) {
 			if(i == highlight)
 				wattron(menuWin, A_REVERSE);
 
@@ -109,11 +110,11 @@ int mainMenu() {
 		if(choice == KEY_DOWN)
 			highlight++;
 
-		if(highlight == 7)
+		if(highlight == 8)
 			highlight = 0;
 
 		if(highlight == -1)
-			highlight = 6;
+			highlight = 7;
 
 		if(choice == 10)
 			break;
@@ -137,9 +138,12 @@ int mainMenu() {
 		showServersList();
 
 	if(highlight == 5)
-		checkServerOnline();
+		showDatabasesList();
 
 	if(highlight == 6)
+		checkServerOnline();
+
+	if(highlight == 7)
 		return 0;
 
 	mainMenu();
@@ -178,6 +182,34 @@ void showServersList() {
 		i++;
 	}
 	
+	getch();
+}
+
+void showDatabasesList() {
+	if(pFirst == NULL) {
+		int success = populateMonitoredServersList();		
+	}
+
+	struct myserver *pServer = pFirst;
+	
+	if(pServer->firstDatabase == NULL) {
+		int success = populateServerDatabasesList(pServer);
+		mvprintw(0, 0, "%d", success);
+	}
+
+	struct mydatabase *pTemp = pServer->firstDatabase;
+
+	mvprintw(1, 0, "Tables List: %s", pServer->hostname);
+	
+	int i = 0;
+
+	while(pTemp != NULL) {
+		mvprintw(i + 3, 0, "%s", pTemp->dbname);
+
+		pTemp = pTemp->next;
+		i++;
+	}
+
 	getch();
 }
 

@@ -25,9 +25,9 @@
 #include <ncurses.h>
 #include <my_global.h>
 #include <mysql.h>
+#include "utility.h"
 #include "guardian.h"
 #include "fileio.h"
-#include "utility.h"
 #include "mysql.h"
 
 extern char db_error[1000];
@@ -146,13 +146,15 @@ int createConfigTables() {
     if(executeQuery(conn, sqlcmd, NULL) == 1)
         return 1;
 
-  	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT, port INT, username TEXT, password TEXT)");
+  	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, ");
+	strcat(sqlcmd, "hostname TEXT, port INT, username TEXT, password TEXT)");
     strcpy(errorMsg, "Cannot create server table in monitoring database.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
 
-    strcpy(sqlcmd, "CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, username TEXT, password TEXT, admin BOOLEAN)");
+    strcpy(sqlcmd, "CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, username TEXT, ");
+	strcat(sqlcmd, "password TEXT, admin BOOLEAN)");
     strcpy(errorMsg, "Cannot create users table in monitoring database.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
@@ -313,8 +315,8 @@ int populateServerDatabasesList(struct myserver *svr) {
 
     while (row = mysql_fetch_row(result))  { 
         char *dbname = row[0];
-
-        addDatabaseNode(svr, dbname);
+        
+		addDatabaseNode(svr, dbname);
     }
 
     mysql_free_result(result);

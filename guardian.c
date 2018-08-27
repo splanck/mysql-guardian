@@ -25,6 +25,7 @@
 #include <ncurses.h>
 #include <signal.h>
 #include "guardian.h"
+#include "utility.h"
 #include "mysql.h"
 #include "fileio.h"
 #include "interface.h"
