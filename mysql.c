@@ -284,6 +284,8 @@ int populateMonitoredServersList() {
     return 0;
 }
 
+// Populates a server's database linked list. Accepts the target server struct as a
+// parameter. Returns 0 on success and 1 on failure.
 int populateServerDatabasesList(struct myserver *svr) {
     MYSQL *conn = connectDB(svr->hostname, svr->username, svr->password, NULL);
 
@@ -306,17 +308,62 @@ int populateServerDatabasesList(struct myserver *svr) {
     if(result == NULL) {
         handleDBError(conn, errorMsg, sqlcmd);
 
-        return -1;
+        return 1;
     }
 
     int num_fields = mysql_num_fields(result);
     
     MYSQL_ROW row;
 
-    while (row = mysql_fetch_row(result))  { 
+    while (row = mysql_fetch_row(result)) { 
         char *dbname = row[0];
         
 		addDatabaseNode(svr, dbname);
+    }
+
+    mysql_free_result(result);
+    mysql_close(conn);
+
+    return 0;
+}
+
+// Populates a database's tables linked list. Accepts the target server and database struct 
+// as parameters. Returns 0 on success and 1 on failure.
+int populateDatabaseTablesList(struct myserver *svr, struct mydatabase *db) {
+    MYSQL *conn = connectDB(svr->hostname, svr->username, svr->password, db->dbname);
+
+    if(conn == NULL)
+        return 1;
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "show tables");
+
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot retrieve list of tables for database: ");
+	strcat(errorMsg, db->dbname);
+	strcat(errorMsg, " on ");
+    strcat(errorMsg, svr->hostname);
+    strcat(errorMsg, ".");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    if(result == NULL) {
+        handleDBError(conn, errorMsg, sqlcmd);
+
+        return 1;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    
+    MYSQL_ROW row;
+
+    while (row = mysql_fetch_row(result)) { 
+        char *tblname = row[0];
+        
+		addTableNode(db, tblname);
     }
 
     mysql_free_result(result);
