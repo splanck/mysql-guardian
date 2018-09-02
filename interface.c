@@ -213,6 +213,38 @@ void showDatabasesList() {
 	getch();
 }
 
+void showTablesList() {
+	if(pFirst == NULL) {
+		int success = populateMonitoredServersList();		
+	}
+
+	struct myserver *pServer = pFirst;
+	
+	if(pServer->firstDatabase == NULL) {
+		int success = populateServerDatabasesList(pServer);
+	}
+
+	if(pServer->firstDatabase->firstTable == NULL) {
+		int success = populateDatabaseTablesList(pServer, pServer->firstDatabase);
+	}
+
+	struct mytable *pTemp = pServer->firstDatabase->firstTable;
+
+	mvprintw(1, 0, "Tables List: %s %s", pServer->hostname, pServer->firstDatabase->dbname);
+	
+	int i = 0;
+
+	while(pTemp != NULL) {
+		mvprintw(i + 3, 0, "%s", pTemp->tblname);
+
+		pTemp = pTemp->next;
+		i++;
+	}
+
+	getch();
+}
+
+
 // Initialises new server variables, calls addServerMenu() to gather values,
 // and calls addServerToTable() to add new server to servers table.
 void addServer() {

@@ -28,5 +28,6 @@ int addServerToTable();
 int getMonitoredServersCount();
 int populateMonitoredServersList();
 int populateServerDatabasesList(struct myserver *);
+int populateDatabaseTablesList(struct myserver *, struct mydatabase *);
 int authenticateUser(char *username, char *password);
 void getDBVersion(char *dbversion);
