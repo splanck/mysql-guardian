@@ -68,7 +68,7 @@ MYSQL* connectDB(char *hostname, char *username, char *password, char *database)
 // database, and an error message to print to the log on failure. Executes the
 // provided SQL statement and returns 0 on success or 1 on failure.
 int executeQuery(MYSQL *conn, char *sql, char *errorMsg) {
-    if (mysql_query(conn, sql)) {
+    if(mysql_query(conn, sql)) {
         handleDBError(conn, errorMsg, sql);
         
         return 1;
@@ -370,6 +370,68 @@ int populateDatabaseTablesList(struct myserver *svr, struct mydatabase *db) {
     mysql_close(conn);
 
     return 0;
+}
+
+int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl) {
+    MYSQL *conn = connectDB(svr->hostname, svr->username, svr->password, db->dbname);
+
+    if(conn == NULL)
+        return 1;
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "check table ");
+	strcat(sqlcmd, tbl->tblname);
+
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot open database to check table: ");
+	strcat(errorMsg, tbl->tblname);
+	strcat(errorMsg, " in ");
+	strcat(errorMsg, db->dbname);
+	strcat(errorMsg, " on ");
+    strcat(errorMsg, svr->hostname);
+    strcat(errorMsg, ".");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    if(result == NULL) {
+        handleDBError(conn, errorMsg, sqlcmd);
+
+        return 1;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    
+    MYSQL_ROW row;
+
+	int checkresult = 1;
+
+    while (row = mysql_fetch_row(result)) { 
+        char *tblname = row[0];
+
+		if(strcmp(row[3], "status")) {
+			if(strcmp(row[4], "OK")) {
+				checkresult = 0;
+			}
+		}
+    }
+
+    mysql_free_result(result);
+    mysql_close(conn);
+
+	strcpy(errorMsg, "Table check failed for ");
+	strcat(errorMsg, tbl->tblname);
+	strcat(errorMsg, " in ");
+	strcat(errorMsg, db->dbname);
+	strcat(errorMsg, " on ");
+    strcat(errorMsg, svr->hostname);
+    strcat(errorMsg, ".");
+   
+	writeToLog(errorMsg); 
+	
+    return checkresult;
 }
 
 // Accepts a usernamd and password as parameters and attempts to authenticate these
