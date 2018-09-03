@@ -293,7 +293,7 @@ int populateServerDatabasesList(struct myserver *svr) {
         return 1;
 
     char sqlcmd[500];
-    strcpy(sqlcmd, "show databases");
+    strcpy(sqlcmd, "SHOW DATABASES");
 
     char errorMsg[100];
     strcpy(errorMsg, "Cannot retrieve list of databases for server ");
@@ -336,7 +336,7 @@ int populateDatabaseTablesList(struct myserver *svr, struct mydatabase *db) {
         return 1;
 
     char sqlcmd[500];
-    strcpy(sqlcmd, "show tables");
+    strcpy(sqlcmd, "SHOW TABLES");
 
     char errorMsg[100];
     strcpy(errorMsg, "Cannot retrieve list of tables for database: ");
@@ -379,7 +379,7 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
         return 1;
 
     char sqlcmd[500];
-    strcpy(sqlcmd, "check table ");
+    strcpy(sqlcmd, "CHECK TABLE ");
 	strcat(sqlcmd, tbl->tblname);
 
     char errorMsg[100];
@@ -409,8 +409,6 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
 	int checkresult = 1;
 
     while (row = mysql_fetch_row(result)) { 
-        char *tblname = row[0];
-
 		if(strcmp(row[3], "status")) {
 			if(strcmp(row[4], "OK")) {
 				checkresult = 0;
