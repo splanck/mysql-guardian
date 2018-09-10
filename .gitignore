@@ -1,7 +1,9 @@
 *.o
-mysql-guardian
 mysql-guardian.log
 mysql-guardian-sql.log
 mysql-guardian.sublime-project
 mysql-guardian.sublime-workspace
 .mysql-guardian_rc
+build/mysql-guardian.log
+build/mysql-guardian-sql.log
+build/.mysql-guardian_rc

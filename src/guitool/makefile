@@ -6,4 +6,4 @@ DEPS = guardian.h mysql.h fileio.h interface.h utility.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 	
 mysql-guardian: guardian.c
-	$(CC) -o mysql-guardian guardian.c mysql.c fileio.c interface.c utility.c $(CFLAGS) 
+	$(CC) -o ../../build/mysql-guardian guardian.c mysql.c fileio.c interface.c utility.c $(CFLAGS) 
