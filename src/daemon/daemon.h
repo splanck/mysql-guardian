@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2018 - Stephen Planck and Alistair Packer
     
-    mysqlgd.c - Main source file for the mysqlgd daemon process.
+    daemon.h - Header file for the daemon.c source file.
     
     This file is part of MySQL Guardian.
 
@@ -19,42 +19,4 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <syslog.h>
-#include <string.h>
-#include "daemon.h"
-
-int main() {
-	pid_t pid = fork();
-
-	if(pid < 0)
-		exit(EXIT_FAILURE);
-
-	if(pid > 0)
-		exit(EXIT_SUCCESS);
-
-	umask(0);
-
-	openlog("mysqlgd", 0, LOG_DAEMON);
-	syslog(LOG_INFO, "%s", "MySQL Guardian daemon starting...");
-
-	pid_t sid = setsid();
-
-	if(sid < 0)
-		exit(EXIT_FAILURE);
-
-	if((chdir("/")) < 0)
-		exit(EXIT_FAILURE);
-
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-	close(STDERR_FILENO);
-
-	startDaemon();
-}
+int startDaemon();

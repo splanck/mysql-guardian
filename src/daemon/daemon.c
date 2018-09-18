@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2018 - Stephen Planck and Alistair Packer
     
-    mysqlgd.c - Main source file for the mysqlgd daemon process.
+	daemon.c - Implements the main daemon loop functionality.
     
     This file is part of MySQL Guardian.
 
@@ -30,31 +30,14 @@
 #include <string.h>
 #include "daemon.h"
 
-int main() {
-	pid_t pid = fork();
+int startDaemon() {
+	int heartbeat = 0;
 
-	if(pid < 0)
-		exit(EXIT_FAILURE);
+	while(1) {
+		syslog(LOG_INFO, "%d", heartbeat);
+		heartbeat++;
+		sleep(30);
+	}
 
-	if(pid > 0)
-		exit(EXIT_SUCCESS);
-
-	umask(0);
-
-	openlog("mysqlgd", 0, LOG_DAEMON);
-	syslog(LOG_INFO, "%s", "MySQL Guardian daemon starting...");
-
-	pid_t sid = setsid();
-
-	if(sid < 0)
-		exit(EXIT_FAILURE);
-
-	if((chdir("/")) < 0)
-		exit(EXIT_FAILURE);
-
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-	close(STDERR_FILENO);
-
-	startDaemon();
+	return 0;
 }
