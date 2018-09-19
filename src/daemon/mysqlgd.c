@@ -28,7 +28,11 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <string.h>
+#include "mysqlgd.h"
 #include "daemon.h"
+#include "fileio.h"
+
+dbserver configServer;      // Struct to store config database server.
 
 int main() {
 	pid_t pid = fork();
@@ -56,5 +60,22 @@ int main() {
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
 
+	getConfig();
 	startDaemon();
+}
+
+// Reads MySQL monitoring server configuration into memory using getConfig()
+void getConfig() {
+    char *hostname = malloc(80);
+    char *username = malloc(25);
+    char *password = malloc(25);
+
+    if(readConfig(hostname, username, password)) {
+		syslog(LOG_INFO, "%s", "Could not read /etc/mysqlgd.conf file. Exiting...");
+        exit(1);
+    }
+
+    configServer.hostname = hostname;
+    configServer.username = username;
+    configServer.password = password;
 }
