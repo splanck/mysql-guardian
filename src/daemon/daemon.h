@@ -20,3 +20,6 @@
 */
 
 int startDaemon();
+int serverCheck();
+int integrityCheck();
+void sig_handler();
