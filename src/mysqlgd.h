@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2018 - Stephen Planck and Alistair Packer
     
-    daemon.h - Header file for the daemon.c source file.
+    mysqlgd.h - Header file for the mysqlgd.c source file.
     
     This file is part of MySQL Guardian.
 
@@ -19,7 +19,9 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
-int startDaemon();
+void startDaemon();
+void getConfigd();
+int initDaemon();
 int serverCheck();
 int integrityCheck();
 void sig_handler();

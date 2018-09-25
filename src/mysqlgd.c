@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2018 - Stephen Planck and Alistair Packer
     
-	daemon.c - Implements the main daemon loop functionality.
+    mysqlgd.c - Main source file for the mysqlgd daemon process.
     
     This file is part of MySQL Guardian.
 
@@ -30,7 +30,11 @@
 #include <string.h>
 #include <time.h>
 #include <signal.h>
-#include "daemon.h"
+#include "mysqlgd.h"
+#include "guardian.h"
+#include "fileio.h"
+
+extern dbserver configServer;      // Struct to store config database server.
 
 time_t last_server_check;
 time_t last_integrity_check;
@@ -38,7 +42,53 @@ time_t last_integrity_check;
 double server_check_delay;
 double integrity_check_delay;
 
-int startDaemon() {
+void startDaemon() {
+	pid_t pid = fork();
+
+	if(pid < 0)
+		exit(EXIT_FAILURE);
+
+	if(pid > 0)
+		exit(EXIT_SUCCESS);
+
+	umask(0);
+
+	openlog("mysqlgd", 0, LOG_DAEMON);
+	syslog(LOG_INFO, "%s", "MySQL Guardian daemon starting...");
+
+	pid_t sid = setsid();
+
+	if(sid < 0)
+		exit(EXIT_FAILURE);
+
+	if((chdir("/")) < 0)
+		exit(EXIT_FAILURE);
+
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
+
+	getConfigd();
+	initDaemon();
+}
+
+// Reads MySQL monitoring server configuration into memory using getConfig()
+void getConfigd() {
+    char *hostname = malloc(80);
+    char *username = malloc(25);
+    char *password = malloc(25);
+
+    if(readConfig(hostname, username, password)) {
+		syslog(LOG_INFO, "%s", "Could not read /etc/mysqlgd.conf file. Exiting...");
+        exit(1);
+    }
+
+    configServer.hostname = hostname;
+    configServer.username = username;
+    configServer.password = password;
+}
+
+int initDaemon() {
 	signal(SIGTERM, sig_handler);
 
 	server_check_delay = 30;

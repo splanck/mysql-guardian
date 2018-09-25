@@ -89,7 +89,7 @@ int readConfig(char *hostname, char *username, char *password) {
 	
 	FILE *configFile;
 
-	configFile = fopen(".mysql-guardian_rc", "r");
+	configFile = fopen("/etc/mysqlgd.conf", "r");
 
 	if (!configFile)
 		return 1;
