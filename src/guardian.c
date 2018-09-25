@@ -44,21 +44,40 @@ dbserver configServer;		// Struct to store config database server.
 // upon exit.
 int main(int argc, char **argv) {
 	if(argc > 1) {
-		if(strcmp(argv[1], "demonize\n")) {
+		if(!strcmp(argv[1], "--demonize")) {
 			startDaemon();
 		}
-
-		if(strcmp(argv[1], "init\n")) {
+		else if(!strcmp(argv[1], "--init")) {
 			initialiseSetup();
 		}
+		else if(!strcmp(argv[1], "--help")) {
+			commandHelp();
+		}
+		else if(!strcmp(argv[1], "--gui")) {
+			setupGUITool();
+		}
+		else {
+			printf("Invalid argument. Type mysql-guardian --help for list of valid parameters.\n");
+			exit(1);
+		}
+	}
+	else {
+		commandHelp();
 	}
 
-	setupGUITool();
-	
 	cleanUpTerminal();
 	cleanUpTasks();
 
 	return 0;
+}
+
+void commandHelp() {
+	printf("MySQL Guardian v%s\n\n", VERSION);
+	printf("--init\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
+	printf("--gui\t\tLaunch the MySQL Guardian console control centre application.\n");
+	printf("--demonize\tLaunch the MySQL Guardian daemon to run in the background.\n");
+	printf("--help\t\tDisplay the help screen.\n");
+	exit(0);
 }
 
 void setupGUITool() {
@@ -75,6 +94,7 @@ void initialiseSetup() {
 	char username[80] = "";		
 	char password[80] = "";		
 
+	printf("MySQL Guardian %s\n\n", VERSION);
 	printf("Configure Monitoring Server\n\n");
 	printf("Server Hostname: ");
 	scanf("%s", &hostname);
