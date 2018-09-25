@@ -17,6 +17,7 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+void setupGUITool();
 void initialiseLog();
 void initialiseSetup();
 void cleanUpTasks();

@@ -29,6 +29,7 @@
 #include "mysql.h"
 #include "fileio.h"
 #include "interface.h"
+#include "mysqlgd.h"
 
 #define VERSION "0.01"
 
@@ -42,24 +43,31 @@ dbserver configServer;		// Struct to store config database server.
 // ncurses terminal, and display the main menu. Also performs clean up tasks
 // upon exit.
 int main(int argc, char **argv) {
-	signal(SIGWINCH, resizeHandler);
-	
-	initialiseLog();
-
 	if(argc > 1) {
+		if(strcmp(argv[1], "demonize\n")) {
+			startDaemon();
+		}
+
 		if(strcmp(argv[1], "init\n")) {
 			initialiseSetup();
 		}
 	}
 
-	getConfig();
-	setupTerminal();
-	mainMenu();
+	setupGUITool();
 	
 	cleanUpTerminal();
 	cleanUpTasks();
 
 	return 0;
+}
+
+void setupGUITool() {
+	signal(SIGWINCH, resizeHandler);
+	
+	initialiseLog();
+	getConfig();
+	setupTerminal();
+	mainMenu();
 }
 
 void initialiseSetup() {

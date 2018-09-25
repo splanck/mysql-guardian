@@ -66,7 +66,7 @@ int writeToSQLLog(char logEntry[200])
 int createConfigFile(char *hostname, char *username, char *password) {
 	FILE *cfgFile;
 
-	cfgFile = fopen(".mysql-guardian_rc", "a");
+	cfgFile = fopen("/etc/mysqlgd.conf", "a");
 
 	if(!cfgFile)
 		return 1;
