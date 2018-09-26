@@ -33,6 +33,8 @@
 #include "mysqlgd.h"
 #include "guardian.h"
 #include "fileio.h"
+#include "utility.h"
+#include "mysql.h"
 
 extern dbserver configServer;      // Struct to store config database server.
 
@@ -41,6 +43,9 @@ time_t last_integrity_check;
 
 double server_check_delay;
 double integrity_check_delay;
+
+extern struct myserver *pFirst;
+extern struct myserver *pLast;
 
 void startDaemon() {
 	pid_t pid = fork();
@@ -98,7 +103,7 @@ int initDaemon() {
 	time(&last_integrity_check);
 
 	while(1) {
-		serverCheck();
+		doServerCheck();
 		integrityCheck();
 
 		sleep(10);
@@ -107,7 +112,7 @@ int initDaemon() {
 	return 0;
 }
 
-int serverCheck() {
+int doServerCheck() {
 	time_t time_now;
 	time(&time_now);
 
@@ -115,10 +120,30 @@ int serverCheck() {
 
 	if(diff > server_check_delay) {
 		syslog(LOG_INFO, "%s", "Time for server check.");
+		checkServersOnline();
+
 		time(&last_server_check);
 	}
 
 	return 0;
+}
+
+int checkServersOnline() {
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+
+	struct myserver *pTemp = pFirst;
+
+	while(pTemp != NULL) {
+		int success = pingServer(pTemp->hostname);
+
+		if(!success)
+			syslog(LOG_INFO, "%s %s", "Server online check succeeded for ", pTemp->hostname);
+		else
+			syslog(LOG_INFO, "%s %s", "Server online check failed for ", pTemp->hostname);
+	
+		pTemp = pTemp->next;
+	}
 }
 
 int integrityCheck() {

@@ -22,6 +22,7 @@
 void startDaemon();
 void getConfigd();
 int initDaemon();
-int serverCheck();
+int doServerCheck();
+int checkServersOnline();
 int integrityCheck();
 void sig_handler();
