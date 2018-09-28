@@ -1,0 +1,14 @@
+[Unit]
+Description=MySQL Guardian Monitoring Service
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/home/splanck/git/mysql-guardian/build/mysql-guardian --demonize
+Restart=always
+WorkingDirectory=/home/splanck/git/mysql-guardian/build
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
