@@ -61,7 +61,7 @@ int mainMenu() {
 	attroff(COLOR_PAIR(1));
 	refresh();
 	
-	int height = 11;
+	int height = 13;
 	int width = 40;
 	int starty = 3;
 	int startx = 35;
@@ -81,6 +81,7 @@ int mainMenu() {
   		"Add Server to Monitoring",
   		"Show Monitored Servers List",
 		"Show Monitored Databases List",
+		"Show Tables List",
   		"Check localhost",
   		"Exit"
 	};
@@ -92,7 +93,7 @@ int mainMenu() {
 	{
 		attron(COLOR_PAIR(1));
 
-		for(int i = 0; i < 8; i++) {
+		for(int i = 0; i < 9; i++) {
 			if(i == highlight)
 				wattron(menuWin, A_REVERSE);
 
@@ -110,11 +111,11 @@ int mainMenu() {
 		if(choice == KEY_DOWN)
 			highlight++;
 
-		if(highlight == 8)
+		if(highlight == 9)
 			highlight = 0;
 
 		if(highlight == -1)
-			highlight = 7;
+			highlight = 8;
 
 		if(choice == 10)
 			break;
@@ -141,9 +142,12 @@ int mainMenu() {
 		showDatabasesList();
 
 	if(highlight == 6)
-		checkServerOnline();
+		showTablesList();
 
 	if(highlight == 7)
+		checkServerOnline();
+
+	if(highlight == 8)
 		return 0;
 
 	mainMenu();

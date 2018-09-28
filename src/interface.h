@@ -29,4 +29,5 @@ void showConfig();
 void showDBVersion();
 void showServersList();
 void showDatabasesList();
+void showTablesList();
 void checkServerOnline();
