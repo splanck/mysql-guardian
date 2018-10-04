@@ -24,6 +24,7 @@ int executeQuery(MYSQL *conn, char *sql, char *errorMsg);
 void handleDBError(MYSQL *conn, char *errorMsg, char *sql);
 int createConfigDB();
 int createConfigTables();
+int writeCheckResult(int id, int type, int result, char *dbname);
 int addServerToTable();
 int getMonitoredServersCount();
 int populateMonitoredServersList();

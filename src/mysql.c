@@ -160,6 +160,14 @@ int createConfigTables() {
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
 
+	strcpy(sqlcmd, "CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, ");
+	strcat(sqlcmd, "server_id INT NOT NULL, ");
+	strcat(sqlcmd, "time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,");
+	strcat(sqlcmd, "check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)");
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
     strcpy(sqlcmd, "INSERT INTO users(username, password, admin) VALUES('admin','admin',true)");
     strcpy(errorMsg, "Cannot create admin user account.");
     
@@ -167,6 +175,51 @@ int createConfigTables() {
         return 1;
 
   	writeToLog("Created configuration tables.");
+
+  	mysql_close(conn);
+}
+
+int writeCheckResult(int id, int type, int result, char *dbname) {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+
+    if(conn == NULL)
+        return 1;
+
+  	char sqlcmd[500];
+
+    int length = snprintf(NULL, 0, "%d", id);
+    char* strid = malloc(length + 1);
+    snprintf(strid, length + 1, "%d", id);
+
+    length = snprintf(NULL, 0, "%d", type);
+    char* strtype = malloc(length + 1);
+    snprintf(strtype, length + 1, "%d", type);
+
+    length = snprintf(NULL, 0, "%d", result);
+    char* strresult = malloc(length + 1);
+    snprintf(strresult, length + 1, "%d", result);
+
+  	strcpy(sqlcmd, "INSERT INTO check_results(server_id, check_type, check_result, db_name) ");
+	strcat(sqlcmd, "VALUES(");
+	strcat(sqlcmd, strid);
+	strcat(sqlcmd, ", ");
+	strcat(sqlcmd, strtype);
+	strcat(sqlcmd, ", ");
+	strcat(sqlcmd, strresult);
+	strcat(sqlcmd, ", '");
+	strcat(sqlcmd, dbname); 
+  	strcat(sqlcmd, "')");
+
+	free(strid);
+	free(strtype);
+	free(strresult);
+
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot record check result to database.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
 
   	mysql_close(conn);
 }
