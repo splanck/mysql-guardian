@@ -47,6 +47,10 @@ double integrity_check_delay;
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
 
+// Forked the current process to create the daemon process, writes successful start up
+// to the system log, sets the current working directory, closes standard input, output
+// and error, reads configuration from config file, and calls the init function to
+// initiate daemon operations.
 void startDaemon() {
 	pid_t pid = fork();
 
@@ -93,6 +97,8 @@ void getConfigd() {
     configServer.password = password;
 }
 
+// Sets up handling of SIGTERM termination signal from kernel, sets intervals for checks,
+// and performs a loop that runs the desired checks at the specified intervals.
 int initDaemon() {
 	signal(SIGTERM, sig_handler);
 
@@ -112,6 +118,9 @@ int initDaemon() {
 	return 0;
 }
 
+// Checks to see if its time to perform server online checks, and if so, it calls the
+// checkServersOnline function to run the checks. It also resets the check timer to
+// calculate time next checks should be performed.
 int doServerCheck() {
 	time_t time_now;
 	time(&time_now);
@@ -128,6 +137,9 @@ int doServerCheck() {
 	return 0;
 }
 
+// Retrieves the server linked list if it hasn't been retrieved already and loops through
+// each server in the list. pingServer is called to perform the check and the result is
+// recorded in both the system log and the check_results table in the monitoring database.
 int checkServersOnline() {
 	if(pFirst == NULL)
 		populateMonitoredServersList();
@@ -141,6 +153,8 @@ int checkServersOnline() {
 			syslog(LOG_INFO, "%s %s", "Server online check succeeded for ", pTemp->hostname);
 		else
 			syslog(LOG_INFO, "%s %s", "Server online check failed for ", pTemp->hostname);
+
+		writeCheckResult(pTemp->id, 1, success, NULL);
 	
 		pTemp = pTemp->next;
 	}
@@ -154,12 +168,20 @@ int integrityCheck() {
 
 	if(diff > integrity_check_delay) {
 		syslog(LOG_INFO, "%s", "Time for integrity checks.");
+		performIntegrityCheck();
+
 		time(&last_integrity_check);
 	}
 
 	return 0;
 }
 
+int performIntegrityCheck() {
+	return 0;
+}
+
+// Handles signal 15 from the kernel and performs tasks to prepare for shutdown. A shutdown
+// message is written to the log and the daemon terminates normally. 
 void sig_handler(int signum) {
 	syslog(LOG_INFO, "%s", "MySQL Guardian daemon stopping...");
 	exit(0);

@@ -25,4 +25,5 @@ int initDaemon();
 int doServerCheck();
 int checkServersOnline();
 int integrityCheck();
+int performIntegrityCheck();
 void sig_handler();

@@ -207,10 +207,16 @@ int writeCheckResult(int id, int type, int result, char *dbname) {
 	strcat(sqlcmd, strtype);
 	strcat(sqlcmd, ", ");
 	strcat(sqlcmd, strresult);
-	strcat(sqlcmd, ", '");
-	strcat(sqlcmd, dbname); 
-  	strcat(sqlcmd, "')");
 
+	if(dbname) {
+		strcat(sqlcmd, ", '");
+		strcat(sqlcmd, dbname); 
+  		strcat(sqlcmd, "')");
+	}	
+	else {
+		strcat(sqlcmd, ", NULL)");
+	}
+	
 	free(strid);
 	free(strtype);
 	free(strresult);
