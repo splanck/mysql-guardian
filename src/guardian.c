@@ -33,11 +33,12 @@
 
 #define VERSION "0.01"
 
-int colourSupport = 0;		// True if terminal supports ncurses colour
-int canChangeColours = 0;	// True if terminal supports ncurses change colour 
-char db_error[1000];		// Global variable to store database error messages
+int colourSupport = 0;			// True if terminal supports ncurses colour
+int canChangeColours = 0;		// True if terminal supports ncurses change colour 
+char db_error[1000];			// Global variable to store database error messages
 
-dbserver configServer;		// Struct to store config database server.
+dbserver configServer;			// Struct to store config database server.
+guardianconfig configSettings;	// Struct to store configuration settings for daemon.
 
 // Calls functions to initialise the log, read configuration file, setup
 // ncurses terminal, and display the main menu. Also performs clean up tasks
@@ -143,6 +144,9 @@ void getConfig() {
 	configServer.hostname = hostname;
 	configServer.username = username;
 	configServer.password = password;
+
+	configSettings.onlineCheckInterval = 60;
+	configSettings.integrityCheckInterval = 500;
 }
 
 // Writes shutdown message to log file.

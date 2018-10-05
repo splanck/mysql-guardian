@@ -36,7 +36,8 @@
 #include "utility.h"
 #include "mysql.h"
 
-extern dbserver configServer;      // Struct to store config database server.
+extern dbserver configServer;			// Struct to store config database server.
+extern guardianconfig configSettings;	// Struct to store configuration settings for daemon.
 
 time_t last_server_check;
 time_t last_integrity_check;
@@ -95,6 +96,9 @@ void getConfigd() {
     configServer.hostname = hostname;
     configServer.username = username;
     configServer.password = password;
+
+    configSettings.onlineCheckInterval = 60;
+	configSettings.integrityCheckInterval = 500;
 }
 
 // Sets up handling of SIGTERM termination signal from kernel, sets intervals for checks,
@@ -102,8 +106,8 @@ void getConfigd() {
 int initDaemon() {
 	signal(SIGTERM, sig_handler);
 
-	server_check_delay = 30;
-	integrity_check_delay = 600;
+	server_check_delay = configSettings.onlineCheckInterval;
+	integrity_check_delay = configSettings.integrityCheckInterval;
 
 	time(&last_server_check);
 	time(&last_integrity_check);

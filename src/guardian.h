@@ -25,10 +25,16 @@ void cleanUpTasks();
 void getConfig();
 
 typedef struct server dbserver;
+typedef struct gconfig guardianconfig;
 
 struct server {
 	char *hostname;
 	int port;
 	char *username;
 	char *password;
+};
+
+struct gconfig {
+	int onlineCheckInterval;
+	int integrityCheckInterval;
 };
