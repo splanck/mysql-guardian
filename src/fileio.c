@@ -71,21 +71,18 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	if(!cfgFile)
 		return 1;
 
-	fprintf(cfgFile, "Hostname %s\n", hostname);
-	fprintf(cfgFile, "Username %s\n", username);
-	fprintf(cfgFile, "Password %s\n", password);
+	fprintf(cfgFile, "HOSTNAME %s\n", hostname);
+	fprintf(cfgFile, "USERNAME %s\n", username);
+	fprintf(cfgFile, "PASSWORD %s\n", password);
 	
 	fclose(cfgFile);
 
 	return 0;
 }
 
-// Reads the .mysql-guardian_rc configuration file and stores its valies 
-// into global variables.
+// Reads configuration from /etc/mysqlgd.conf and passed values back as string pointers.
 int readConfig(char *hostname, char *username, char *password) {
-	char host_buffer[1000];
-	char username_buffer[1000];
-	char password_buffer[1000];
+	char k[40], v[40];
 	
 	FILE *configFile;
 
@@ -94,58 +91,18 @@ int readConfig(char *hostname, char *username, char *password) {
 	if (!configFile)
 		return 1;
 
-	fgets(host_buffer, 1000, configFile);
-	fgets(username_buffer, 1000, configFile);
-	fgets(password_buffer, 1000, configFile);
+	while(!feof(configFile)) {
+		if(fscanf(configFile, "%s %s", k, v)) {
+			if(strcmp(k, "HOSTNAME") == 0)
+				strcpy(hostname, v);
 
-	fclose(configFile);
+			if(strcmp(k, "USERNAME") == 0)
+				strcpy(username, v);
 
-  	char *str;
-
-  	str = strtok(host_buffer, " ");
-  	str = strtok(NULL, " ");
-  	remove_char_from_string('\n', str);
-	strcpy(hostname, str);
-
-	str = strtok(username_buffer, " ");
-  	str = strtok(NULL, " ");
-  	remove_char_from_string('\n', str);
-	strcpy(username, str);
-
-	str = strtok(password_buffer, " ");
-  	str = strtok(NULL, " ");
-  	remove_char_from_string('\n', str);
-	strcpy(password, str);
-
-  	return 0;
-}
-
-// Improved read config function that is not yet working.
-int readConfig2() {
-	char buffer[1000];
-	char cfg_hostname[80];
-	char cfg_username[25];
-	char cfg_password[25];
-
-	FILE *configFile;
-
-	configFile = fopen(".mysql-guardian_rc", "r");
-
-	if (!configFile)
-		return 1;
-
-	char *str;
-
-	while(fgets(buffer, 1000, configFile)) {
-		str = strtok(buffer, " ");
-
-		if(strcmp(str, "Hostname"))
-			strcpy(cfg_hostname, strtok(NULL, " "));
-		else if(strcmp(str, "Username"))
-			strcpy(cfg_username, strtok(NULL, " "));
-		else if(strcmp(str, "Password"))
-			strcpy(cfg_password, strtok(NULL, " "));
-	}
+			if(strcmp(k, "PASSWORD") == 0)
+				strcpy(password, v);
+		}	
+    }
 
 	fclose(configFile);
 
