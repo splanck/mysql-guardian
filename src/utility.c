@@ -182,21 +182,20 @@ int sendPing(int p_sockfd, struct sockaddr_in *p_addr, char *p_dom, char *p_ip, 
     int retries = 0;
     int ttl_val = 64;
     int msg_count = 0;
-    int i = 1;
     int addr_len = 1;
     int msg_received_count = 0;
      
     struct ping_packet pckt;
     struct sockaddr_in r_addr;
-    struct timeval tv_out;
+    struct timeval timeout;
 
-	tv_out.tv_sec = 30;
-	tv_out.tv_usec = 0;
+	timeout.tv_sec = 30;
+	timeout.tv_usec = 0;
  
     if (setsockopt(p_sockfd, SOL_IP, IP_TTL, &ttl_val, sizeof(ttl_val)) != 0)
         return -1;
  
-    setsockopt(p_sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv_out, sizeof tv_out);
+    setsockopt(p_sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof timeout);
  
     while(1) {
         bzero(&pckt, sizeof(pckt));
@@ -204,10 +203,10 @@ int sendPing(int p_sockfd, struct sockaddr_in *p_addr, char *p_dom, char *p_ip, 
         pckt.hdr.type = ICMP_ECHO;
         pckt.hdr.un.echo.id = getpid();
          
-        for (i = 0; i < sizeof(pckt.msg) - 1; i++)
+        for (int i = 0; i < sizeof(pckt.msg) - 1; i++)
             pckt.msg[i] = i+'0';
          
-        pckt.msg[i] = 0;
+        pckt.msg[1] = 0;
         pckt.hdr.un.echo.sequence = msg_count++;
         pckt.hdr.checksum = checkSum(&pckt, sizeof(pckt));
  

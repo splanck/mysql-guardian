@@ -79,13 +79,6 @@ void startDaemon() {
 	close(STDERR_FILENO);
 
 	getConfigd();
-
-	syslog(LOG_INFO, "%d", configSettings.onlineCheckInterval);
-	syslog(LOG_INFO, "%d", configSettings.integrityCheckInterval);
-	syslog(LOG_INFO, "%s", configServer.hostname);
-	syslog(LOG_INFO, "%s", configServer.username);
-	syslog(LOG_INFO, "%s", configServer.password);
-
 	initDaemon();
 }
 
