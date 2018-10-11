@@ -79,12 +79,22 @@ void startDaemon() {
 	close(STDERR_FILENO);
 
 	getConfigd();
+
+	syslog(LOG_INFO, "%d", configSettings.onlineCheckInterval);
+	syslog(LOG_INFO, "%d", configSettings.integrityCheckInterval);
+	syslog(LOG_INFO, "%s", configServer.hostname);
+	syslog(LOG_INFO, "%s", configServer.username);
+	syslog(LOG_INFO, "%s", configServer.password);
+
 	initDaemon();
 }
 
 // Reads MySQL monitoring server configuration into memory using getConfig()
 void getConfigd() {
-    char *hostname = malloc(80);
+    configSettings.onlineCheckInterval = 60;
+	configSettings.integrityCheckInterval = 500;
+
+	char *hostname = malloc(80);
     char *username = malloc(25);
     char *password = malloc(25);
 
@@ -96,9 +106,6 @@ void getConfigd() {
     configServer.hostname = hostname;
     configServer.username = username;
     configServer.password = password;
-
-    configSettings.onlineCheckInterval = 60;
-	configSettings.integrityCheckInterval = 500;
 }
 
 // Sets up handling of SIGTERM termination signal from kernel, sets intervals for checks,
@@ -116,7 +123,7 @@ int initDaemon() {
 		doServerCheck();
 		integrityCheck();
 
-		sleep(10);
+		sleep(2);
 	}
 
 	return 0;

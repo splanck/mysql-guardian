@@ -24,6 +24,10 @@
 #include <string.h>
 #include <time.h>
 #include "utility.h"
+#include "mysqlgd.h"
+#include "guardian.h"
+
+extern guardianconfig configSettings;   // Struct to store configuration settings for daemon.
 
 // Writes an entry into the mysql_guardian.log file. It accepts a char array
 // as the string to be written to the log.
@@ -93,6 +97,8 @@ int readConfig(char *hostname, char *username, char *password) {
 
 	while(!feof(configFile)) {
 		if(fscanf(configFile, "%s %s", k, v)) {
+			ucase(k);
+
 			if(strcmp(k, "HOSTNAME") == 0)
 				strcpy(hostname, v);
 
@@ -101,6 +107,20 @@ int readConfig(char *hostname, char *username, char *password) {
 
 			if(strcmp(k, "PASSWORD") == 0)
 				strcpy(password, v);
+
+			if(strcmp(k, "ONLINE_CHECK_INTERVAL") == 0) {
+				int i = atoi(v);
+				
+				if(i > 0 && i < 99999)
+					configSettings.onlineCheckInterval = i;
+			}
+
+			if(strcmp(k, "INTEGRITY_CHECK_INTERVAL") == 0) {
+				int i = atoi(v);
+
+				if(i > 0 && i < 99999)
+					configSettings.integrityCheckInterval = i;
+			}
 		}	
     }
 

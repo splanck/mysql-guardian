@@ -189,6 +189,9 @@ int sendPing(int p_sockfd, struct sockaddr_in *p_addr, char *p_dom, char *p_ip, 
     struct ping_packet pckt;
     struct sockaddr_in r_addr;
     struct timeval tv_out;
+
+	tv_out.tv_sec = 30;
+	tv_out.tv_usec = 0;
  
     if (setsockopt(p_sockfd, SOL_IP, IP_TTL, &ttl_val, sizeof(ttl_val)) != 0)
         return -1;
@@ -265,4 +268,16 @@ int pingServer(char *hostname) {
         return 0;
     else
         return -1;
+}
+
+// Accepts a character array and converts all letters to uppercase.
+void ucase(char str[]) {
+	int i = 0;
+   
+	while (str[i] != '\0') {
+		if (str[i] >= 'a' && str[i] <= 'z') 
+			str[i] = str[i] - 32;
+
+		i++;
+	}
 }
