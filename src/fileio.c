@@ -70,14 +70,20 @@ int writeToSQLLog(char logEntry[200])
 int createConfigFile(char *hostname, char *username, char *password) {
 	FILE *cfgFile;
 
-	cfgFile = fopen("/etc/mysqlgd.conf", "a");
+	cfgFile = fopen("/etc/mysqlgd.conf", "w");
 
 	if(!cfgFile)
 		return 1;
 
+	freopen(NULL, "w+", cfgFile);
+
 	fprintf(cfgFile, "HOSTNAME %s\n", hostname);
 	fprintf(cfgFile, "USERNAME %s\n", username);
 	fprintf(cfgFile, "PASSWORD %s\n", password);
+	fprintf(cfgFile, "ONLINE_CHECK_INTERVAL 60\n");
+	fprintf(cfgFile, "DATABASE_SERVER_CHECK_INTERVAL 120\n");
+	fprintf(cfgFile, "DATABASE_CHECK_INTERVAL 120\n");
+	fprintf(cfgFile, "INTEGRITY_CHECH_INTERVAL 500\n");
 	
 	fclose(cfgFile);
 
@@ -120,6 +126,20 @@ int readConfig(char *hostname, char *username, char *password) {
 
 				if(i > 0 && i < 99999)
 					configSettings.integrityCheckInterval = i;
+			}
+
+			if(strcmp(k, "DATABASE_CHECK_INTERVAL") == 0) {
+				int i = atoi(v);
+
+				if(i > 0 && i < 99999)
+					configSettings.databaseCheckInterval = i;
+			}
+
+			if(strcmp(k, "DATABASE_SERVER_CHECK_INTERVAL") == 0) {
+				int i = atoi(v);
+
+				if(i > 0 && i < 99999)
+					configSettings.databaseServerCheckInterval = i;
 			}
 		}	
     }

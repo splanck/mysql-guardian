@@ -36,5 +36,7 @@ struct server {
 
 struct gconfig {
 	int onlineCheckInterval;
+	int databaseServerCheckInterval;
+	int databaseCheckInterval;
 	int integrityCheckInterval;
 };

@@ -41,9 +41,13 @@ extern guardianconfig configSettings;	// Struct to store configuration settings 
 
 time_t last_server_check;
 time_t last_integrity_check;
+time_t last_database_check;
+time_t last_database_server_check;
 
 double server_check_delay;
 double integrity_check_delay;
+double database_check_delay;
+double database_server_check_delay;
 
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
@@ -85,6 +89,8 @@ void startDaemon() {
 // Reads MySQL monitoring server configuration into memory using getConfig()
 void getConfigd() {
     configSettings.onlineCheckInterval = 60;
+	configSettings.databaseCheckInterval = 120;
+	configSettings.databaseServerCheckInterval = 120;
 	configSettings.integrityCheckInterval = 500;
 
 	char *hostname = malloc(80);
@@ -107,14 +113,20 @@ int initDaemon() {
 	signal(SIGTERM, sig_handler);
 
 	server_check_delay = configSettings.onlineCheckInterval;
+	database_server_check_delay = configSettings.databaseServerCheckInterval;
+	database_check_delay = configSettings.databaseCheckInterval;
 	integrity_check_delay = configSettings.integrityCheckInterval;
 
 	time(&last_server_check);
 	time(&last_integrity_check);
+	time(&last_database_server_check);
+	time(&last_database_check);
 
 	while(1) {
 		doServerCheck();
-		integrityCheck();
+		doDatabaseServerCheck();
+		doDatabaseCheck();
+		doIntegrityCheck();
 
 		sleep(2);
 	}
@@ -164,7 +176,47 @@ int checkServersOnline() {
 	}
 }
 
-int integrityCheck() {
+int doDatabaseServerCheck() {
+	time_t time_now;
+	time(&time_now);
+
+	double diff = difftime(time_now, last_database_server_check);
+
+	if(diff > database_check_delay) {
+		syslog(LOG_INFO, "%s", "Time for database server check.");
+		checkDatabaseServer();
+
+		time(&last_database_server_check);
+	}
+
+	return 0;
+}
+
+int checkDatabaseServer() {
+	return 0;
+}
+
+int doDatabaseCheck() {
+	time_t time_now;
+	time(&time_now);
+
+	double diff = difftime(time_now, last_database_check);
+
+	if(diff > database_check_delay) {
+		syslog(LOG_INFO, "%s", "Time for database online check.");
+		checkDatabaseOnline();
+
+		time(&last_database_check);
+	}
+
+	return 0;
+}
+
+int checkDatabaseOnline() {
+	return 0;
+}
+
+int doIntegrityCheck() {
 	time_t time_now;
 	time(&time_now);
 
