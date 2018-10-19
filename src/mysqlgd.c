@@ -170,7 +170,7 @@ int checkServersOnline() {
 		else
 			syslog(LOG_INFO, "%s %s", "Server online check failed for ", pTemp->hostname);
 
-		writeCheckResult(pTemp->id, 1, success, NULL);
+		writeCheckResult(pTemp->id, 1, success, NULL, NULL);
 	
 		pTemp = pTemp->next;
 	}

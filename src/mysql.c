@@ -168,6 +168,11 @@ int createConfigTables() {
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
 		return 1;
 
+	strcpy(sqlcmd, "CREATE TABLE check_result_errors(id INT, error_msg TEXT)");
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
     strcpy(sqlcmd, "INSERT INTO users(username, password, admin) VALUES('admin','admin',true)");
     strcpy(errorMsg, "Cannot create admin user account.");
     
@@ -179,7 +184,7 @@ int createConfigTables() {
   	mysql_close(conn);
 }
 
-int writeCheckResult(int id, int type, int result, char *dbname) {
+int writeCheckResult(int id, int type, int result, char *dbname, char *errorText) {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
         configServer.password, "mysql_guardian");
 
@@ -226,6 +231,35 @@ int writeCheckResult(int id, int type, int result, char *dbname) {
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
+
+	if(errorText != NULL) {
+		strcpy(sqlcmd, "SELECT LAST_INSERT_ID()");
+
+		if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+			return 1;
+	
+		MYSQL_RES *result = mysql_store_result(conn);
+    	MYSQL_ROW row = mysql_fetch_row(result); 
+
+    	int row_id = atoi(row[0]);
+
+		length = snprintf(NULL, 0, "%d", row_id);
+    	char* strid = malloc(length + 1);
+    	snprintf(strid, length + 1, "%d", row_id);
+
+    	mysql_free_result(result);
+
+		strcpy(sqlcmd, "INSERT INTO check_result_errors(id, error_msg) VALUES("); 
+		strcat(sqlcmd, strid);
+		strcat(sqlcmd, "', ");
+		strcat(sqlcmd, errorText);
+		strcat(sqlcmd, "'");
+
+		free(strid);
+
+		if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+			return 1;
+	}
 
   	mysql_close(conn);
 }
