@@ -240,7 +240,7 @@ int sendPing(int p_sockfd, struct sockaddr_in *p_addr, char *p_dom, char *p_ip, 
 }
  
 // Accepts a server host name and checks to see if it is reachable. Returns
-// 0 on success and -1 on failure.
+// 0 on success and 1 on failure.
 int pingServer(char *hostname) {
     struct sockaddr_in addr_con;
 
@@ -254,19 +254,19 @@ int pingServer(char *hostname) {
     ip = DNSLookup(hostname, &addr_con);
     
     if(ip == NULL)
-        return -1;
+        return 1;
  
     reverse_host = reverseDNSLookup(ip);
 
     sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     
     if(sockfd < 0)
-        return -1;
+        return 1;
  
     if(sendPing(sockfd, &addr_con, reverse_host, ip, hostname) == 0) 
         return 0;
     else
-        return -1;
+        return 1;
 }
 
 // Accepts a character array and converts all letters to uppercase.

@@ -30,6 +30,7 @@ int getMonitoredServersCount();
 int populateMonitoredServersList();
 int populateServerDatabasesList(struct myserver *);
 int populateDatabaseTablesList(struct myserver *, struct mydatabase *);
+int checkDatabase(struct myserver *svr, struct mydatabase *db, char *db_err);
 int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl);
 int authenticateUser(char *username, char *password);
 void getDBVersion(char *dbversion);

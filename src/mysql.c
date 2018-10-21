@@ -251,9 +251,9 @@ int writeCheckResult(int id, int type, int result, char *dbname, char *errorText
 
 		strcpy(sqlcmd, "INSERT INTO check_result_errors(id, error_msg) VALUES("); 
 		strcat(sqlcmd, strid);
-		strcat(sqlcmd, "', ");
+		strcat(sqlcmd, ", '");
 		strcat(sqlcmd, errorText);
-		strcat(sqlcmd, "'");
+		strcat(sqlcmd, "')");
 
 		free(strid);
 
@@ -463,6 +463,19 @@ int populateDatabaseTablesList(struct myserver *svr, struct mydatabase *db) {
     mysql_close(conn);
 
     return 0;
+}
+
+int checkDatabase(struct myserver *svr, struct mydatabase *db, char *db_err) {
+    MYSQL *conn = connectDB(svr->hostname, svr->username, svr->password, db->dbname);
+
+    if(conn == NULL) {
+		strcpy(db_err, db_error);
+        return 1;
+	}
+	else {
+		mysql_close(conn);
+		return 0;
+	}
 }
 
 int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl) {

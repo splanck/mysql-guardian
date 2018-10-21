@@ -51,6 +51,7 @@ double database_server_check_delay;
 
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
+//extern char db_error[1000];
 
 // Forked the current process to create the daemon process, writes successful start up
 // to the system log, sets the current working directory, closes standard input, output
@@ -166,9 +167,9 @@ int checkServersOnline() {
 		int success = pingServer(pTemp->hostname);
 
 		if(!success)
-			syslog(LOG_INFO, "%s %s", "Server online check succeeded for ", pTemp->hostname);
+			syslog(LOG_INFO, "%s %s", "Server online check succeeded for", pTemp->hostname);
 		else
-			syslog(LOG_INFO, "%s %s", "Server online check failed for ", pTemp->hostname);
+			syslog(LOG_INFO, "%s %s", "Server online check failed for", pTemp->hostname);
 
 		writeCheckResult(pTemp->id, 1, success, NULL, NULL);
 	
@@ -193,6 +194,27 @@ int doDatabaseServerCheck() {
 }
 
 int checkDatabaseServer() {
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+
+	struct myserver *pTemp = pFirst;
+
+	while(pTemp != NULL) {
+		char db_err[1000] = "";
+
+		int success = checkDatabase(pTemp, NULL, db_err);
+
+		if(!success)
+			syslog(LOG_INFO, "%s %s", "Database server online check succeeded for", 
+				pTemp->hostname);
+		else
+			syslog(LOG_INFO, "%s %s", "Database Server online check failed for", pTemp->hostname);
+
+		writeCheckResult(pTemp->id, 2, success, NULL, db_err);
+	
+		pTemp = pTemp->next;
+	}
+
 	return 0;
 }
 
@@ -213,6 +235,40 @@ int doDatabaseCheck() {
 }
 
 int checkDatabaseOnline() {
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+
+	struct myserver *pTemp = pFirst;
+
+	int success = 0;
+
+	while(pTemp != NULL) {
+		char db_err[1000] = "";
+
+		if(pTemp->firstDatabase == NULL) {
+			success = populateServerDatabasesList(pTemp);
+     	}
+
+		struct mydatabase *pDatabase = pTemp->firstDatabase;
+
+		while(pDatabase != NULL) {
+			int success = checkDatabase(pTemp, pDatabase, db_err);
+
+			if(!success)
+				syslog(LOG_INFO, "%s %s %s %s", "Database online check succeeded for", 
+					pDatabase->dbname, "on", pTemp->hostname);
+			else
+				syslog(LOG_INFO, "%s %s %s %s", "Database Server online check failed for", 
+					pDatabase->dbname, "on", pTemp->hostname);
+
+			writeCheckResult(pTemp->id, 3, success, pDatabase->dbname, db_err);
+	
+			pDatabase = pDatabase->next;
+		}
+
+		pTemp = pTemp->next;
+	}
+
 	return 0;
 }
 
