@@ -237,6 +237,9 @@ int writeCheckResult(int id, int type, int result, char *dbname, char *errorText
 
 		if(executeQuery(conn, sqlcmd, errorMsg) == 1)
 			return 1;
+
+		char c = 39;
+		remove_char_from_string(c, errorText);
 	
 		MYSQL_RES *result = mysql_store_result(conn);
     	MYSQL_ROW row = mysql_fetch_row(result); 
@@ -469,6 +472,7 @@ int checkDatabase(struct myserver *svr, struct mydatabase *db, char *db_err) {
     MYSQL *conn = connectDB(svr->hostname, svr->username, svr->password, db->dbname);
 
     if(conn == NULL) {
+		writeToLog(db_error);
 		strcpy(db_err, db_error);
         return 1;
 	}

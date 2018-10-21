@@ -129,7 +129,7 @@ int initDaemon() {
 		doDatabaseCheck();
 		doIntegrityCheck();
 
-		sleep(2);
+		sleep(5);
 	}
 
 	return 0;
@@ -164,17 +164,28 @@ int checkServersOnline() {
 	struct myserver *pTemp = pFirst;
 
 	while(pTemp != NULL) {
+		char *db_err = malloc(200);
+
 		int success = pingServer(pTemp->hostname);
 
-		if(!success)
+		if(!success) {
 			syslog(LOG_INFO, "%s %s", "Server online check succeeded for", pTemp->hostname);
-		else
+			db_err = NULL;
+		}	
+		else {
 			syslog(LOG_INFO, "%s %s", "Server online check failed for", pTemp->hostname);
 
-		writeCheckResult(pTemp->id, 1, success, NULL, NULL);
-	
+			strcpy(db_err, "Could not reach the host ");
+			strcat(db_err, pTemp->hostname);
+		}
+
+		writeCheckResult(pTemp->id, 1, success, NULL, db_err);
+
+		free(db_err);
 		pTemp = pTemp->next;
 	}
+
+	return 0;
 }
 
 int doDatabaseServerCheck() {
@@ -183,7 +194,7 @@ int doDatabaseServerCheck() {
 
 	double diff = difftime(time_now, last_database_server_check);
 
-	if(diff > database_check_delay) {
+	if(diff > database_server_check_delay) {
 		syslog(LOG_INFO, "%s", "Time for database server check.");
 		checkDatabaseServer();
 
@@ -200,7 +211,7 @@ int checkDatabaseServer() {
 	struct myserver *pTemp = pFirst;
 
 	while(pTemp != NULL) {
-		char db_err[1000] = "";
+		char *db_err = malloc(500);
 
 		int success = checkDatabase(pTemp, NULL, db_err);
 
@@ -210,8 +221,12 @@ int checkDatabaseServer() {
 		else
 			syslog(LOG_INFO, "%s %s", "Database Server online check failed for", pTemp->hostname);
 
+		if(!success)
+			db_err = NULL;
+
 		writeCheckResult(pTemp->id, 2, success, NULL, db_err);
-	
+
+		free(db_err);
 		pTemp = pTemp->next;
 	}
 
@@ -243,7 +258,7 @@ int checkDatabaseOnline() {
 	int success = 0;
 
 	while(pTemp != NULL) {
-		char db_err[1000] = "";
+		char *db_err = malloc(500);
 
 		if(pTemp->firstDatabase == NULL) {
 			success = populateServerDatabasesList(pTemp);
@@ -261,11 +276,15 @@ int checkDatabaseOnline() {
 				syslog(LOG_INFO, "%s %s %s %s", "Database Server online check failed for", 
 					pDatabase->dbname, "on", pTemp->hostname);
 
+			if(!success)
+				db_err = NULL;
+
 			writeCheckResult(pTemp->id, 3, success, pDatabase->dbname, db_err);
 	
 			pDatabase = pDatabase->next;
 		}
 
+		free(db_err);
 		pTemp = pTemp->next;
 	}
 
