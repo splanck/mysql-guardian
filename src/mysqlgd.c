@@ -30,11 +30,11 @@
 #include <string.h>
 #include <time.h>
 #include <signal.h>
-#include "mysqlgd.h"
+#include "utility.h"
 #include "guardian.h"
 #include "fileio.h"
-#include "utility.h"
 #include "mysql.h"
+#include "mysqlgd.h"
 
 extern dbserver configServer;			// Struct to store config database server.
 extern guardianconfig configSettings;	// Struct to store configuration settings for daemon.
@@ -51,7 +51,6 @@ double database_server_check_delay;
 
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
-//extern char db_error[1000];
 
 // Forked the current process to create the daemon process, writes successful start up
 // to the system log, sets the current working directory, closes standard input, output
@@ -260,9 +259,8 @@ int checkDatabaseOnline() {
 	while(pTemp != NULL) {
 		char *db_err = malloc(500);
 
-		if(pTemp->firstDatabase == NULL) {
-			success = populateServerDatabasesList(pTemp);
-     	}
+		if(pTemp->firstDatabase == NULL) 
+			success = populateServerDatabasesList(pTemp);	
 
 		struct mydatabase *pDatabase = pTemp->firstDatabase;
 
@@ -299,7 +297,7 @@ int doIntegrityCheck() {
 
 	if(diff > integrity_check_delay) {
 		syslog(LOG_INFO, "%s", "Time for integrity checks.");
-		performIntegrityCheck();
+		performIntegrityCheckDB();
 
 		time(&last_integrity_check);
 	}
@@ -307,7 +305,45 @@ int doIntegrityCheck() {
 	return 0;
 }
 
-int performIntegrityCheck() {
+int performIntegrityCheckDB() {
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+
+	struct myserver *pTemp = pFirst;
+
+	while(pTemp != NULL) {
+		if(pTemp->firstDatabase == NULL)
+			populateServerDatabasesList(pTemp); 
+
+		struct mydatabase *pDatabase = pTemp->firstDatabase;
+
+		while(pDatabase != NULL) {
+			syslog(LOG_INFO, "%s %s %s %s", "Checking tables in", pDatabase->dbname, "on", 
+				pTemp->hostname);
+
+			performIntegrityCheckTable(pTemp, pDatabase);
+
+			pDatabase = pDatabase->next;
+		}
+
+		pTemp = pTemp->next;
+	}
+
+	return 0;
+}
+
+int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDatabase) {
+	if(pDatabase->firstTable == NULL)
+		populateDatabaseTablesList(pServer, pDatabase);	
+
+	struct mytable *pTable = pDatabase->firstTable;
+		
+	while(pTable != NULL) {
+		syslog(LOG_INFO, "%s %s %s %s", "Checking table", pTable->tblname, "in", pDatabase->dbname);
+
+		pTable = pTable->next;
+	}
+
 	return 0;
 }
 

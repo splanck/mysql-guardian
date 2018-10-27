@@ -29,5 +29,6 @@ int checkDatabaseServer();
 int doDatabaseCheck();
 int checkDatabaseOnline();
 int doIntegrityCheck();
-int performIntegrityCheck();
+int performIntegrityCheckDB();
+int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDatabase);
 void sig_handler();
