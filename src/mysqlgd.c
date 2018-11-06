@@ -341,6 +341,18 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 	while(pTable != NULL) {
 		syslog(LOG_INFO, "%s %s %s %s", "Checking table", pTable->tblname, "in", pDatabase->dbname);
 
+		int success = checkTable(pServer, pDatabase, pTable);
+
+		if(success == 0) 
+			syslog(LOG_INFO, "%s %s", pTable->tblname, "check was successful.");
+		else if(success == 1) 
+			syslog(LOG_INFO, "%s %s", pTable->tblname, "check returned errors.");
+		else if(success == 2)
+			syslog(LOG_INFO, "%s %s", pTable->tblname, 
+				"is using a storage engine that does not support table checking.");
+		else if(success == -1)
+			syslog(LOG_INFO, "%s %s", "Could not perform table check on", pTable->tblname);
+
 		pTable = pTable->next;
 	}
 

@@ -486,7 +486,7 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
     MYSQL *conn = connectDB(svr->hostname, svr->username, svr->password, db->dbname);
 
     if(conn == NULL)
-        return 1;
+        return -1;
 
     char sqlcmd[500];
     strcpy(sqlcmd, "CHECK TABLE ");
@@ -502,14 +502,14 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
     strcat(errorMsg, ".");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-        return 1;
+        return -1;
 
     MYSQL_RES *result = mysql_store_result(conn);
 
     if(result == NULL) {
         handleDBError(conn, errorMsg, sqlcmd);
 
-        return 1;
+        return -1;
     }
 
     int num_fields = mysql_num_fields(result);
@@ -519,10 +519,12 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
 	int checkresult = 1;
 
     while (row = mysql_fetch_row(result)) { 
-		if(strcmp(row[3], "status")) {
-			if(strcmp(row[4], "OK")) {
+		if(strcmp(row[2], "status")) {
+			if(strcmp(row[3], "OK"))
 				checkresult = 0;
-			}
+
+			if(strcmp(row[3], "The storage engine for the table doesn't support check"))
+				checkresult = 2;
 		}
     }
 
