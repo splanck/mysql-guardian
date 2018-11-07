@@ -318,10 +318,17 @@ int performIntegrityCheckDB() {
 		struct mydatabase *pDatabase = pTemp->firstDatabase;
 
 		while(pDatabase != NULL) {
-			syslog(LOG_INFO, "%s %s %s %s", "Checking tables in", pDatabase->dbname, "on", 
-				pTemp->hostname);
+			if((strcmp(pDatabase->dbname, "information_schema") == 0) ||
+				(strcmp(pDatabase->dbname, "performance_schema") == 0)) {
+				syslog(LOG_INFO, "%s %s %s %s. %s", "Table check not valid for system database", 
+					pDatabase->dbname, "on", pTemp->hostname, "Skipping.");
+			}
+			else {
+				syslog(LOG_INFO, "%s %s %s %s", "Checking tables in", pDatabase->dbname, "on", 
+					pTemp->hostname);
 
-			performIntegrityCheckTable(pTemp, pDatabase);
+				performIntegrityCheckTable(pTemp, pDatabase);
+			}
 
 			pDatabase = pDatabase->next;
 		}
@@ -339,8 +346,6 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 	struct mytable *pTable = pDatabase->firstTable;
 		
 	while(pTable != NULL) {
-		syslog(LOG_INFO, "%s %s %s %s", "Checking table", pTable->tblname, "in", pDatabase->dbname);
-
 		int success = checkTable(pServer, pDatabase, pTable);
 
 		if(success == 0) 
