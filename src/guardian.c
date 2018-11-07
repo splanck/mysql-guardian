@@ -45,17 +45,20 @@ guardianconfig configSettings;	// Struct to store configuration settings for dae
 // upon exit.
 int main(int argc, char **argv) {
 	if(argc > 1) {
-		if(!strcmp(argv[1], "--demonize")) {
+		if(strcmp(argv[1], "--demonize") == 0) {
 			startDaemon();
 		}
-		else if(!strcmp(argv[1], "--init")) {
+		else if(strcmp(argv[1], "--init") == 0) {
 			initialiseSetup();
 		}
-		else if(!strcmp(argv[1], "--help")) {
+		else if(strcmp(argv[1], "--help") == 0) {
 			commandHelp();
 		}
-		else if(!strcmp(argv[1], "--gui")) {
+		else if(strcmp(argv[1], "--gui") == 0) {
 			setupGUITool();
+		}
+		else if(strcmp(argv[1], "--debug") == 0) {
+			debugFunc();
 		}
 		else {
 			printf("Invalid argument. Type mysql-guardian --help for list of valid parameters.\n");
@@ -70,6 +73,11 @@ int main(int argc, char **argv) {
 	cleanUpTasks();
 
 	return 0;
+}
+
+void debugFunc() {
+	getConfigd();
+	initDaemon();
 }
 
 void commandHelp() {

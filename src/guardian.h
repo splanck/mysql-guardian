@@ -23,6 +23,7 @@ void initialiseLog();
 void initialiseSetup();
 void cleanUpTasks();
 void getConfig();
+void debugFunc();
 
 typedef struct server dbserver;
 typedef struct gconfig guardianconfig;

@@ -519,27 +519,33 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
 	int checkresult = 1;
 
     while (row = mysql_fetch_row(result)) { 
-		if(strcmp(row[2], "status")) {
-			if(strcmp(row[3], "OK"))
+		if(strcmp(row[2], "status") == 0) {
+			if(strcmp(row[3], "OK") == 0) {
 				checkresult = 0;
+			}
+		}
 
-			if(strcmp(row[3], "The storage engine for the table doesn't support check"))
+		if(strcmp(row[2], "note") == 0) {
+			if(strcmp(row[3], "The storage engine for the table doesn't support check") == 0) {
 				checkresult = 2;
+			}	
 		}
     }
 
     mysql_free_result(result);
     mysql_close(conn);
 
-	strcpy(errorMsg, "Table check failed for ");
-	strcat(errorMsg, tbl->tblname);
-	strcat(errorMsg, " in ");
-	strcat(errorMsg, db->dbname);
-	strcat(errorMsg, " on ");
-    strcat(errorMsg, svr->hostname);
-    strcat(errorMsg, ".");
+	if(checkresult != 0) {
+		strcpy(errorMsg, "Table check failed for ");
+		strcat(errorMsg, tbl->tblname);
+		strcat(errorMsg, " in ");
+		strcat(errorMsg, db->dbname);
+		strcat(errorMsg, " on ");
+		strcat(errorMsg, svr->hostname);
+    	strcat(errorMsg, ".");
    
-	writeToLog(errorMsg); 
+		writeToLog(errorMsg); 
+	}
 	
     return checkresult;
 }
