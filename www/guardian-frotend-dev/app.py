@@ -6,8 +6,8 @@ app = Flask(__name__)
 def main():
     return render_template('index.html')
 
-@app.route('/getdata/', methods=['POST', 'GET'])
-def getdata():
+@app.route('/login_info/', methods=['POST', 'GET'])
+def login_info():
     return render_template('layout.html')
 
 ButtonPressed = 1        
