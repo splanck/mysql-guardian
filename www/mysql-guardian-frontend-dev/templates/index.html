@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <main class="hero-section">
+    <div class="container">
+      
+      <div class="section-content">
+        <h2>mySQL Guardian</h2>
+        <a href="#" class="btn-primary">Log in</a>
+        <a href="{{ url_for('about') }}" class="btn-secondary">Tell me more</a> 
+      </div>
+
+      <div class="section-device">
+        <img src="static/img/dolphin.png">
+      </div>
+      
+      <div class="clearfix"></div>
+
+    </div>
+  </main>
+{% endblock %}
