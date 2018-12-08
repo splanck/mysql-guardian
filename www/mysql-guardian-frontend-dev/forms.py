@@ -8,3 +8,8 @@ class SignupForm(Form):
     email = StringField('Email')
     password = PasswordField('Password')
     submit = SubmitField ('Sign up')
+
+class Loginform(Form):
+    email = StringField('Email')
+    password = PasswordField('Password')
+    submit = SubmitField("Sign In")
