@@ -4,7 +4,7 @@ from forms import SignupForm, Loginform
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'configure'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://alistair:W@rdyIT01@localhost/my_test_database'
 db.init_app(app)
 
 #this protects against xss 
@@ -50,8 +50,8 @@ def login():
     else:
       email = form.email.data
       password = form.password.data
-
       user = User.query.filter_by(email=email).first()
+
       if user is not None and user.check_password(password):
         session['email'] = form.email.data
         return redirect(url_for('home'))
