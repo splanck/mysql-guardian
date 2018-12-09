@@ -4,7 +4,7 @@ from forms import SignupForm, Loginform
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'configure'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://alistair:W@rdyIT01@localhost/my_test_database'
 db.init_app(app)
 
 #this protects against xss 
@@ -21,6 +21,11 @@ def about():
 @app.route("/home")
 def home():
   return render_template("home.html")
+
+@app.route("/showusers")
+def showusers():
+  showusers = User.query.all()
+  return render_template('showusers.html', showusers = showusers)
 
 @app.route("/signup", methods = ['GET', 'POST'])
 def signup():
