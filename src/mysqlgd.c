@@ -112,6 +112,9 @@ void getConfigd() {
 int initDaemon() {
 	signal(SIGTERM, sig_handler);
 
+	if(configSettings.slowQueryMonitoring == 1)
+		enableSlowQueryLogging();
+
 	server_check_delay = configSettings.onlineCheckInterval;
 	database_server_check_delay = configSettings.databaseServerCheckInterval;
 	database_check_delay = configSettings.databaseCheckInterval;
