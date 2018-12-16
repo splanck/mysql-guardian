@@ -5,7 +5,7 @@ import random
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://alistair:W@rdyIT01@localhost/testing'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'configure me '
 db.init_app(app)
 
 #this protects against xss 
