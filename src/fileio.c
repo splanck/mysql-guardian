@@ -84,6 +84,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	fprintf(cfgFile, "DATABASE_SERVER_CHECK_INTERVAL 120\n");
 	fprintf(cfgFile, "DATABASE_CHECK_INTERVAL 120\n");
 	fprintf(cfgFile, "INTEGRITY_CHECH_INTERVAL 500\n");
+	fprintf(cfgFile, "SLOW_QUERY_MONITORING 1\n");
 	
 	fclose(cfgFile);
 
@@ -140,6 +141,13 @@ int readConfig(char *hostname, char *username, char *password) {
 
 				if(i > 0 && i < 99999)
 					configSettings.databaseServerCheckInterval = i;
+			}
+
+			if(strcmp(k, "SLOW_QUERY_MONITORING") == 0) {
+				int i = atoi(v);
+
+				if(i == 0 || i == 1)
+					configSettings.slowQueryMonitoring = i;
 			}
 		}	
     }

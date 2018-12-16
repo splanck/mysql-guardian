@@ -93,7 +93,9 @@ int mainMenu() {
 	{
 		attron(COLOR_PAIR(1));
 
-		for(int i = 0; i < 9; i++) {
+		int i;
+
+		for(i = 0; i < 9; i++) {
 			if(i == highlight)
 				wattron(menuWin, A_REVERSE);
 
@@ -317,7 +319,9 @@ int addServerMenu() {
 		mvwprintw(addServerWin, 3, 20, newUsername);
 		mvwprintw(addServerWin, 4, 20, newPassword);
 		
-		for(int i = 0; i < 6; i++) {
+		int i;
+
+		for(i = 0; i < 6; i++) {
 			if(i == addServerHighlight)
 				wattron(addServerWin, A_REVERSE);
 

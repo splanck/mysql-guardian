@@ -40,4 +40,5 @@ struct gconfig {
 	int databaseServerCheckInterval;
 	int databaseCheckInterval;
 	int integrityCheckInterval;
+	int slowQueryMonitoring;
 };

@@ -125,6 +125,39 @@ int createConfigDB() {
   	return 0;
 }
 
+int enableSlowQueryLogging() {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, NULL);
+
+    if(conn == NULL)
+        return 1;
+
+    char sqlcmd[500];
+    char errorMsg[100];
+
+    strcpy(sqlcmd, "SET GLOBAL slow_query_log = 1;");
+    strcpy(errorMsg, "Cannot enable slow query logging.");
+  	
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+	strcpy(sqlcmd, "SET GLOBAL log_output = \"TABLE\";");
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
+	strcpy(sqlcmd, "SET GLOBAL long_query_time = 5;");
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
+  	mysql_close(conn);
+  	
+  	writeToLog("Enabled slow query logging.");
+
+  	return 0;
+}
+
 // Creates the servers table on the monitoring server.
 int createConfigTables() {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
@@ -162,7 +195,7 @@ int createConfigTables() {
 
 	strcpy(sqlcmd, "CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "server_id INT NOT NULL, ");
-	strcat(sqlcmd, "time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,");
+	strcat(sqlcmd, "time timestamp NOT NULL,");
 	strcat(sqlcmd, "check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)");
 
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)

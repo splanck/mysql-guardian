@@ -23,6 +23,7 @@ MYSQL* connectDB(char *hostname, char *username, char *password, char *database)
 int executeQuery(MYSQL *conn, char *sql, char *errorMsg);
 void handleDBError(MYSQL *conn, char *errorMsg, char *sql);
 int createConfigDB();
+int enableSlowQueryLogging();
 int createConfigTables();
 int writeCheckResult(int id, int type, int result, char *dbname, char *errorText);
 int addServerToTable();
