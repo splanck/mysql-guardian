@@ -203,7 +203,9 @@ int sendPing(int p_sockfd, struct sockaddr_in *p_addr, char *p_dom, char *p_ip, 
         pckt.hdr.type = ICMP_ECHO;
         pckt.hdr.un.echo.id = getpid();
          
-        for (int i = 0; i < sizeof(pckt.msg) - 1; i++)
+		int i;
+
+        for (i = 0; i < sizeof(pckt.msg) - 1; i++)
             pckt.msg[i] = i+'0';
          
         pckt.msg[1] = 0;
