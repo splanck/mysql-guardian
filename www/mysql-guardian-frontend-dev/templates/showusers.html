@@ -5,9 +5,12 @@
     <div class="container">
 
     <h2>Heade 2</h2>
-    <p>Placeholder text here</p>
+    <p>Placeholder text asf;sahere</p>
 
-    {{ showusers  }}
+    {% for users in get_user %}
+    <li> {{ users.firstname }} </li>
+    {% endfor %}
+
 
 
     </div>
