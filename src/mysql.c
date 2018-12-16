@@ -195,7 +195,7 @@ int createConfigTables() {
 
 	strcpy(sqlcmd, "CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "server_id INT NOT NULL, ");
-	strcat(sqlcmd, "time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,");
+	strcat(sqlcmd, "time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,");
 	strcat(sqlcmd, "check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)");
 
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
