@@ -179,6 +179,16 @@ int createConfigTables() {
     if(executeQuery(conn, sqlcmd, NULL) == 1)
         return 1;
 
+	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_results");
+
+	if(executeQuery(conn, sqlcmd, NULL) == 1)
+		return 1;
+
+	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_result_errors");
+
+	if(executeQuery(conn, sqlcmd, NULL) == 1)
+		return 1;
+
   	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "hostname TEXT, port INT, username TEXT, password TEXT)");
     strcpy(errorMsg, "Cannot create server table in monitoring database.");
@@ -193,16 +203,27 @@ int createConfigTables() {
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
 
-	strcpy(sqlcmd, "CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, ");
-	strcat(sqlcmd, "server_id INT NOT NULL, ");
-	strcat(sqlcmd, "time timestamp NOT NULL,");
-	strcat(sqlcmd, "check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)");
+	strcpy(sqlcmd, "CREATE TABLE server_checks(id INT, online_check INT, ");
+	strcat(sqlcmd, "database_server_check INT, database_check INT, ");
+	strcat(sqlcmd, "integrity_check INT, slow_query_monitoring INT, ");
+	strcat(sqlcmd, "database_backup INT)");
+	strcpy(errorMsg, "Cannot create server_checks table in monitoring database.");
 
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
 		return 1;
 
-	strcpy(sqlcmd, "CREATE TABLE check_result_errors(id INT, error_msg TEXT)");
+	strcpy(sqlcmd, "CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, ");
+	strcat(sqlcmd, "server_id INT NOT NULL, ");
+	strcat(sqlcmd, "time timestamp NOT NULL,");
+	strcat(sqlcmd, "check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)");
+	strcpy(errorMsg, "Cannot create check_results table in monitoring database.");
+    
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
 
+	strcpy(sqlcmd, "CREATE TABLE check_result_errors(id INT, error_msg TEXT)");
+	strcpy(errorMsg, "Cannot create check_result_errors table in monitoring database.");
+    
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
 		return 1;
 
@@ -326,11 +347,40 @@ int addServerToTable() {
 
   	free(strPort);
 
-    char errorMsg[100];
+	char errorMsg[100];
     strcpy(errorMsg, "Cannot add server to database.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
+
+	strcpy(sqlcmd, "SELECT LAST_INSERT_ID()");
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
+	MYSQL_RES *result = mysql_store_result(conn);
+    MYSQL_ROW row = mysql_fetch_row(result); 
+
+    int row_id = atoi(row[0]);
+
+	length = snprintf(NULL, 0, "%d", row_id);
+    char* strid = malloc(length + 1);
+    snprintf(strid, length + 1, "%d", row_id);
+
+    mysql_free_result(result);
+
+	strcpy(sqlcmd, "INSERT INTO server_checks (id, online_check, ");
+	strcat(sqlcmd, "database_server_check, database_check, ");
+	strcat(sqlcmd, "integrity_check, slow_query_monitoring, ");
+	strcat(sqlcmd, "database_backup) ");
+	strcat(sqlcmd, "VALUES("); 
+	strcat(sqlcmd, strid);
+	strcat(sqlcmd, ", 1, 1, 1, 1, 1, 1)");
+
+	free(strid);
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
 
   	writeToLog("Server added to monitoring.");
 	
