@@ -33,6 +33,12 @@ struct myserver {
     struct mydatabase *firstDatabase;
     struct mydatabase *lastDatabase;
     struct myserver *next;
+	int online_check;
+	int database_server_check;
+	int database_check;
+	int integrity_check;
+	int slow_query_monitoring;
+	int database_backup;
 };
 
 struct mydatabase {
