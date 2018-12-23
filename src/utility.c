@@ -36,7 +36,8 @@ struct myserver *pFirst = NULL;
 struct myserver *pLast = NULL;
 
 // Adds a server to the end of the linked list based on the parameters passed.
-void addServerNode(int id, char *hostname, int port, char *username, char *password) {
+void addServerNode(int id, char *hostname, int port, char *username, char *password,
+	int ol_chk, int db_svr_chk, int db_chk, int int_chk, int slow, int db_backup) {
     struct myserver *pNewNode = malloc(sizeof(struct myserver));
 
     strcpy(pNewNode->hostname, hostname);
@@ -48,6 +49,12 @@ void addServerNode(int id, char *hostname, int port, char *username, char *passw
     pNewNode->next = NULL;
 	pNewNode->firstDatabase = NULL;
 	pNewNode->lastDatabase = NULL;
+	pNewNode->online_check = ol_chk;
+	pNewNode->database_server_check = db_svr_chk;
+	pNewNode->database_check = db_chk;
+	pNewNode->integrity_check = int_chk;
+	pNewNode->slow_query_monitoring = slow;
+	pNewNode->database_backup = db_backup;
 
     if(pFirst == NULL) {
         pFirst = pLast = pNewNode;

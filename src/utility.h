@@ -58,7 +58,7 @@ struct ping_packet {
     char msg[PING_PKT_S-sizeof(struct icmphdr)];
 };
 
-void addServerNode(int id, char *hostname, int port, char *username, char *password);
+void addServerNode(int id, char *hostname, int port, char *username, char *password, int ol_chk, int db_svr_chk, int db_chk, int int_chk, int slow, int db_backup);
 void addDatabaseNode(struct myserver *svr, char *dbname);
 void addTableNode(struct mydatabase *db, char *tblname);
 void remove_char_from_string(char c, char *str);

@@ -427,7 +427,12 @@ int populateMonitoredServersList() {
         return -1;
 
     char sqlcmd[500];
-    strcpy(sqlcmd, "SELECT id, hostname, port, username, password FROM servers");
+    strcpy(sqlcmd, "SELECT a.id, a.hostname, a.port, a.username, a.password, ");
+	strcat(sqlcmd, "b.online_check, b.database_server_check, b.database_check, ");
+	strcat(sqlcmd, "b.integrity_check, b.slow_query_monitoring, ");
+	strcat(sqlcmd, "b.database_backup ");
+	strcat(sqlcmd, "FROM servers a, server_checks b ");
+	strcat(sqlcmd, "WHERE a.id = b.id;");
 
     char errorMsg[100];
     strcpy(errorMsg, "Cannot retrieve list of servers in monitoring.");
@@ -453,8 +458,15 @@ int populateMonitoredServersList() {
         int port = atoi(row[2]);
         char *username = row[3];
         char *password = row[4];
+		int online_check = atoi(row[5]);
+		int database_server_check = atoi(row[6]);
+		int database_check = atoi(row[7]);
+		int integrity_check = atoi(row[8]);
+		int slow_query = atoi(row[9]);
+		int database_backup = atoi(row[10]);
 
-        addServerNode(id, hostname, port, username, password);
+        addServerNode(id, hostname, port, username, password, online_check, database_server_check,
+			database_check, integrity_check, slow_query, database_backup);
     }
 
     mysql_free_result(result);

@@ -166,24 +166,27 @@ int checkServersOnline() {
 	struct myserver *pServer = pFirst;
 
 	while(pServer != NULL) {
-		char *db_err = malloc(200);
+		if(pServer->online_check == 1) {
+			char *db_err = malloc(200);
 
-		int success = pingServer(pServer->hostname);
+			int success = pingServer(pServer->hostname);
 
-		if(!success) {
-			syslog(LOG_INFO, "%s %s", "Server online check succeeded for", pServer->hostname);
-			db_err = NULL;
+			if(!success) {
+				syslog(LOG_INFO, "%s %s", "Server online check succeeded for", pServer->hostname);
+				db_err = NULL;
+			}	
+			else {
+				syslog(LOG_INFO, "%s %s", "Server online check failed for", pServer->hostname);
+
+				strcpy(db_err, "Could not reach the host ");
+				strcat(db_err, pServer->hostname);
+			}
+
+			writeCheckResult(pServer->id, 1, success, NULL, db_err);
+
+			free(db_err);
 		}	
-		else {
-			syslog(LOG_INFO, "%s %s", "Server online check failed for", pServer->hostname);
 
-			strcpy(db_err, "Could not reach the host ");
-			strcat(db_err, pServer->hostname);
-		}
-
-		writeCheckResult(pServer->id, 1, success, NULL, db_err);
-
-		free(db_err);
 		pServer = pServer->next;
 	}
 
@@ -213,22 +216,26 @@ int checkDatabaseServer() {
 	struct myserver *pServer = pFirst;
 
 	while(pServer != NULL) {
-		char *db_err = malloc(500);
+		if(pServer->database_server_check == 1) {
+			char *db_err = malloc(500);
 
-		int success = checkDatabase(pServer, NULL, db_err);
+			int success = checkDatabase(pServer, NULL, db_err);
 
-		if(!success)
-			syslog(LOG_INFO, "%s %s", "Database server online check succeeded for", 
-				pServer->hostname);
-		else
-			syslog(LOG_INFO, "%s %s", "Database Server online check failed for", pServer->hostname);
+			if(!success)
+				syslog(LOG_INFO, "%s %s", "Database server online check succeeded for", 
+					pServer->hostname);
+			else
+				syslog(LOG_INFO, "%s %s", "Database Server online check failed for", 
+					pServer->hostname);
 
-		if(!success)
-			db_err = NULL;
+			if(!success)
+				db_err = NULL;
 
-		writeCheckResult(pServer->id, 2, success, NULL, db_err);
+			writeCheckResult(pServer->id, 2, success, NULL, db_err);
 
-		free(db_err);
+			free(db_err);
+		}
+
 		pServer = pServer->next;
 	}
 
@@ -260,32 +267,35 @@ int checkDatabaseOnline() {
 	int success = 0;
 
 	while(pServer != NULL) {
-		char *db_err = malloc(500);
+		if(pServer->database_check == 1) {
+			char *db_err = malloc(500);
 
-		if(pServer->firstDatabase == NULL) 
-			success = populateServerDatabasesList(pServer);	
+			if(pServer->firstDatabase == NULL) 
+				success = populateServerDatabasesList(pServer);	
 
-		struct mydatabase *pDatabase = pServer->firstDatabase;
+			struct mydatabase *pDatabase = pServer->firstDatabase;
 
-		while(pDatabase != NULL) {
-			int success = checkDatabase(pServer, pDatabase, db_err);
+			while(pDatabase != NULL) {
+				int success = checkDatabase(pServer, pDatabase, db_err);
 
-			if(!success)
-				syslog(LOG_INFO, "%s %s %s %s", "Database online check succeeded for", 
-					pDatabase->dbname, "on", pServer->hostname);
-			else
-				syslog(LOG_INFO, "%s %s %s %s", "Database Server online check failed for", 
-					pDatabase->dbname, "on", pServer->hostname);
+				if(!success)
+					syslog(LOG_INFO, "%s %s %s %s", "Database online check succeeded for", 
+						pDatabase->dbname, "on", pServer->hostname);
+				else
+					syslog(LOG_INFO, "%s %s %s %s", "Database Server online check failed for", 
+						pDatabase->dbname, "on", pServer->hostname);
 
-			if(!success)
-				db_err = NULL;
+				if(!success)
+					db_err = NULL;
 
-			writeCheckResult(pServer->id, 3, success, pDatabase->dbname, db_err);
+				writeCheckResult(pServer->id, 3, success, pDatabase->dbname, db_err);
 	
-			pDatabase = pDatabase->next;
+				pDatabase = pDatabase->next;
+			}
+
+			free(db_err);
 		}
 
-		free(db_err);
 		pServer = pServer->next;
 	}
 
@@ -315,25 +325,28 @@ int performIntegrityCheckDB() {
 	struct myserver *pServer = pFirst;
 
 	while(pServer != NULL) {
-		if(pServer->firstDatabase == NULL)
-			populateServerDatabasesList(pServer); 
+		if(pServer->integrity_check == 1) {
+			if(pServer->firstDatabase == NULL)
+				populateServerDatabasesList(pServer); 
 
-		struct mydatabase *pDatabase = pServer->firstDatabase;
+			struct mydatabase *pDatabase = pServer->firstDatabase;
 
-		while(pDatabase != NULL) {
-			if((strcmp(pDatabase->dbname, "information_schema") == 0) ||
-				(strcmp(pDatabase->dbname, "performance_schema") == 0)) {
-				syslog(LOG_INFO, "%s %s %s %s. %s", "Table check not valid for system database", 
-					pDatabase->dbname, "on", pServer->hostname, "Skipping.");
+			while(pDatabase != NULL) {
+				if((strcmp(pDatabase->dbname, "information_schema") == 0) ||
+					(strcmp(pDatabase->dbname, "performance_schema") == 0)) {
+					syslog(LOG_INFO, "%s %s %s %s. %s", 
+						"Table check not valid for system database", 
+						pDatabase->dbname, "on", pServer->hostname, "Skipping.");
+				}
+				else {
+					syslog(LOG_INFO, "%s %s %s %s", "Checking tables in", pDatabase->dbname, "on", 
+						pServer->hostname);
+
+					performIntegrityCheckTable(pServer, pDatabase);
+				}
+
+				pDatabase = pDatabase->next;
 			}
-			else {
-				syslog(LOG_INFO, "%s %s %s %s", "Checking tables in", pDatabase->dbname, "on", 
-					pServer->hostname);
-
-				performIntegrityCheckTable(pServer, pDatabase);
-			}
-
-			pDatabase = pDatabase->next;
 		}
 
 		pServer = pServer->next;
