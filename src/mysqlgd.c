@@ -43,11 +43,13 @@ time_t last_server_check;
 time_t last_integrity_check;
 time_t last_database_check;
 time_t last_database_server_check;
+time_t last_slow_query_check;
 
 double server_check_delay;
 double integrity_check_delay;
 double database_check_delay;
 double database_server_check_delay;
+double slow_query_check_delay;
 
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
@@ -130,6 +132,8 @@ int initDaemon() {
 		doDatabaseServerCheck();
 		doDatabaseCheck();
 		doIntegrityCheck();
+		doSlowQueryCheck();
+		doDatabaseBackups();
 
 		sleep(5);
 	}
@@ -378,6 +382,14 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 	}
 
 	return 0;
+}
+
+int doSlowQueryCheck() {
+
+}
+
+int doDatabaseBackups() {
+
 }
 
 // Handles signal 15 from the kernel and performs tasks to prepare for shutdown. A shutdown
