@@ -1,0 +1,69 @@
+MySQL Guardian Installation Instructions
+----------------------------------------
+
+MySQL Guardian is currently a work in progress. There are future plans to create packages
+for various Linux distributions to simplify the installation process, but at the moment
+building the binary from source and manually configuring the service is required. This
+document provides a brief explanation of the steps required to get the service running
+on a Linux system using the Systemd init system.
+
+Download and setup MySQL Guardian using the following steps:
+
+1. Clone the git repository to download the source tree using the following command:
+
+git clone https://github.com/splanck/mysql-guardian.git
+
+2. Ensure you have the ncurses and MySQL development libraries installed on your system.
+
+Use the following command to install both libraries on an Arch based distibution:
+
+sudo pacman -S libmariadbclient lib32-ncurses
+
+Use the following command on a Debian based distribution:
+
+sudo apt-get install libmysqlclient-dev libncurses-dev
+
+Use the following command on a RHEL or CentOS distribution:
+
+sudo yum install mysql-devel ncurses-devel
+
+3. Goto the mysql-guardian/src directory and build the source using the following command:
+
+make -b
+
+4. Copy the mysqlgd.service file from the build directory into your /etc/systemd/system
+directory. Edit this file to point to the mysql-guardian binary file.
+
+5. Run the mysql-guardian application to generate a config file using the following command:
+
+sudo ./mysql-guardian --init
+
+6. Emter the hostname, root username, and password for the MySQL instance you want to use
+to store the mysql-guardian database. This database is where all monitoring data will be
+stored.
+
+7. Run the mysql-guardian application to create the monitoring database and required tables.
+Run the following command and select "Create monitoring database" from the menu:
+
+sudo ./mysql-guardian --gui
+
+8. Start the MySQL Guardian service using Systemd with the following command:
+
+sudo systemctl start mysqlgd
+
+9. If you would like MySQL Guardian to start when your system boots, use the following
+command to enable the service:
+
+sudo systemctl enable mysqlgd
+
+Configuring MySQL Guardian
+--------------------------
+
+MySQL Guardian can be configured by editing the /etc/mysqlgd.conf file. This file is
+generated when you run the binary with the --init parameter and allows you to configure
+the monitoring server used by Guardian as well as the various checks it performs. Changing
+the defauly values in the file will change the intervals in which each check will be
+performed. These intervals are specified in seconds.
+
+If you have any problems with this installation you can email the authors at
+packer.alistair@gmail.com or splanck9271@gmail.com to request assistance.
