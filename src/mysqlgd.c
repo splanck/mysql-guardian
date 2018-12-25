@@ -401,7 +401,22 @@ int doSlowQueryCheck() {
 }
 
 int doDatabaseBackups() {
+	time_t time_now;
+	time(&time_now);
 
+	double diff = difftime(time_now, last_backup_check);
+
+	if(diff > backup_check_delay) {
+		syslog(LOG_INFO, "%s", "Time to perform database backups.");
+
+		time(&last_backup_check);
+	}
+
+	return 0;
+}
+
+int performDatabaseBackups() {
+	return 0;
 }
 
 // Handles signal 15 from the kernel and performs tasks to prepare for shutdown. A shutdown
