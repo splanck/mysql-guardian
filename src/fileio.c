@@ -86,6 +86,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	fprintf(cfgFile, "INTEGRITY_CHECK_INTERVAL 500\n");
 	fprintf(cfgFile, "SLOW_QUERY_MONITORING 1\n");
 	fprintf(cfgFile, "DATABASE_BACKUP 1000\n");
+	fprintf(cfgFile, "BACKUP_PATH /tmp\n");
 	
 	fclose(cfgFile);
 
@@ -115,6 +116,9 @@ int readConfig(char *hostname, char *username, char *password) {
 
 			if(strcmp(k, "PASSWORD") == 0)
 				strcpy(password, v);
+
+			if(strcmp(k, "BACKUP_PATH") == 0)
+				strcpy(configSettings.backupPath, v);
 
 			if(strcmp(k, "ONLINE_CHECK_INTERVAL") == 0) {
 				int i = atoi(v);
@@ -154,7 +158,7 @@ int readConfig(char *hostname, char *username, char *password) {
 			if(strcmp(k, "DATABASE_BACKUP") == 0) {
 				int i = atoi(v);
 
-				if(i == 0 || i == 1)
+				if(i > 0 || i < 99999)
 					configSettings.databaseBackup = i;
 			}
 		}	

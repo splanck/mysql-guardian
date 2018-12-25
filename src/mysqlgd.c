@@ -44,12 +44,14 @@ time_t last_integrity_check;
 time_t last_database_check;
 time_t last_database_server_check;
 time_t last_slow_query_check;
+time_t last_backup_check;
 
 double server_check_delay;
 double integrity_check_delay;
 double database_check_delay;
 double database_server_check_delay;
 double slow_query_check_delay;
+double backup_check_delay;
 
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
@@ -109,6 +111,22 @@ void getConfigd() {
     configServer.password = password;
 }
 
+void setupTimers() {
+	server_check_delay = configSettings.onlineCheckInterval;
+	database_server_check_delay = configSettings.databaseServerCheckInterval;
+	database_check_delay = configSettings.databaseCheckInterval;
+	integrity_check_delay = configSettings.integrityCheckInterval;
+	slow_query_check_delay = 60;
+	backup_check_delay = configSettings.databaseBackup;
+
+	time(&last_server_check);
+	time(&last_integrity_check);
+	time(&last_database_server_check);
+	time(&last_database_check);
+	time(&last_slow_query_check);
+	time(&last_backup_check);
+}
+
 // Sets up handling of SIGTERM termination signal from kernel, sets intervals for checks,
 // and performs a loop that runs the desired checks at the specified intervals.
 int initDaemon() {
@@ -117,24 +135,18 @@ int initDaemon() {
 	if(configSettings.slowQueryMonitoring == 1)
 		enableSlowQueryLogging();
 
-	server_check_delay = configSettings.onlineCheckInterval;
-	database_server_check_delay = configSettings.databaseServerCheckInterval;
-	database_check_delay = configSettings.databaseCheckInterval;
-	integrity_check_delay = configSettings.integrityCheckInterval;
-
-	time(&last_server_check);
-	time(&last_integrity_check);
-	time(&last_database_server_check);
-	time(&last_database_check);
+	setupTimers();
 
 	while(1) {
 		doServerCheck();
 		doDatabaseServerCheck();
 		doDatabaseCheck();
 		doIntegrityCheck();
-		doSlowQueryCheck();
 		doDatabaseBackups();
 
+		if(configSettings.slowQueryMonitoring == 1)
+			doSlowQueryCheck();
+	
 		sleep(5);
 	}
 

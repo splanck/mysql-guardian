@@ -21,6 +21,7 @@
 
 void startDaemon();
 void getConfigd();
+void setupTimers();
 int initDaemon();
 int doServerCheck();
 int checkServersOnline();
@@ -33,4 +34,5 @@ int performIntegrityCheckDB();
 int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDatabase);
 int doSlowQueryCheck();
 int doDatabaseBackups();
+int performDatabaseBackups();
 void sig_handler();
