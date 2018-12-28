@@ -100,8 +100,9 @@ void getConfigd() {
 	char *hostname = malloc(80);
     char *username = malloc(25);
     char *password = malloc(25);
+	char *backup_path = malloc(200);
 
-    if(readConfig(hostname, username, password)) {
+    if(readConfig(hostname, username, password, backup_path)) {
 		syslog(LOG_INFO, "%s", "Could not read /etc/mysqlgd.conf file. Exiting...");
         exit(1);
     }
@@ -109,6 +110,7 @@ void getConfigd() {
     configServer.hostname = hostname;
     configServer.username = username;
     configServer.password = password;
+	configSettings.backupPath = backup_path;
 }
 
 void setupTimers() {

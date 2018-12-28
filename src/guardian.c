@@ -141,8 +141,9 @@ void getConfig() {
 	char *hostname = malloc(80);
 	char *username = malloc(25);
 	char *password = malloc(25);
+	char *backup_path = malloc(200);
 
-	if(readConfig(hostname, username, password)) {
+	if(readConfig(hostname, username, password, backup_path)) {
 		printf("Could not read configuration file. Use the -init parameter to create one.\n\r");
 		printf("Exiting,\n\r");
 		
@@ -153,6 +154,7 @@ void getConfig() {
 	configServer.username = username;
 	configServer.password = password;
 
+	configSettings.backupPath = backup_path;
 	configSettings.onlineCheckInterval = 60;
 	configSettings.integrityCheckInterval = 500;
 }

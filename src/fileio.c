@@ -94,7 +94,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 }
 
 // Reads configuration from /etc/mysqlgd.conf and passed values back as string pointers.
-int readConfig(char *hostname, char *username, char *password) {
+int readConfig(char *hostname, char *username, char *password, char *backup_path) {
 	char k[40], v[40];
 	
 	FILE *configFile;
@@ -118,7 +118,7 @@ int readConfig(char *hostname, char *username, char *password) {
 				strcpy(password, v);
 
 			if(strcmp(k, "BACKUP_PATH") == 0)
-				strcpy(configSettings.backupPath, v);
+				strcpy(backup_path, v);
 
 			if(strcmp(k, "ONLINE_CHECK_INTERVAL") == 0) {
 				int i = atoi(v);
