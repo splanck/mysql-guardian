@@ -112,8 +112,13 @@ int createConfigDB() {
     char sqlcmd[500];
     char errorMsg[100];
 
-    strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
+    strcpy(sqlcmd, "DROP DATABASE IF EXISTS mysql_guardian");
     strcpy(errorMsg, "Cannot create configuration database.");
+
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
   	
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
@@ -160,6 +165,8 @@ int enableSlowQueryLogging() {
 
 // Creates the servers table on the monitoring server.
 int createConfigTables() {
+	dropOldTables();
+
     MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
         configServer.password, "mysql_guardian");
     
@@ -169,26 +176,6 @@ int createConfigTables() {
     char sqlcmd[500];
     char errorMsg[100];
     
-    strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
-
-    if(executeQuery(conn, sqlcmd, NULL) == 1)
-        return 1;
-
-    strcpy(sqlcmd, "DROP TABLE IF EXISTS users");
-
-    if(executeQuery(conn, sqlcmd, NULL) == 1)
-        return 1;
-
-	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_results");
-
-	if(executeQuery(conn, sqlcmd, NULL) == 1)
-		return 1;
-
-	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_result_errors");
-
-	if(executeQuery(conn, sqlcmd, NULL) == 1)
-		return 1;
-
   	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "hostname TEXT, port INT, username TEXT, password TEXT)");
     strcpy(errorMsg, "Cannot create server table in monitoring database.");
@@ -221,6 +208,13 @@ int createConfigTables() {
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
 		return 1;
 
+	strcpy(sqlcmd, "CREATE TABLE backup_history(id INT PRIMARY KEY AUTO_INCREMENT, ");
+	strcat(sqlcmd, "server_id INT NOT NULL, time timestamp NOT NULL, ");
+	strcat(sqlcmd, "db_name TEXT, filename TEXT)");
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
 	strcpy(sqlcmd, "CREATE TABLE check_result_errors(id INT, error_msg TEXT)");
 	strcpy(errorMsg, "Cannot create check_result_errors table in monitoring database.");
     
@@ -237,6 +231,41 @@ int createConfigTables() {
 
   	mysql_close(conn);
 }
+
+int dropOldTables() {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+    
+    if(conn == NULL)
+        return 1;
+  	
+    char sqlcmd[500];
+    char errorMsg[100];
+    
+    strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
+
+    if(executeQuery(conn, sqlcmd, NULL) == 1)
+        return 1;
+
+    strcpy(sqlcmd, "DROP TABLE IF EXISTS users");
+
+    if(executeQuery(conn, sqlcmd, NULL) == 1)
+        return 1;
+
+	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_results");
+
+	if(executeQuery(conn, sqlcmd, NULL) == 1)
+		return 1;
+
+	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_result_errors");
+
+	if(executeQuery(conn, sqlcmd, NULL) == 1)
+		return 1;
+
+  	mysql_close(conn);
+
+	return 0;
+}	
 
 int writeCheckResult(int id, int type, int result, char *dbname, char *errorText) {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
