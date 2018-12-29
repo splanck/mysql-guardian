@@ -69,5 +69,20 @@ the default values in the file will change the intervals in which each check wil
 performed. These intervals are specified in seconds. You will need to restart the mysqlgd
 service for any configuration changes to take effect.
 
+Uninstall Instructions
+----------------------
+
+You can uninstall MySQL Guardian by using the following command from the src directory:
+
+sudo make uninstall
+
+You may also want to drop the mysql_guardian database from your MySQL or MariaDB database
+server by executing the following query:
+
+DROP DATABASE mysql_guardian;
+
+Get Support
+-----------
+
 If you have any problems with this installation you can email the authors at
 packer.alistair@gmail.com or splanck9271@gmail.com to request assistance.

@@ -13,4 +13,9 @@ install: all
 	chmod 755 /usr/bin/mysql-guardian
 	cp -f ../build/mysqlgd.service /etc/systemd/system/mysqlgd.service
 
-.PHONY: all install
+uninstall:
+	rm -f /usr/bin/mysql-guardian
+	rm -f /etc/systemd/system/mysqlgd.service
+	rm -f /etc/mysqlgd.conf
+
+.PHONY: all install uninstall
