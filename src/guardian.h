@@ -43,4 +43,5 @@ struct gconfig {
 	int slowQueryMonitoring;
 	int databaseBackup;
 	char *backupPath;
+	char *logPath;
 };

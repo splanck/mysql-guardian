@@ -114,8 +114,28 @@ void initialiseSetup() {
 	printf("Root Password: ");
 	scanf("%s", &password);
 
-	if(createConfigFile(hostname, username, password) == 1)
-		printf("Could not create configuration file.\n");
+	if(createConfigFile(hostname, username, password) == 1) {
+		printf("\nCould not create configuration file.\n");
+		return;
+	}
+
+	getConfig();
+
+	int dbsuccess = createConfigDB();
+
+	if(dbsuccess) {
+		printf("\nCould not create configuration database.\n");
+	}
+	else {
+		printf("\nConfiguration database created successfully.\n");
+
+		int tblsuccess = createConfigTables();
+
+		if(tblsuccess)
+			printf("Could not create configuration tables.\n");
+		else
+			printf("Configuration tables created successfully.\n");
+	}
 }
 
 // Writes start up message to log fiile.
@@ -142,8 +162,9 @@ void getConfig() {
 	char *username = malloc(25);
 	char *password = malloc(25);
 	char *backup_path = malloc(200);
+	char *log_path = malloc(200);
 
-	if(readConfig(hostname, username, password, backup_path)) {
+	if(readConfig(hostname, username, password, backup_path, log_path)) {
 		printf("Could not read configuration file. Use the -init parameter to create one.\n\r");
 		printf("Exiting,\n\r");
 		
@@ -155,6 +176,7 @@ void getConfig() {
 	configServer.password = password;
 
 	configSettings.backupPath = backup_path;
+	configSettings.logPath = log_path;
 	configSettings.onlineCheckInterval = 60;
 	configSettings.integrityCheckInterval = 500;
 }

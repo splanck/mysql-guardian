@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=forking
-ExecStart=/home/splanck/git/mysql-guardian/build/mysql-guardian --demonize
+ExecStart=/usr/bin/mysql-guardian --demonize
 Restart=always
-WorkingDirectory=/home/splanck/git/mysql-guardian/build
+WorkingDirectory=/var/log
 User=root
 Group=root
 

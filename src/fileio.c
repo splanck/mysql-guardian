@@ -80,6 +80,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	fprintf(cfgFile, "HOSTNAME %s\n", hostname);
 	fprintf(cfgFile, "USERNAME %s\n", username);
 	fprintf(cfgFile, "PASSWORD %s\n", password);
+	fprintf(cfgFile, "LOG_PATH /var/log\n");
 	fprintf(cfgFile, "ONLINE_CHECK_INTERVAL 60\n");
 	fprintf(cfgFile, "DATABASE_SERVER_CHECK_INTERVAL 120\n");
 	fprintf(cfgFile, "DATABASE_CHECK_INTERVAL 120\n");
@@ -94,7 +95,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 }
 
 // Reads configuration from /etc/mysqlgd.conf and passed values back as string pointers.
-int readConfig(char *hostname, char *username, char *password, char *backup_path) {
+int readConfig(char *hostname, char *username, char *password, char *backup_path, char *log_path) {
 	char k[40], v[40];
 	
 	FILE *configFile;
@@ -119,6 +120,9 @@ int readConfig(char *hostname, char *username, char *password, char *backup_path
 
 			if(strcmp(k, "BACKUP_PATH") == 0)
 				strcpy(backup_path, v);
+
+			if(strcmp(k, "LOG_PATH") == 0)
+				strcpy(log_path, v);
 
 			if(strcmp(k, "ONLINE_CHECK_INTERVAL") == 0) {
 				int i = atoi(v);

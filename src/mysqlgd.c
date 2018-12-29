@@ -79,14 +79,15 @@ void startDaemon() {
 	if(sid < 0)
 		exit(EXIT_FAILURE);
 
-	if((chdir("/")) < 0)
+	getConfigd();
+
+	if((chdir(configSettings.logPath)) < 0)
 		exit(EXIT_FAILURE);
 
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
 
-	getConfigd();
 	initDaemon();
 }
 
@@ -101,8 +102,9 @@ void getConfigd() {
     char *username = malloc(25);
     char *password = malloc(25);
 	char *backup_path = malloc(200);
+	char *log_path = malloc(200);
 
-    if(readConfig(hostname, username, password, backup_path)) {
+    if(readConfig(hostname, username, password, backup_path, log_path)) {
 		syslog(LOG_INFO, "%s", "Could not read /etc/mysqlgd.conf file. Exiting...");
         exit(1);
     }
@@ -111,6 +113,7 @@ void getConfigd() {
     configServer.username = username;
     configServer.password = password;
 	configSettings.backupPath = backup_path;
+	configSettings.logPath = log_path;
 }
 
 void setupTimers() {
