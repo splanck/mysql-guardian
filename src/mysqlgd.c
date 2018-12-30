@@ -30,14 +30,14 @@
 #include <string.h>
 #include <time.h>
 #include <signal.h>
+#include <sys/wait.h>
 #include "utility.h"
 #include "guardian.h"
 #include "fileio.h"
 #include "mysql.h"
 #include "mysqlgd.h"
 
-extern dbserver configServer;			// Struct to store config database server.
-extern guardianconfig configSettings;	// Struct to store configuration settings for daemon.
+pid_t parent_pid;
 
 time_t last_server_check;
 time_t last_integrity_check;
@@ -52,6 +52,9 @@ double database_check_delay;
 double database_server_check_delay;
 double slow_query_check_delay;
 double backup_check_delay;
+
+extern dbserver configServer;			// Struct to store config database server.
+extern guardianconfig configSettings;	// Struct to store configuration settings for daemon.
 
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
@@ -78,6 +81,8 @@ void startDaemon() {
 
 	if(sid < 0)
 		exit(EXIT_FAILURE);
+
+	parent_pid = getpid();
 
 	getConfigd();
 
@@ -153,6 +158,8 @@ int initDaemon() {
 			doSlowQueryCheck();
 	
 		sleep(5);
+
+		waitpid(-1, NULL, WNOHANG);
 	}
 
 	return 0;
@@ -402,7 +409,7 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 }
 
 int doSlowQueryCheck() {
-
+	return 0;
 }
 
 int doDatabaseBackups() {
@@ -413,20 +420,71 @@ int doDatabaseBackups() {
 
 	if(diff > backup_check_delay) {
 		syslog(LOG_INFO, "%s", "Time to perform database backups.");
+	
+		pid_t pid = fork();
 
-		time(&last_backup_check);
+		if(pid < 0)
+			return 1;	
+
+		if(pid > 0) {
+			time(&last_backup_check);
+			return 0;	
+		}	
+		else {
+			pid_t sid = setsid();
+
+			if(sid < 0)
+				exit(EXIT_FAILURE);
+
+			performDatabaseBackups();
+	
+			syslog(LOG_INFO, "%s", "Backup process completed.");
+
+			exit(EXIT_SUCCESS);
+		}	
 	}
 
 	return 0;
 }
 
 int performDatabaseBackups() {
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+
+	struct myserver *pServer = pFirst;
+
+	while(pServer != NULL) {
+		if(pServer->database_backup == 1) {
+			if(pServer->firstDatabase == NULL)
+				populateServerDatabasesList(pServer); 
+
+			struct mydatabase *pDatabase = pServer->firstDatabase;
+
+			while(pDatabase != NULL) {
+				syslog(LOG_INFO, "%s %s %s %s.", "Performing backup of", 
+					pDatabase->dbname, "database on", pServer->hostname);
+
+				// Perform database backup
+				sleep(15);
+				pDatabase = pDatabase->next;
+			}
+		}
+
+		pServer = pServer->next;
+	}
+
 	return 0;
 }
 
 // Handles signal 15 from the kernel and performs tasks to prepare for shutdown. A shutdown
 // message is written to the log and the daemon terminates normally. 
 void sig_handler(int signum) {
-	syslog(LOG_INFO, "%s", "MySQL Guardian daemon stopping...");
+	pid_t my_pid = getpid();
+
+	if(my_pid == parent_pid) 
+		syslog(LOG_INFO, "%s", "MySQL Guardian daemon stopping...");
+	else
+		syslog(LOG_INFO, "%s", "WARNING: Running backup process may have been terminated.");
+
 	exit(0);
 }
