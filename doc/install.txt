@@ -41,7 +41,7 @@ make -B
 
 sudo make install
 
-5. Run the mysql-guardian application to generate a config file and create the required database
+5. Run the mysql-guardian command from the mysql-guardian/build folder to generate a config file and create the required database
 using the following command:
 
 sudo ./mysql-guardian --init
