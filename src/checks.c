@@ -234,11 +234,11 @@ int performDatabaseBackups() {
 			struct mydatabase *pDatabase = pServer->firstDatabase;
 
 			while(pDatabase != NULL) {
-				syslog(LOG_INFO, "%s %s %s %s.", "Performing backup of", 
+				syslog(LOG_INFO, "%s %s %s %s.", "Calling backup of", 
 					pDatabase->dbname, "database on", pServer->hostname);
 
-				// Perform database backup
-				sleep(15);
+				backupDatabase(pServer, pDatabase);
+
 				pDatabase = pDatabase->next;
 			}
 		}
@@ -247,4 +247,47 @@ int performDatabaseBackups() {
 	}
 
 	return 0;
+}
+
+int backupDatabase(struct myserver *svr, struct mydatabase *db) {
+	syslog(LOG_INFO, "%s %s %s %s.", "Performing backup of", 
+		db->dbname, "database on", svr->hostname);
+
+	char cmd[250];
+
+	int length = snprintf(NULL, 0, "%d", svr->port);
+	char* strPort = malloc(length + 1);
+	snprintf(strPort, length + 1, "%d", svr->port);
+
+	char *backupTime = malloc(80);
+	getCurrentTime(backupTime);
+
+	remove_char_from_string('/', backupTime);
+	remove_char_from_string(':', backupTime);
+
+	strcpy(cmd, "mysqldump --host ");
+	strcat(cmd, svr->hostname);
+	strcat(cmd, " -P ");
+	strcat(cmd, strPort);
+	strcat(cmd, " -u ");
+	strcat(cmd, svr->username);
+	strcat(cmd, " -p");
+	strcat(cmd, svr->password);
+	strcat(cmd, " ");
+	strcat(cmd, db->dbname);
+	strcat(cmd, " > ");
+	strcat(cmd, configSettings.backupPath);
+	strcat(cmd, "/");
+	strcat(cmd, svr->hostname);
+	strcat(cmd, "_");
+	strcat(cmd, db->dbname);
+	strcat(cmd, "_");
+	strcat(cmd, backupTime);
+	strcat(cmd, ".sql");
+
+	syslog(LOG_INFO, "%s", cmd);
+
+	int result = system(cmd);
+
+	return result;
 }

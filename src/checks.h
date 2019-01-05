@@ -25,3 +25,4 @@ int checkDatabaseOnline();
 int performIntegrityCheckDB();
 int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDatabase);
 int performDatabaseBackups();
+int backupDatabase(struct myserver *svr, struct mydatabase *db);

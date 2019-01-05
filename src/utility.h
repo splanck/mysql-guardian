@@ -66,3 +66,4 @@ unsigned short checkSum(void *buffer, int len);
 char* reverseDNSLookup(char *ip_addr);
 int pingServer(char *hostname);
 void ucase(char str[]);
+void getCurrentTime(char *timeStr);

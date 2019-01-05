@@ -289,3 +289,15 @@ void ucase(char str[]) {
 		i++;
 	}
 }
+
+void getCurrentTime(char *timeStr) {
+	time_t t;
+	struct tm *local;
+	char result[80];
+
+	time(&t);
+	local = localtime(&t);
+
+	strftime(result, 80, "%x-%I:%M%p", local);
+	strcpy(timeStr, result);
+}
