@@ -18,6 +18,7 @@
 */
 
 void setupGUITool();
+void processParams();
 void commandHelp();
 void initialiseLog();
 void initialiseSetup();

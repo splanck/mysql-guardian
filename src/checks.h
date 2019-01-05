@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2018 - Stephen Planck and Alistair Packer
     
-    mysqlgd.h - Header file for the mysqlgd.c source file.
+    check.c - Header file for the checks.c source file.
     
     This file is part of MySQL Guardian.
 
@@ -19,14 +19,9 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
-void startDaemon();
-void getConfigd();
-void setupTimers();
-int initDaemon();
-int doServerCheck();
-int doDatabaseServerCheck();
-int doDatabaseCheck();
-int doIntegrityCheck();
-int doSlowQueryCheck();
-int doDatabaseBackups();
-void sig_handler();
+int checkServersOnline();
+int checkDatabaseServer();
+int checkDatabaseOnline();
+int performIntegrityCheckDB();
+int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDatabase);
+int performDatabaseBackups();

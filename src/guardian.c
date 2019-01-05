@@ -36,6 +36,8 @@
 int colourSupport = 0;			// True if terminal supports ncurses colour
 int canChangeColours = 0;		// True if terminal supports ncurses change colour 
 char db_error[1000];			// Global variable to store database error messages
+int g_argc = 0;
+char **g_argv = NULL;
 
 dbserver configServer;			// Struct to store config database server.
 guardianconfig configSettings;	// Struct to store configuration settings for daemon.
@@ -44,20 +46,32 @@ guardianconfig configSettings;	// Struct to store configuration settings for dae
 // ncurses terminal, and display the main menu. Also performs clean up tasks
 // upon exit.
 int main(int argc, char **argv) {
-	if(argc > 1) {
-		if(strcmp(argv[1], "--demonize") == 0) {
+	g_argc = argc;
+	g_argv = argv;
+
+	processParams();
+
+	cleanUpTerminal();
+	cleanUpTasks();
+
+	return 0;
+}
+
+void processParams() {
+	if(g_argc > 1) {
+		if(strcmp(g_argv[1], "--demonize") == 0) {
 			startDaemon();
 		}
-		else if(strcmp(argv[1], "--init") == 0) {
+		else if(strcmp(g_argv[1], "--init") == 0) {
 			initialiseSetup();
 		}
-		else if(strcmp(argv[1], "--help") == 0) {
+		else if(strcmp(g_argv[1], "--help") == 0) {
 			commandHelp();
 		}
-		else if(strcmp(argv[1], "--gui") == 0) {
+		else if(strcmp(g_argv[1], "--gui") == 0) {
 			setupGUITool();
 		}
-		else if(strcmp(argv[1], "--debug") == 0) {
+		else if(strcmp(g_argv[1], "--debug") == 0) {
 			debugFunc();
 		}
 		else {
@@ -68,11 +82,6 @@ int main(int argc, char **argv) {
 	else {
 		commandHelp();
 	}
-
-	cleanUpTerminal();
-	cleanUpTasks();
-
-	return 0;
 }
 
 void debugFunc() {
