@@ -269,7 +269,7 @@ void addServer() {
 	}
 
 	if(action == 1) {
-		int success = addServerToTable();
+		int success = addServerToTable(newHostname, newPort, newUsername, newPassword);
 		
 		if(success) {
 			mvprintw(1, 0, "Could not add server to monitoring.\n\r");

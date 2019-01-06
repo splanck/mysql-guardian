@@ -31,10 +31,6 @@
 #include "mysql.h"
 
 extern char db_error[1000];
-extern char newHostname[80];
-extern int newPort;
-extern char newUsername[80];
-extern char newPassword[80];
 extern dbserver configServer;
 
 // Accepts a hostname, username, password, and database name and returns a pointer 
@@ -267,6 +263,39 @@ int dropOldTables() {
 	return 0;
 }	
 
+int writeBackupHistory(int server_id, char *dbname, char *filename) {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+
+    if(conn == NULL)
+        return 1;
+
+  	char sqlcmd[500];
+
+    int length = snprintf(NULL, 0, "%d", server_id);
+    char* strid = malloc(length + 1);
+    snprintf(strid, length + 1, "%d", server_id);
+
+	strcpy(sqlcmd, "INSERT INTO backup_history(server_id, db_name, filename) ");
+	strcat(sqlcmd, "VALUES(");
+	strcat(sqlcmd, strid);
+	strcat(sqlcmd, ", '");
+	strcat(sqlcmd, dbname);
+	strcat(sqlcmd, "', '");
+	strcat(sqlcmd, filename);
+	strcat(sqlcmd, "')");
+
+	free(strid);
+
+	char errorMsg[100];
+    strcpy(errorMsg, "Cannot record database backup result.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+  	mysql_close(conn);
+}
+
 int writeCheckResult(int id, int type, int result, char *dbname, char *errorText) {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
         configServer.password, "mysql_guardian");
@@ -351,7 +380,7 @@ int writeCheckResult(int id, int type, int result, char *dbname, char *errorText
 }
 
 // Adds a new server into the servers table on the monitoring server.
-int addServerToTable() {
+int addServerToTable(char *hostname, int port, char *username, char *password) {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
         configServer.password, "mysql_guardian");
 
@@ -360,18 +389,18 @@ int addServerToTable() {
 
   	char sqlcmd[500];
 
-    int length = snprintf(NULL, 0, "%d", newPort);
+    int length = snprintf(NULL, 0, "%d", port);
     char* strPort = malloc(length + 1);
-    snprintf(strPort, length + 1, "%d", newPort);
+    snprintf(strPort, length + 1, "%d", port);
 
   	strcpy(sqlcmd, "INSERT INTO servers(hostname, port, username, password) VALUES('");
-  	strcat(sqlcmd, newHostname);
+  	strcat(sqlcmd, hostname);
   	strcat(sqlcmd, "', ");
   	strcat(sqlcmd, strPort);
   	strcat(sqlcmd, ", '");
-  	strcat(sqlcmd, newUsername);
+  	strcat(sqlcmd, username);
   	strcat(sqlcmd, "', '");
-  	strcat(sqlcmd, newPassword);
+  	strcat(sqlcmd, password);
   	strcat(sqlcmd, "')");
 
   	free(strPort);

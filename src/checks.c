@@ -234,12 +234,20 @@ int performDatabaseBackups() {
 			struct mydatabase *pDatabase = pServer->firstDatabase;
 
 			while(pDatabase != NULL) {
-				syslog(LOG_INFO, "%s %s %s %s.", "Calling backup of", 
-					pDatabase->dbname, "database on", pServer->hostname);
+				if((strcmp(pDatabase->dbname, "information_schema") == 0) ||
+					(strcmp(pDatabase->dbname, "performance_schema") == 0)) {
+					syslog(LOG_INFO, "%s %s %s %s. %s", 
+						"Cannot backup system database", pDatabase->dbname, "on", 
+						pServer->hostname, "Skipping.");
+				}
+				else {
+					syslog(LOG_INFO, "%s %s %s %s.", "Calling backup of", 
+						pDatabase->dbname, "database on", pServer->hostname);
 
-				backupDatabase(pServer, pDatabase);
+					backupDatabase(pServer, pDatabase);
 
-				pDatabase = pDatabase->next;
+					pDatabase = pDatabase->next;
+				}	
 			}
 		}
 
@@ -254,6 +262,7 @@ int backupDatabase(struct myserver *svr, struct mydatabase *db) {
 		db->dbname, "database on", svr->hostname);
 
 	char cmd[250];
+	char path[200];
 
 	int length = snprintf(NULL, 0, "%d", svr->port);
 	char* strPort = malloc(length + 1);
@@ -263,7 +272,15 @@ int backupDatabase(struct myserver *svr, struct mydatabase *db) {
 	getCurrentTime(backupTime);
 
 	remove_char_from_string('/', backupTime);
-	remove_char_from_string(':', backupTime);
+
+	strcpy(path, configSettings.backupPath);
+	strcat(path, "/");
+	strcat(path, svr->hostname);
+	strcat(path, "_");
+	strcat(path, db->dbname);
+	strcat(path, "_");
+	strcat(path, backupTime);
+	strcat(path, ".sql");
 
 	strcpy(cmd, "mysqldump --host ");
 	strcat(cmd, svr->hostname);
@@ -276,18 +293,15 @@ int backupDatabase(struct myserver *svr, struct mydatabase *db) {
 	strcat(cmd, " ");
 	strcat(cmd, db->dbname);
 	strcat(cmd, " > ");
-	strcat(cmd, configSettings.backupPath);
-	strcat(cmd, "/");
-	strcat(cmd, svr->hostname);
-	strcat(cmd, "_");
-	strcat(cmd, db->dbname);
-	strcat(cmd, "_");
-	strcat(cmd, backupTime);
-	strcat(cmd, ".sql");
+	strcat(cmd, path);
 
 	syslog(LOG_INFO, "%s", cmd);
 
 	int result = system(cmd);
+
+	if(result == 0) {
+		writeBackupHistory(svr->id, db->dbname, path);
+	}
 
 	return result;
 }

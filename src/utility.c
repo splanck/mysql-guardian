@@ -298,6 +298,6 @@ void getCurrentTime(char *timeStr) {
 	time(&t);
 	local = localtime(&t);
 
-	strftime(result, 80, "%x-%I:%M%p", local);
+	strftime(result, 80, "%x-%I%M%p", local);
 	strcpy(timeStr, result);
 }
