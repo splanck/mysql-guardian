@@ -204,15 +204,20 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 	while(pTable != NULL) {
 		int success = checkTable(pServer, pDatabase, pTable);
 
-		if(success == 0) 
+		if(success == 0) {
 			syslog(LOG_INFO, "%s %s", pTable->tblname, "check was successful.");
-		else if(success == 1) 
+		} 
+		else if(success == 1) { 
 			syslog(LOG_INFO, "%s %s", pTable->tblname, "check returned errors.");
-		else if(success == 2)
+			checkFailure(pServer, pDatabase, "Integrity Check Failed", "");
+		} 
+		else if(success == 2) {
 			syslog(LOG_INFO, "%s %s", pTable->tblname, 
 				"is using a storage engine that does not support table checking.");
-		else if(success == -1)
+		} 
+		else if(success == -1) {
 			syslog(LOG_INFO, "%s %s", "Could not perform table check on", pTable->tblname);
+		}
 
 		pTable = pTable->next;
 	}
@@ -301,6 +306,9 @@ int backupDatabase(struct myserver *svr, struct mydatabase *db) {
 
 	if(result == 0) {
 		writeBackupHistory(svr->id, db->dbname, path);
+	}
+	else {
+		checkFailure(svr, db, "Backup Failed.", "Database could not be backed up.");
 	}
 
 	return result;

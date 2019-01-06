@@ -29,4 +29,5 @@ int doDatabaseCheck();
 int doIntegrityCheck();
 int doSlowQueryCheck();
 int doDatabaseBackups();
+void checkFailure(struct myserver *svr, struct mydatabase *db, char *error, char *error_desc);
 void sig_handler();

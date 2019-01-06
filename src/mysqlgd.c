@@ -272,6 +272,10 @@ int doDatabaseBackups() {
 	return 0;
 }
 
+void checkFailure(struct myserver *svr, struct mydatabase *db, char *error, char *error_desc) {
+
+}
+
 // Handles signal 15 from the kernel and performs tasks to prepare for shutdown. A shutdown
 // message is written to the log and the daemon terminates normally. 
 void sig_handler(int signum) {
