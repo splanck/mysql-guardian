@@ -71,6 +71,9 @@ void processParams() {
 		else if(strcmp(g_argv[1], "--gui") == 0) {
 			setupGUITool();
 		}
+		else if(strcmp(g_argv[1], "--add") == 0) {
+			addNewServer();
+		}
 		else if(strcmp(g_argv[1], "--debug") == 0) {
 			debugFunc();
 		}
@@ -94,6 +97,7 @@ void commandHelp() {
 	printf("--init\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
 	printf("--gui\t\tLaunch the MySQL Guardian console control centre application.\n");
 	printf("--demonize\tLaunch the MySQL Guardian daemon to run in the background.\n");
+	printf("--add\t\tAdd a new MySQL or MariaDB database server to monitoring\n");
 	printf("--help\t\tDisplay the help screen.\n");
 	exit(0);
 }
@@ -107,6 +111,40 @@ void setupGUITool() {
 	mainMenu();
 }
 
+void addNewServer() {
+	getConfig();
+
+	char hostname[80] = "";
+	char username[80] = "";
+	char password[80] = "";
+	int port = 3306;
+
+	printf("MySQL Guardian %s\n\n", VERSION);
+	printf("Add New Server to Monitoring\n\n");
+
+	printf("Server Hostname: ");
+	scanf("%s", &hostname);
+
+	printf("Server Port: ");
+	scanf("%d", &port);
+
+	printf("Root Username: ");
+	scanf("%s", &username);
+
+	printf("Root Password: ");
+	scanf("%s", &password);
+
+	int success = addServerToTable(hostname, port, username, password);
+
+	if(success) {
+		printf("Could not add server to monitoring.\n");
+	}
+	else {
+		printf("Server added successfully.\n");
+		printf("Restart the mysqlgd service for changes to take effect\n");
+	}	
+}
+
 void initialiseSetup() {
 	char hostname[80] = "";
 	char username[80] = "";		
@@ -114,6 +152,7 @@ void initialiseSetup() {
 
 	printf("MySQL Guardian %s\n\n", VERSION);
 	printf("Configure Monitoring Server\n\n");
+
 	printf("Server Hostname: ");
 	scanf("%s", &hostname);
 
