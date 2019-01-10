@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from models import db, User
+from models import db, Guardian_user 
 from forms import SignupForm, Loginform
 import random
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'configure me '
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://alistair:W@rdyIT01@localhost/mysql_guardian'
 db.init_app(app)
 
 #this protects against xss 
@@ -23,17 +23,10 @@ def about():
 def home():
   return render_template("home.html")
 
-@app.route("/showusers")
-def showusers():
-  get_user = User.query.all()
-  return render_template("showusers.html", get_user = get_user)
-
-'''
-@app.route("/showusers")
-def showusers():
-  users = User.query.all()
-  return render_template('showusers.html', users = users)
-'''
+@app.route("/guardian_users")
+def guardian_users():
+  get_guardian_users = Guardian_user.query.all()
+  return render_template("guardian_users.html", get_guardian_users = get_guardian_users)
 
 @app.route("/signup", methods = ['GET', 'POST'])
 def signup():

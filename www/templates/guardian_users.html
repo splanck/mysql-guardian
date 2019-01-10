@@ -7,8 +7,8 @@
     <h2>Heade 2</h2>
     <p>Placeholder text asf;sahere</p>
 
-    {% for users in get_user %}
-    <li> {{ users.id }} </li>
+    {% for users in get_guardian_users %}
+    <li> {{ users.username }} </li>
     {% endfor %}
 
 
@@ -16,5 +16,4 @@
     </div>
   </main>
 {% endblock %}
-
 

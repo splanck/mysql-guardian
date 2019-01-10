@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
+'''
 class User(db.Model):
   __tablename__ = 'users'
   uid = db.Column(db.Integer, primary_key = True)
@@ -21,4 +22,20 @@ class User(db.Model):
 
   def check_password(self, password):
     return check_password_hash(self.pwdhash, password)
+'''
+
+
+class Guardian_user(db.Model):
+  __tablename__ = 'users'
+  id = db.Column(db.Integer, primary_key = True)
+  username = db.Column(db.String(100))
+  password = db.Column(db.String(100))
+  admin = db.Column(db.String(100))
+
+  def __init__(self, firstname, lastname, email, password):
+    self.firstname = firstname 
+    self.lastname = lastname
+    self.email = email
+    self.password = password
+
 
