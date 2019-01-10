@@ -180,7 +180,7 @@ int createConfigTables() {
         return 1;
 
     strcpy(sqlcmd, "CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, username TEXT, ");
-	strcat(sqlcmd, "password TEXT, admin BOOLEAN)");
+	strcat(sqlcmd, "password TEXT, email TEXT, admin BOOLEAN)");
     strcpy(errorMsg, "Cannot create users table in monitoring database.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
