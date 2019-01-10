@@ -11,13 +11,13 @@
         <div class="form-group">
           {{ form.username.label }}
 
-          {% if form.email.errors %}
-            {% for error in form.email.errors %}
+          {% if form.username.errors %}
+            {% for error in form.username.errors %}
               <p class="error-message">{{ error }}</p>
             {% endfor %}
           {% endif %}
 
-          {{ form.email }}
+          {{ form.username }}
         </div>
 
         <div class="form-group">

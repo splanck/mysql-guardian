@@ -36,7 +36,7 @@ def signup():
     if form.validate() == False:
       return render_template('signup.html', form=form)
     else:
-      newuser = Guardian_user(form.username.data, form.email.data, form.password.data)
+      newuser = Guardian_user(form.username.data, form.email.data, form.password.data, admin = 1)
       db.session.add(newuser)
       db.session.commit()
 
