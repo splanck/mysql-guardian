@@ -36,7 +36,7 @@ def signup():
     if form.validate() == False:
       return render_template('signup.html', form=form)
     else:
-      newuser = User(form.first_name.data, form.last_name.data, form.email.data, form.password.data)
+      newuser = Guardian_user(form.username.data, form.email.data, form.password.data)
       db.session.add(newuser)
       db.session.commit()
 
@@ -56,7 +56,7 @@ def login():
     else:
       email = form.email.data
       password = form.password.data
-      user = User.query.filter_by(email=email).first()
+      user = Guardian_user.query.filter_by(email=email).first()
 
       if user is not None and user.check_password(password):
         session['email'] = form.email.data

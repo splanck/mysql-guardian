@@ -31,11 +31,11 @@ class Guardian_user(db.Model):
   username = db.Column(db.String(100))
   password = db.Column(db.String(100))
   admin = db.Column(db.String(100))
+  email = db.Column(db.String(120))
 
-  def __init__(self, firstname, lastname, email, password):
-    self.firstname = firstname 
-    self.lastname = lastname
+  def __init__(self, username, email, password):
+    self.username = username 
     self.email = email
-    self.password = password
+    self.password = password 
 
 
