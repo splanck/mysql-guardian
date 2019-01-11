@@ -7,8 +7,8 @@
     <h2>Current users in database</h2>
     <p></p>
 
-    {% for users in get_guardian_users %}
-    <li> {{ users.username }} </li>
+    {% for servers in get_guardian_servers %}
+    <li> {{ servers.hostname }} </li>
     {% endfor %}
 
     </div>

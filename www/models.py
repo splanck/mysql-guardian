@@ -16,4 +16,19 @@ class Guardian_user(db.Model):
     self.password = password 
     self.admin = admin
 
+class Guardian_servers(db.Model):
+  __tablename__ = 'servers'
+  id = db.Column(db.Integer, primary_key = True)
+  hostname = db.Column(db.String(100))
+  port = db.Column(db.Integer)
+  username = db.Column(db.String(100))
+  password = db.Column(db.String(100))
+
+  def __init__(self, id, hostname, port, username, password):
+    self.id = id
+    self.hostname = hostname
+    self.port = port
+    self.username = username
+    self.password = password 
+
 

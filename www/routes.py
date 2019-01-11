@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from models import db, Guardian_user 
+from models import db, Guardian_user, Guardian_servers
 from forms import SignupForm, Loginform
 import random
 
@@ -27,6 +27,11 @@ def home():
 def guardian_users():
   get_guardian_users = Guardian_user.query.all()
   return render_template("guardian_users.html", get_guardian_users = get_guardian_users)
+
+@app.route("/guardian_servers")
+def guardian_servers():
+  get_guardian_servers = Guardian_servers.query.all()
+  return render_template("guardian_servers.html", get_guardian_servers = get_guardian_servers )
 
 @app.route("/signup", methods = ['GET', 'POST'])
 def signup():
