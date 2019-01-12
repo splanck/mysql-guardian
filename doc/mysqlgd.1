@@ -1,0 +1,31 @@
+.\" manpage for MySQL Guardian
+.TH mysqlgd 1 "12 Jan 2019" "0.1" "MySQL Guardian Man Page"
+.SH NAME
+MySQL Guardian - Monitors MySQL and MariaDB Database Servers.
+.SH SYNOPSIS
+.B mysql-guardian --["OPTION"]
+.SH DESCRIPTION
+MySQL Guardian is a daemon that monitors MySQL and MariaDB databases. Database servers are checked at configurable intervals to ensure they are online, responsive, and their databases are accessible. Database tables can also be checked to ensure their integrity. Guardian will also perform automated remote database backups.
+.SH OPTIONS
+.TP
+.B --init
+Create new /etc/mysqlgd.conf configuration file.
+.TP
+.B --gui
+Launch the MySQL Guardian console control centre application.
+.TP
+.B --demonize
+Launch the MySQL Guardian daemon to run in the background.
+.TP
+.B --add
+Add a new MySQL or MariaDB database server to monitoring.
+.TP
+.B --help
+Display the help screen.
+.SH AUTHOR
+Alistair Packer (packer.alistair@gmail.com) and Stephen Planck (splanck9271@gmail.com
+.SH COPYRIGHT
+.PP
+GNU General Public License v2
+.PP
+Copyright (c) 2018-19 - Alistair Packer and Stephen Planck

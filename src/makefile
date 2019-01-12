@@ -12,6 +12,8 @@ install: all
 	cp -f ../build/mysql-guardian /usr/bin/mysql-guardian
 	chmod 755 /usr/bin/mysql-guardian
 	cp -f ../build/mysqlgd.service /etc/systemd/system/mysqlgd.service
+	cp -f ../doc/mysqlgd.1 /usr/local/man/man1/mysqlgd.1
+	gzip /usr/local/man/man1/mysqlgd.1
 
 uninstall:
 	rm -f /usr/bin/mysql-guardian
