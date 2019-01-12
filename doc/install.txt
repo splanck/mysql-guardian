@@ -85,4 +85,4 @@ Get Support
 -----------
 
 If you have any problems with this installation you can email the authors at
-packer.alistair@gmail.com or splanck9271@gmail.com to request assistance.
+alistairpacker@yandex.com or splanck9271@gmail.com to request assistance.

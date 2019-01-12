@@ -59,19 +59,19 @@ int main(int argc, char **argv) {
 
 void processParams() {
 	if(g_argc > 1) {
-		if(strcmp(g_argv[1], "--demonize") == 0) {
+		if(strcmp(g_argv[1], "--demonize") == 0 || strcmp(g_argv[1], "-d") == 0) {
 			startDaemon();
 		}
-		else if(strcmp(g_argv[1], "--init") == 0) {
+		else if(strcmp(g_argv[1], "--init") == 0 || strcmp(g_argv[1], "-i") == 0) {
 			initialiseSetup();
 		}
-		else if(strcmp(g_argv[1], "--help") == 0) {
+		else if(strcmp(g_argv[1], "--help") == 0 || strcmp(g_argv[1], "-h") == 0) {
 			commandHelp();
 		}
-		else if(strcmp(g_argv[1], "--gui") == 0) {
+		else if(strcmp(g_argv[1], "--gui") == 0 || strcmp(g_argv[1], "-g") == 0) {
 			setupGUITool();
 		}
-		else if(strcmp(g_argv[1], "--add") == 0) {
+		else if(strcmp(g_argv[1], "--add") == 0 || strcmp(g_argv[1], "-a") == 0) {
 			addNewServer();
 		}
 		else if(strcmp(g_argv[1], "--debug") == 0) {

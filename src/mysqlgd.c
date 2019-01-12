@@ -272,8 +272,27 @@ int doDatabaseBackups() {
 	return 0;
 }
 
-void checkFailure(struct myserver *svr, struct mydatabase *db, char *error, char *error_desc) {
+void checkFailure(struct myserver *svr, struct mydatabase *db, checkType_t chk, char *error, 
+	char *error_desc) {
+	char error_msg[250];
 
+	if(chk == c_serverOnline) {
+		strcpy(error_msg, "CHECK FAILURE: Server ");
+		strcat(error_msg, svr->hostname);
+		strcat(error_msg, " is offline.");
+
+		syslog(LOG_INFO, "%s", error_msg);
+	}
+	else if(chk == c_databaseServer) {
+	}
+	else if(chk == c_databaseOnline) {
+	}
+	else if(chk == c_integrityCheck) {
+	}
+	else if(chk == c_databaseBackup) {
+	}
+	else if(chk == c_slowQuery) {
+	}
 }
 
 // Handles signal 15 from the kernel and performs tasks to prepare for shutdown. A shutdown

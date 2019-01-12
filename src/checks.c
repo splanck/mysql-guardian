@@ -209,7 +209,7 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 		} 
 		else if(success == 1) { 
 			syslog(LOG_INFO, "%s %s", pTable->tblname, "check returned errors.");
-			checkFailure(pServer, pDatabase, "Integrity Check Failed", "");
+			checkFailure(pServer, pDatabase, c_integrityCheck, "Integrity Check Failed", "");
 		} 
 		else if(success == 2) {
 			syslog(LOG_INFO, "%s %s", pTable->tblname, 
@@ -308,7 +308,8 @@ int backupDatabase(struct myserver *svr, struct mydatabase *db) {
 		writeBackupHistory(svr->id, db->dbname, path);
 	}
 	else {
-		checkFailure(svr, db, "Backup Failed.", "Database could not be backed up.");
+		checkFailure(svr, db, c_databaseBackup,  "Backup Failed.", 
+			"Database could not be backed up.");
 	}
 
 	return result;
