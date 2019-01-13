@@ -64,6 +64,9 @@ int checkServersOnline() {
 				db_err = NULL;
 			}	
 			else {
+				checkFailure(pServer, NULL, NULL, c_serverOnline, "Server Offline",
+					"Could not reach host.");
+
 				syslog(LOG_INFO, "%s %s", "Server online check failed for", pServer->hostname);
 
 				strcpy(db_err, "Could not reach the host ");
@@ -93,12 +96,17 @@ int checkDatabaseServer() {
 
 			int success = checkDatabase(pServer, NULL, db_err);
 
-			if(!success)
+			if(!success) {
 				syslog(LOG_INFO, "%s %s", "Database server online check succeeded for", 
 					pServer->hostname);
-			else
+			}
+			else {
 				syslog(LOG_INFO, "%s %s", "Database Server online check failed for", 
 					pServer->hostname);
+
+				checkFailure(pServer, NULL, NULL, c_databaseServer, "Database server check failed",
+					"Could not connect to database server.");
+			}
 
 			if(!success)
 				db_err = NULL;
@@ -134,12 +142,17 @@ int checkDatabaseOnline() {
 			while(pDatabase != NULL) {
 				int success = checkDatabase(pServer, pDatabase, db_err);
 
-				if(!success)
+				if(!success) {
 					syslog(LOG_INFO, "%s %s %s %s", "Database online check succeeded for", 
 						pDatabase->dbname, "on", pServer->hostname);
-				else
+				}
+				else {
 					syslog(LOG_INFO, "%s %s %s %s", "Database Server online check failed for", 
 						pDatabase->dbname, "on", pServer->hostname);
+
+					checkFailure(pServer, pDatabase, NULL, c_databaseOnline, "Database offline",
+						"Could not open database.");
+				}
 
 				if(!success)
 					db_err = NULL;
@@ -209,7 +222,9 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 		} 
 		else if(success == 1) { 
 			syslog(LOG_INFO, "%s %s", pTable->tblname, "check returned errors.");
-			checkFailure(pServer, pDatabase, c_integrityCheck, "Integrity Check Failed", "");
+
+			checkFailure(pServer, pDatabase, pTable, c_integrityCheck, "Integrity Check Failed", 
+				"");
 		} 
 		else if(success == 2) {
 			syslog(LOG_INFO, "%s %s", pTable->tblname, 
@@ -241,9 +256,8 @@ int performDatabaseBackups() {
 			while(pDatabase != NULL) {
 				if((strcmp(pDatabase->dbname, "information_schema") == 0) ||
 					(strcmp(pDatabase->dbname, "performance_schema") == 0)) {
-					syslog(LOG_INFO, "%s %s %s %s. %s", 
-						"Cannot backup system database", pDatabase->dbname, "on", 
-						pServer->hostname, "Skipping.");
+					syslog(LOG_INFO, "%s %s %s %s. %s", "Cannot backup system database", 
+						pDatabase->dbname, "on", pServer->hostname, "Skipping.");
 				}
 				else {
 					syslog(LOG_INFO, "%s %s %s %s.", "Calling backup of", 
@@ -308,7 +322,7 @@ int backupDatabase(struct myserver *svr, struct mydatabase *db) {
 		writeBackupHistory(svr->id, db->dbname, path);
 	}
 	else {
-		checkFailure(svr, db, c_databaseBackup,  "Backup Failed.", 
+		checkFailure(svr, db, NULL, c_databaseBackup, "Backup Failed.", 
 			"Database could not be backed up.");
 	}
 

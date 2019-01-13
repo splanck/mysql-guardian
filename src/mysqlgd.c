@@ -272,27 +272,47 @@ int doDatabaseBackups() {
 	return 0;
 }
 
-void checkFailure(struct myserver *svr, struct mydatabase *db, checkType_t chk, char *error, 
-	char *error_desc) {
-	char error_msg[250];
+void checkFailure(struct myserver *svr, struct mydatabase *db, struct mytable *tbl, checkType_t chk,
+	char *error, char *error_desc) {
+	char error_msg[250] = "CHECK FAILURE: "; 
 
 	if(chk == c_serverOnline) {
-		strcpy(error_msg, "CHECK FAILURE: Server ");
+		strcat(error_msg, "Server ");
 		strcat(error_msg, svr->hostname);
-		strcat(error_msg, " is offline.");
-
-		syslog(LOG_INFO, "%s", error_msg);
+		strcat(error_msg, " is unresponsive and may be offline.");
 	}
 	else if(chk == c_databaseServer) {
+		strcat(error_msg, "Cannot connect to database server on ");
+		strcat(error_msg, svr->hostname);
+		strcat(error_msg, ". Database server may be inaccessible.");
 	}
 	else if(chk == c_databaseOnline) {
+		strcat(error_msg, "Connot access the ");
+		strcat(error_msg, db->dbname);
+		strcat(error_msg, " database on ");
+		strcat(error_msg, svr->hostname);
+		strcat(error_msg, ". Database may be offline.");
 	}
 	else if(chk == c_integrityCheck) {
+		strcat(error_msg, "Integrity check failed on ");
+		strcat(error_msg, tbl->tblname);
+		strcat(error_msg, " from the ");
+		strcat(error_msg, db->dbname);
+		strcat(error_msg, " on ");
+		strcat(error_msg, svr->hostname);
+		strcat(error_msg, ".");	
 	}
 	else if(chk == c_databaseBackup) {
+		strcat(error_msg, "The database backup of ");
+		strcat(error_msg, db->dbname);
+		strcat(error_msg, " on ");
+		strcat(error_msg, svr->hostname);
+		strcat(error_msg, " has failed.");
 	}
 	else if(chk == c_slowQuery) {
 	}
+
+	syslog(LOG_INFO, "%s", error_msg);
 }
 
 // Handles signal 15 from the kernel and performs tasks to prepare for shutdown. A shutdown

@@ -38,5 +38,5 @@ int doDatabaseCheck();
 int doIntegrityCheck();
 int doSlowQueryCheck();
 int doDatabaseBackups();
-void checkFailure(struct myserver *svr, struct mydatabase *db, checkType_t chk, char *error, char *error_desc);
+void checkFailure(struct myserver *svr, struct mydatabase *db, struct mytable *tbl, checkType_t chk, char *error, char *error_desc);
 void sig_handler();
