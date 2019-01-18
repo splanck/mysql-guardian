@@ -7,8 +7,8 @@
     <h2>Displays backup information</h2>
     <p></p>
 
-    {% for servers in get_guardian_servers %}
-    <li> {{ servers.hostname }} </li>
+    {% for backup_history in get_guardian_servers %}
+    <li> {{ backup_history.server_id }} </li>
     {% endfor %}
 
     </div>
