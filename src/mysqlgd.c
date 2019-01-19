@@ -158,6 +158,7 @@ int initDaemon() {
 		doDatabaseCheck();
 		doIntegrityCheck();
 		doDatabaseBackups();
+		doTaskCheck();
 
 		if(configSettings.slowQueryMonitoring == 1)
 			doSlowQueryCheck();
@@ -242,6 +243,18 @@ int doSlowQueryCheck() {
 }
 
 int doTaskCheck() {
+	time_t time_now;
+	time(&time_now);
+
+	double diff = difftime(time_now, last_task_check);
+
+	if(diff > task_check_delay) {
+		syslog(LOG_INFO, "%s", "Time to check for pending taska..");
+		performTaskCheck();
+
+		time(&last_task_check);
+	}
+
 	return 0;
 }
 

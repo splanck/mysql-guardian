@@ -328,3 +328,15 @@ int backupDatabase(struct myserver *svr, struct mydatabase *db) {
 
 	return result;
 }
+
+int performTaskCheck() {
+	struct mytask *task = malloc(sizeof(struct mytask));
+
+	int task_exists = getNextTask(task);
+
+	if(task_exists == 1) {
+		// Code to perform task
+	}
+
+	return 0;
+}

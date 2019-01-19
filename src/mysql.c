@@ -522,13 +522,18 @@ int getNextTask(struct mytask *task) {
 	    task->id = atoi(row[0]);
 		task->task_id = atoi(row[1]);
 		task->server_id = atoi(row[2]);
+		task->dbname = row[3];
+		task->param = row[4];
 		task->status = atoi(row[5]);
 	}
  	
 	mysql_free_result(result);
     mysql_close(conn);
 
-	return 0;
+	if(num_fields > 0)
+		return 1;
+	else
+		return 0;
 }
 
 // Retrieves a list of servers in monitoring from the servers table in the 
