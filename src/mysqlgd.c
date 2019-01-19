@@ -46,6 +46,7 @@ time_t last_database_check;
 time_t last_database_server_check;
 time_t last_slow_query_check;
 time_t last_backup_check;
+time_t last_task_check;
 
 double server_check_delay;
 double integrity_check_delay;
@@ -53,6 +54,7 @@ double database_check_delay;
 double database_server_check_delay;
 double slow_query_check_delay;
 double backup_check_delay;
+double task_check_delay;
 
 extern dbserver configServer;			// Struct to store config database server.
 extern guardianconfig configSettings;	// Struct to store configuration settings for daemon.
@@ -127,15 +129,17 @@ void setupTimers() {
 	database_server_check_delay = configSettings.databaseServerCheckInterval;
 	database_check_delay = configSettings.databaseCheckInterval;
 	integrity_check_delay = configSettings.integrityCheckInterval;
-	slow_query_check_delay = 60;
 	backup_check_delay = configSettings.databaseBackup;
+	slow_query_check_delay = 60;
+	task_check_delay = 30;
 
 	time(&last_server_check);
 	time(&last_integrity_check);
 	time(&last_database_server_check);
 	time(&last_database_check);
-	time(&last_slow_query_check);
 	time(&last_backup_check);
+	time(&last_slow_query_check);
+	time(&last_task_check);
 }
 
 // Sets up handling of SIGTERM termination signal from kernel, sets intervals for checks,
@@ -234,6 +238,10 @@ int doIntegrityCheck() {
 }
 
 int doSlowQueryCheck() {
+	return 0;
+}
+
+int doTaskCheck() {
 	return 0;
 }
 

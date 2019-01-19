@@ -53,6 +53,15 @@ struct mytable {
     struct mytable *next;
 };
 
+struct mytask {
+    int id;
+    int task_id;
+    int server_id;
+    char *dbname;
+    char *param;
+    int status;
+};
+
 struct ping_packet {
     struct icmphdr hdr;
     char msg[PING_PKT_S-sizeof(struct icmphdr)];

@@ -23,11 +23,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
-#include <my_global.h>
+//#include <my_global.h>
 #include <mysql.h>
 #include "utility.h"
 #include "guardian.h"
 #include "fileio.h"
+#include "mysqlgd.h"
 #include "mysql.h"
 
 extern char db_error[1000];
@@ -173,7 +174,8 @@ int createConfigTables() {
     char errorMsg[100];
     
   	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, ");
-	strcat(sqlcmd, "hostname TEXT, port INT, username TEXT, password TEXT)");
+	strcat(sqlcmd, "hostname TEXT NOT NULL, port INT NOT NULL, username TEXT NOT NULL, ");
+	strcat(sqlcmd, "password TEXT NOT NULL)");
     strcpy(errorMsg, "Cannot create server table in monitoring database.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
@@ -186,7 +188,7 @@ int createConfigTables() {
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
 
-	strcpy(sqlcmd, "CREATE TABLE server_checks(id INT, online_check INT, ");
+	strcpy(sqlcmd, "CREATE TABLE server_checks(id INT NOT NULL, online_check INT, ");
 	strcat(sqlcmd, "database_server_check INT, database_check INT, ");
 	strcat(sqlcmd, "integrity_check INT, slow_query_monitoring INT, ");
 	strcat(sqlcmd, "database_backup INT)");
@@ -197,7 +199,7 @@ int createConfigTables() {
 
 	strcpy(sqlcmd, "CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "server_id INT NOT NULL, ");
-	strcat(sqlcmd, "time timestamp NOT NULL,");
+	strcat(sqlcmd, "time timestamp NOT NULL, ");
 	strcat(sqlcmd, "check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)");
 	strcpy(errorMsg, "Cannot create check_results table in monitoring database.");
     
@@ -211,7 +213,15 @@ int createConfigTables() {
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
 		return 1;
 
-	strcpy(sqlcmd, "CREATE TABLE check_result_errors(id INT, error_msg TEXT)");
+	strcpy(sqlcmd, "CREATE TABLE tasks(id INT PRIMARY KEY AUTO_INCREMENT, task_id INT NOT NULL, ");
+	strcat(sqlcmd, "server_id INT, db_name TEXT, param TEXT, status INT NOT NULL, ");
+	strcat(sqlcmd, "time TIMESTAMP NOT NULL)");
+	strcpy(errorMsg, "Cannot create taska table in monitoring database.");
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
+	strcpy(sqlcmd, "CREATE TABLE check_result_errors(id INT NOT NULL, error_msg TEXT)");
 	strcpy(errorMsg, "Cannot create check_result_errors table in monitoring database.");
     
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
@@ -254,6 +264,11 @@ int dropOldTables() {
 		return 1;
 
 	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_result_errors");
+
+	if(executeQuery(conn, sqlcmd, NULL) == 1)
+		return 1;
+
+	strcpy(sqlcmd, "DROP TABLE IF EXISTS tasks");
 
 	if(executeQuery(conn, sqlcmd, NULL) == 1)
 		return 1;
@@ -472,6 +487,48 @@ int getMonitoredServersCount() {
     mysql_close(conn);
 
     return rows;
+}
+
+int getNextTask(struct mytask *task) {
+	MYSQL *conn = connectDB(configServer.hostname, configServer.username,
+		configServer.password, "mysql_guardian");
+
+	if(conn == NULL)
+		return -1;
+
+	char sqlcmd[500];
+	strcpy(sqlcmd, "SELECT id, task_id, server_id, db_name, param, status ");
+	strcat(sqlcmd, "FROM tasks where status = 1 ORDER BY time ASC LIMIT 1");
+	
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot retrieve next pending task from monitoring database.");
+
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return -1;
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    if(result == NULL) {
+        handleDBError(conn, errorMsg, NULL);
+
+        return -1;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    
+	if(num_fields > 0) {
+    	MYSQL_ROW row = mysql_fetch_row(result);
+    
+	    task->id = atoi(row[0]);
+		task->task_id = atoi(row[1]);
+		task->server_id = atoi(row[2]);
+		task->status = atoi(row[5]);
+	}
+ 	
+	mysql_free_result(result);
+    mysql_close(conn);
+
+	return 0;
 }
 
 // Retrieves a list of servers in monitoring from the servers table in the 

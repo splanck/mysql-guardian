@@ -30,6 +30,7 @@ int writeBackupHistory(int server_id, char *dbname, char *filename);
 int writeCheckResult(int id, int type, int result, char *dbname, char *errorText);
 int addServerToTable(char *hostname, int port, char *username, char *password);
 int getMonitoredServersCount();
+int getNextTask(struct mytask *task);
 int populateMonitoredServersList();
 int populateServerDatabasesList(struct myserver *);
 int populateDatabaseTablesList(struct myserver *, struct mydatabase *);
