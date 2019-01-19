@@ -44,6 +44,7 @@ struct gconfig {
 	int integrityCheckInterval;
 	int slowQueryMonitoring;
 	int databaseBackup;
+	int extendedLogging;
 	char *backupPath;
 	char *logPath;
 };

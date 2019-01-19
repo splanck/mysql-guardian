@@ -88,6 +88,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	fprintf(cfgFile, "SLOW_QUERY_MONITORING 1\n");
 	fprintf(cfgFile, "DATABASE_BACKUP 1000\n");
 	fprintf(cfgFile, "BACKUP_PATH /tmp\n");
+	fprintf(cfgFile, "EXTENDED_LOGGING 0\n");
 	
 	fclose(cfgFile);
 
@@ -157,6 +158,13 @@ int readConfig(char *hostname, char *username, char *password, char *backup_path
 
 				if(i == 0 || i == 1)
 					configSettings.slowQueryMonitoring = i;
+			}
+
+			if(strcmp(k, "EXTENDED_LOGGING") == 0) {
+				int i = atoi(v);
+
+				if(i == 0 || i == 1)
+					configSettings.extendedLogging = i;
 			}
 
 			if(strcmp(k, "DATABASE_BACKUP") == 0) {

@@ -78,6 +78,7 @@ void startDaemon() {
 	umask(0);
 
 	openlog("mysqlgd", 0, LOG_DAEMON);
+	
 	syslog(LOG_INFO, "%s", "MySQL Guardian daemon starting...");
 
 	pid_t sid = setsid();
@@ -181,7 +182,9 @@ int doServerCheck() {
 	double diff = difftime(time_now, last_server_check);
 
 	if(diff > server_check_delay) {
-		syslog(LOG_INFO, "%s", "Time for server check.");
+		if(configSettings.extendedLogging == 1)
+			syslog(LOG_INFO, "%s", "Time for server check.");
+
 		checkServersOnline();
 
 		time(&last_server_check);
@@ -197,7 +200,9 @@ int doDatabaseServerCheck() {
 	double diff = difftime(time_now, last_database_server_check);
 
 	if(diff > database_server_check_delay) {
-		syslog(LOG_INFO, "%s", "Time for database server check.");
+		if(configSettings.extendedLogging == 1)
+			syslog(LOG_INFO, "%s", "Time for database server check.");
+
 		checkDatabaseServer();
 
 		time(&last_database_server_check);
@@ -213,7 +218,9 @@ int doDatabaseCheck() {
 	double diff = difftime(time_now, last_database_check);
 
 	if(diff > database_check_delay) {
-		syslog(LOG_INFO, "%s", "Time for database online check.");
+		if(configSettings.extendedLogging == 1)
+			syslog(LOG_INFO, "%s", "Time for database online check.");
+
 		checkDatabaseOnline();
 
 		time(&last_database_check);
@@ -229,7 +236,9 @@ int doIntegrityCheck() {
 	double diff = difftime(time_now, last_integrity_check);
 
 	if(diff > integrity_check_delay) {
-		syslog(LOG_INFO, "%s", "Time for integrity checks.");
+		if(configSettings.extendedLogging == 1)
+			syslog(LOG_INFO, "%s", "Time for integrity checks.");
+
 		performIntegrityCheckDB();
 
 		time(&last_integrity_check);
@@ -249,7 +258,9 @@ int doTaskCheck() {
 	double diff = difftime(time_now, last_task_check);
 
 	if(diff > task_check_delay) {
-		syslog(LOG_INFO, "%s", "Time to check for pending taska..");
+		if(configSettings.extendedLogging == 1)
+			syslog(LOG_INFO, "%s", "Time to check for pending taska..");
+
 		performTaskCheck();
 
 		time(&last_task_check);
@@ -265,7 +276,8 @@ int doDatabaseBackups() {
 	double diff = difftime(time_now, last_backup_check);
 
 	if(diff > backup_check_delay) {
-		syslog(LOG_INFO, "%s", "Time to perform database backups.");
+		if(configSettings.extendedLogging == 1)
+			syslog(LOG_INFO, "%s", "Time to perform database backups.");
 	
 		pid_t pid = fork();
 
@@ -284,7 +296,8 @@ int doDatabaseBackups() {
 
 			performDatabaseBackups();
 	
-			syslog(LOG_INFO, "%s", "Backup process completed.");
+			if(configSettings.extendedLogging == 1)
+				syslog(LOG_INFO, "%s", "Backup process completed.");
 
 			exit(EXIT_SUCCESS);
 		}	
