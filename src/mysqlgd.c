@@ -159,7 +159,7 @@ int initDaemon() {
 		doDatabaseCheck();
 		doIntegrityCheck();
 		doDatabaseBackups();
-		doTaskCheck();
+		//doTaskCheck();
 
 		if(configSettings.slowQueryMonitoring == 1)
 			doSlowQueryCheck();

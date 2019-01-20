@@ -114,25 +114,25 @@ void setupGUITool() {
 void addNewServer() {
 	getConfig();
 
-	char hostname[80] = "";
-	char username[80] = "";
-	char password[80] = "";
+	char *hostname = malloc(sizeof(char) * 80); 
+	char *username = malloc(sizeof(char) * 80);
+	char *password = malloc(sizeof(char) * 80);
 	int port = 3306;
 
 	printf("MySQL Guardian %s\n\n", VERSION);
 	printf("Add New Server to Monitoring\n\n");
 
 	printf("Server Hostname: ");
-	scanf("%s", &hostname);
+	scanf("%s", hostname);
 
 	printf("Server Port: ");
 	scanf("%d", &port);
 
 	printf("Root Username: ");
-	scanf("%s", &username);
+	scanf("%s", username);
 
 	printf("Root Password: ");
-	scanf("%s", &password);
+	scanf("%s", password);
 
 	int success = addServerToTable(hostname, port, username, password);
 
@@ -146,21 +146,21 @@ void addNewServer() {
 }
 
 void initialiseSetup() {
-	char hostname[80] = "";
-	char username[80] = "";		
-	char password[80] = "";		
+	char *hostname = malloc(sizeof(char) * 80);
+	char *username = malloc(sizeof(char) * 80);
+	char *password = malloc(sizeof(char) * 80);
 
 	printf("MySQL Guardian %s\n\n", VERSION);
 	printf("Configure Monitoring Server\n\n");
 
 	printf("Server Hostname: ");
-	scanf("%s", &hostname);
+	scanf("%s", hostname);
 
 	printf("Root Username: ");
-	scanf("%s", &username);
+	scanf("%s", username);
 
 	printf("Root Password: ");
-	scanf("%s", &password);
+	scanf("%s", password);
 
 	if(createConfigFile(hostname, username, password) == 1) {
 		printf("\nCould not create configuration file.\n");
