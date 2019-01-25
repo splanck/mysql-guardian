@@ -30,6 +30,7 @@
 #include "fileio.h"
 #include "interface.h"
 #include "mysqlgd.h"
+#include "checks.h"
 
 #define VERSION "0.01"
 
@@ -89,7 +90,7 @@ void processParams() {
 
 void debugFunc() {
 	getConfigd();
-	initDaemon();
+	performTaskCheck();
 }
 
 void commandHelp() {

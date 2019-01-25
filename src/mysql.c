@@ -514,9 +514,9 @@ int getNextTask(struct mytask *task) {
         return -1;
     }
 
-    int num_fields = mysql_num_fields(result);
+    int num_rows = mysql_num_rows(result);
     
-	if(num_fields > 0) {
+	if(num_rows > 0) {
     	MYSQL_ROW row = mysql_fetch_row(result);
     
 	    task->id = atoi(row[0]);
@@ -530,10 +530,47 @@ int getNextTask(struct mytask *task) {
 	mysql_free_result(result);
     mysql_close(conn);
 
-	if(num_fields > 0)
+	if(num_rows > 0)
 		return 1;
 	else
 		return 0;
+}
+
+int updateTaskStatus(struct mytask *task) {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+    
+    if(conn == NULL)
+        return -1;
+
+	int task_id = task->task_id;
+	int status = task->status;
+	int length = 0;
+
+	length = snprintf(NULL, 0, "%d", task_id);
+    char* str_taskid = malloc(length + 1);
+    snprintf(str_taskid, length + 1, "%d", task_id);
+
+	length = snprintf(NULL, 0, "%d", status);
+    char* str_status = malloc(length + 1);
+    snprintf(str_status, length + 1, "%d", status);
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "UPDATE tasks SET status = ");
+	strcat(sqlcmd, str_status);
+	strcat(sqlcmd, " WHERE task_id = ");
+	strcat(sqlcmd, str_taskid);
+
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot update status for task ID ");
+	strcat(errorMsg, str_taskid);
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return -1;
+
+	mysql_close(conn);
+
+	return 0;
 }
 
 // Retrieves a list of servers in monitoring from the servers table in the 

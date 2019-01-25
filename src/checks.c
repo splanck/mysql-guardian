@@ -335,8 +335,13 @@ int performTaskCheck() {
 	int task_exists = getNextTask(task);
 
 	if(task_exists == 1) {
-		// Code to perform task
+		syslog(LOG_INFO, "%s %d %d.", "Found new task", task->server_id, task->task_id);
+
+		task->status = 2;
+		updateTaskStatus(task);
 	}
+
+	free(task);
 
 	return 0;
 }
