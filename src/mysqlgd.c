@@ -100,7 +100,7 @@ void startDaemon() {
 	initDaemon();
 }
 
-// Reads MySQL monitoring server configuration into memory using getConfig()
+// Reads MySQL monitoring server configuration into memory using readConfig()
 void getConfigd() {
     configSettings.onlineCheckInterval = 60;
 	configSettings.databaseCheckInterval = 120;
@@ -125,6 +125,7 @@ void getConfigd() {
 	configSettings.logPath = log_path;
 }
 
+// Initialises values for timers used to schedule checks.
 void setupTimers() {
 	server_check_delay = configSettings.onlineCheckInterval;
 	database_server_check_delay = configSettings.databaseServerCheckInterval;
@@ -193,6 +194,9 @@ int doServerCheck() {
 	return 0;
 }
 
+// Checks to see if its time to perform database server online checks, and if so, it calls the
+// checkDatabaseServer function to run the checks. It also resets the check timer to
+// calculate time next checks should be performed.
 int doDatabaseServerCheck() {
 	time_t time_now;
 	time(&time_now);
@@ -211,6 +215,9 @@ int doDatabaseServerCheck() {
 	return 0;
 }
 
+// Checks to see if its time to perform database online checks, and if so, it calls the
+// checkDatabaseOnline function to run the checks. It also resets the check timer to
+// calculate time next checks should be performed.
 int doDatabaseCheck() {
 	time_t time_now;
 	time(&time_now);
@@ -229,6 +236,9 @@ int doDatabaseCheck() {
 	return 0;
 }
 
+// Checks to see if its time to perform integrity checks, and if so, it calls the
+// performIntegrityCheckDB function to run the checks. It also resets the check timer to
+// calculate time next checks should be performed.
 int doIntegrityCheck() {
 	time_t time_now;
 	time(&time_now);
@@ -251,6 +261,9 @@ int doSlowQueryCheck() {
 	return 0;
 }
 
+// Determines if its time to check for pending manual tasks, and if so, it spawns a new process
+// to perform these tasks asynchronously. performTaskCheck function is called to check for
+// pending tasks and perform them. 
 int doTaskCheck() {
 	time_t time_now;
 	time(&time_now);
@@ -261,14 +274,34 @@ int doTaskCheck() {
 		if(configSettings.extendedLogging == 1)
 			syslog(LOG_INFO, "%s", "Time to check for pending tasks..");
 
-		performTaskCheck();
+		pid_t pid = fork();
 
-		time(&last_task_check);
+		if(pid < 0)
+			return 1;	
+
+		if(pid > 0) {
+			time(&last_task_check);
+			return 0;	
+		}	
+		else {
+			pid_t sid = setsid();
+
+			if(sid < 0)
+				exit(EXIT_FAILURE);
+
+			performTaskCheck();
+			syslog(LOG_INFO, "%s", "Task check performed successfully.");
+	
+			exit(EXIT_SUCCESS);
+		}	
 	}
 
 	return 0;
 }
 
+// Checks to see if it is time to perform automated database backups, and if so, it spawns a 
+// new process to perform these backups asynchronously. The performDatabaseBackups function is
+// called to perform the backups. 
 int doDatabaseBackups() {
 	time_t time_now;
 	time(&time_now);
@@ -306,6 +339,8 @@ int doDatabaseBackups() {
 	return 0;
 }
 
+// The checkFailure function is called to process failed checks. Error messages are constructed
+// to generate an alert for the failure. These alerts are written to the system log.
 void checkFailure(struct myserver *svr, struct mydatabase *db, struct mytable *tbl, checkType_t chk,
 	char *error, char *error_desc) {
 	char error_msg[250] = "CHECK FAILURE: "; 

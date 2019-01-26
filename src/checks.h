@@ -27,3 +27,4 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 int performDatabaseBackups();
 int backupDatabase(struct myserver *svr, struct mydatabase *db);
 int performTaskCheck();
+int taskDatabaseBackup(int server_id, char *dbname);

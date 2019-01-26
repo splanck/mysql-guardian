@@ -345,3 +345,38 @@ int performTaskCheck() {
 
 	return 0;
 }
+
+int taskDatabaseBackup(int server_id, char *dbname) {
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+
+	struct myserver *pServer = pFirst;
+	int result = 1;
+
+	while(pServer != NULL) {
+		if(pServer->id == server_id) {
+			if(pServer->firstDatabase == NULL)
+				populateServerDatabasesList(pServer); 
+
+			struct mydatabase *pDatabase = pServer->firstDatabase;
+
+			while(pDatabase != NULL) {
+				if(strcmp(pDatabase->dbname, dbname) == 0) { 
+					syslog(LOG_INFO, "%s %s %s %s.", "Performing manual backup of", 
+						pDatabase->dbname, "database on", pServer->hostname);
+
+					result = backupDatabase(pServer, pDatabase);
+					break;
+				}
+
+				pDatabase = pDatabase->next;
+			}
+
+			break;
+		}
+
+		pServer = pServer->next;
+	}
+
+	return result;
+}
