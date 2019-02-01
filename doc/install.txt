@@ -29,6 +29,9 @@ Use the following command on a Debian based distribution:
 
 sudo apt-get install libmysqlclient-dev libncurses-dev
 
+If you get an error that libmysqlclient-dev is depreciated, get these instead...
+sudo apt-get libmariadb-dev-compat libmariadb-dev
+
 Use the following command on a RHEL or CentOS distribution:
 
 sudo yum install mysql-devel ncurses-devel
