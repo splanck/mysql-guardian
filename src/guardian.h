@@ -47,4 +47,5 @@ struct gconfig {
 	int extendedLogging;
 	char *backupPath;
 	char *logPath;
+	char *destinationEmail;
 };

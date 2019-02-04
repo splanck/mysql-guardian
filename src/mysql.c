@@ -543,13 +543,13 @@ int updateTaskStatus(struct mytask *task) {
     if(conn == NULL)
         return -1;
 
-	int task_id = task->task_id;
+	int id = task->id;
 	int status = task->status;
 	int length = 0;
 
-	length = snprintf(NULL, 0, "%d", task_id);
-    char* str_taskid = malloc(length + 1);
-    snprintf(str_taskid, length + 1, "%d", task_id);
+	length = snprintf(NULL, 0, "%d", id);
+    char* str_id = malloc(length + 1);
+    snprintf(str_id, length + 1, "%d", id);
 
 	length = snprintf(NULL, 0, "%d", status);
     char* str_status = malloc(length + 1);
@@ -558,12 +558,12 @@ int updateTaskStatus(struct mytask *task) {
     char sqlcmd[500];
     strcpy(sqlcmd, "UPDATE tasks SET status = ");
 	strcat(sqlcmd, str_status);
-	strcat(sqlcmd, " WHERE task_id = ");
-	strcat(sqlcmd, str_taskid);
+	strcat(sqlcmd, " WHERE id = ");
+	strcat(sqlcmd, str_id);
 
     char errorMsg[100];
     strcpy(errorMsg, "Cannot update status for task ID ");
-	strcat(errorMsg, str_taskid);
+	strcat(errorMsg, str_id);
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return -1;

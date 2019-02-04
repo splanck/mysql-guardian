@@ -90,7 +90,6 @@ void processParams() {
 
 void debugFunc() {
 	getConfigd();
-	performTaskCheck();
 }
 
 void commandHelp() {
@@ -205,27 +204,15 @@ void initialiseLog() {
 	writeToLog("MySQL Guardian has started.");
 }
 
-// Reads MySQL monitoring server configuration into memory using getConfig()
+// Reads MySQL monitoring server configuration into memory using readConfig()
 void getConfig() {
-	char *hostname = malloc(80);
-	char *username = malloc(25);
-	char *password = malloc(25);
-	char *backup_path = malloc(200);
-	char *log_path = malloc(200);
-
-	if(readConfig(hostname, username, password, backup_path, log_path)) {
+	if(readConfig()) {
 		printf("Could not read configuration file. Use the -init parameter to create one.\n\r");
 		printf("Exiting,\n\r");
 		
 		exit(1);
 	}
 
-	configServer.hostname = hostname;
-	configServer.username = username;
-	configServer.password = password;
-
-	configSettings.backupPath = backup_path;
-	configSettings.logPath = log_path;
 	configSettings.onlineCheckInterval = 60;
 	configSettings.integrityCheckInterval = 500;
 }

@@ -30,10 +30,13 @@
 #include <unistd.h>
 #include <time.h>
 #include <fcntl.h>
+#include "guardian.h"
 #include "utility.h"
 
 struct myserver *pFirst = NULL;
 struct myserver *pLast = NULL;
+
+extern guardianconfig configSettings;   // Struct to store configuration settings for daemon.
 
 // Adds a server to the end of the linked list based on the parameters passed.
 void addServerNode(int id, char *hostname, int port, char *username, char *password,
@@ -278,6 +281,21 @@ int pingServer(char *hostname) {
         return 1;
 }
 
+int sendEmail(char *message, char *subject) {
+	char *cmd;
+
+	strcpy(cmd, "echo \"");
+	strcat(cmd, message);
+	strcat(cmd, "\" | mail -s \"");
+	strcat(cmd, subject);
+	strcat(cmd, "\" ");
+	strcat(cmd, configSettings.destinationEmail);
+
+	int result = system(cmd);
+
+	return result;
+}
+
 // Accepts a character array and converts all letters to uppercase.
 void ucase(char str[]) {
 	int i = 0;
@@ -290,6 +308,7 @@ void ucase(char str[]) {
 	}
 }
 
+// Assigns a formatted version of date and time to the char pointer.
 void getCurrentTime(char *timeStr) {
 	time_t t;
 	struct tm *local;

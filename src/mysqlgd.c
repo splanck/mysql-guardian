@@ -107,22 +107,10 @@ void getConfigd() {
 	configSettings.databaseServerCheckInterval = 120;
 	configSettings.integrityCheckInterval = 500;
 
-	char *hostname = malloc(80);
-    char *username = malloc(25);
-    char *password = malloc(25);
-	char *backup_path = malloc(200);
-	char *log_path = malloc(200);
-
-    if(readConfig(hostname, username, password, backup_path, log_path)) {
+    if(readConfig()) {
 		syslog(LOG_INFO, "%s", "Could not read /etc/mysqlgd.conf file. Exiting...");
         exit(1);
     }
-
-    configServer.hostname = hostname;
-    configServer.username = username;
-    configServer.password = password;
-	configSettings.backupPath = backup_path;
-	configSettings.logPath = log_path;
 }
 
 // Initialises values for timers used to schedule checks.

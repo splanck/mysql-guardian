@@ -74,5 +74,6 @@ void remove_char_from_string(char c, char *str);
 unsigned short checkSum(void *buffer, int len);
 char* reverseDNSLookup(char *ip_addr);
 int pingServer(char *hostname);
+int sendEmail(char *message, char *subject);
 void ucase(char str[]);
 void getCurrentTime(char *timeStr);

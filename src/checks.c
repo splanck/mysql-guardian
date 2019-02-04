@@ -337,7 +337,20 @@ int performTaskCheck() {
 	if(task_exists == 1) {
 		syslog(LOG_INFO, "%s %d %d.", "Found new task", task->server_id, task->task_id);
 
-		task->status = 2;
+		task->status = 2; // Update task status to in progress.
+		updateTaskStatus(task);
+
+		int result = 0;
+
+		if(task->task_id == 1) {
+			result = taskDatabaseBackup(task->server_id, task->dbname);
+
+			if(result == 0)
+				task->status = 3; // Task status of 3 equals success.
+			else if(result != 0)
+				task->status = 4; // Task status of 4 equals failure.
+		}
+
 		updateTaskStatus(task);
 	}
 
