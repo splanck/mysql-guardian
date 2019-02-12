@@ -32,8 +32,6 @@
 #include "mysqlgd.h"
 #include "checks.h"
 
-#define VERSION "0.01"
-
 int colourSupport = 0;			// True if terminal supports ncurses colour
 int canChangeColours = 0;		// True if terminal supports ncurses change colour 
 char db_error[1000];			// Global variable to store database error messages
@@ -42,6 +40,9 @@ char **g_argv = NULL;
 
 dbserver configServer;			// Struct to store config database server.
 guardianconfig configSettings;	// Struct to store configuration settings for daemon.
+
+extern struct myserver *pFirst;
+extern struct myserver *pLast;
 
 // Calls functions to initialise the log, read configuration file, setup
 // ncurses terminal, and display the main menu. Also performs clean up tasks
@@ -71,6 +72,9 @@ void processParams() {
 		}
 		else if(strcmp(g_argv[1], "--gui") == 0 || strcmp(g_argv[1], "-g") == 0) {
 			setupGUITool();
+		}
+		else if(strcmp(g_argv[1], "--list") == 0 || strcmp(g_argv[1], "-l") == 0) {
+			listServers();
 		}
 		else if(strcmp(g_argv[1], "--add") == 0 || strcmp(g_argv[1], "-a") == 0) {
 			addNewServer();
@@ -109,6 +113,22 @@ void setupGUITool() {
 	getConfig();
 	setupTerminal();
 	mainMenu();
+}
+
+void listServers() {
+	getConfig();
+
+	if(pFirst == NULL) 
+		populateMonitoredServersList();
+		
+	struct myserver *pTemp = pFirst;
+
+	printf("Server List:\n------------\n");
+
+	while(pTemp != NULL) {
+		printf("%s\n", pTemp->hostname);
+		pTemp = pTemp->next;
+	}
 }
 
 void addNewServer() {

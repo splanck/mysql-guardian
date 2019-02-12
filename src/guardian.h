@@ -17,10 +17,13 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#define VERSION "0.01"
+
 void setupGUITool();
 void processParams();
 void commandHelp();
 void initialiseLog();
+void listServers();
 void addNewServer();
 void initialiseSetup();
 void cleanUpTasks();
