@@ -79,6 +79,18 @@ void processParams() {
 		else if(strcmp(g_argv[1], "--add") == 0 || strcmp(g_argv[1], "-a") == 0) {
 			addNewServer();
 		}
+		else if(strcmp(g_argv[1], "--remove") == 0 || strcmp(g_argv[1], "-r") == 0) {
+			if(g_argc > 2) {
+				char *hostname = malloc(sizeof(char) * 80);
+				strcpy(hostname, g_argv[2]);
+
+				removeServer(hostname);
+			}
+			else {
+				printf("You must provide the hostname for the server to remove\n");
+				exit(1);
+			}
+		}
 		else if(strcmp(g_argv[1], "--debug") == 0) {
 			debugFunc();
 		}
@@ -98,11 +110,12 @@ void debugFunc() {
 
 void commandHelp() {
 	printf("MySQL Guardian v%s\n\n", VERSION);
-	printf("--init\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
-	printf("--gui\t\tLaunch the MySQL Guardian console control centre application.\n");
-	printf("--demonize\tLaunch the MySQL Guardian daemon to run in the background.\n");
-	printf("--add\t\tAdd a new MySQL or MariaDB database server to monitoring\n");
-	printf("--help\t\tDisplay the help screen.\n");
+	printf("--init\t\t\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
+	printf("--gui\t\t\t\tLaunch the MySQL Guardian console control centre application.\n");
+	printf("--demonize\t\t\tLaunch the MySQL Guardian daemon to run in the background.\n");
+	printf("--add\t\t\t\tAdd a new MySQL or MariaDB database server to monitoring.\n");
+	printf("--remove [hostname]\tRemove a database server from monitoring.\n");
+	printf("--help\t\t\t\tDisplay the help screen.\n");
 	exit(0);
 }
 
@@ -163,6 +176,41 @@ void addNewServer() {
 		printf("Server added successfully.\n");
 		printf("Restart the mysqlgd service for changes to take effect\n");
 	}	
+}
+
+void removeServer(char *serverName) {
+	getConfig();
+	ucase(serverName);
+
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+	
+	struct myserver *pTemp = pFirst;
+	char *hostname = malloc(sizeof(char) * 80);
+
+	while(pTemp != NULL) {
+		strcpy(hostname, pTemp->hostname);
+		ucase(hostname);		
+
+		if(strcmp(hostname, serverName) == 0) {
+			int success = removeServerFromTable(pTemp->id);
+
+			if(!success) {
+				printf("Server removed from monitoring.\n");
+				printf("Restart the mysqlgd service for changes to take effect\n");
+			}
+			else {
+				printf("Could not remove server from monitoring.\n");
+			}
+	
+			break;
+		}
+
+		pTemp = pTemp->next;
+	}
+
+	free(pTemp);
+	free(hostname);
 }
 
 void initialiseSetup() {

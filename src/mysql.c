@@ -460,6 +460,37 @@ int addServerToTable(char *hostname, int port, char *username, char *password) {
   	mysql_close(conn);
 }
 
+int removeServerFromTable(int server_id) {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+
+    if(conn == NULL)
+        return 1;
+
+  	char sqlcmd[500];
+
+    int length = snprintf(NULL, 0, "%d", server_id);
+    char* strid = malloc(length + 1);
+    snprintf(strid, length + 1, "%d", server_id);
+
+  	strcpy(sqlcmd, "DELETE FROM servers WHERE id = ");
+  	strcat(sqlcmd, strid);
+
+  	free(strid);
+
+	char errorMsg[100];
+    strcpy(errorMsg, "Cannot delete server to database.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+	writeToLog("Server removed from monitoring.");
+	
+  	mysql_close(conn);
+
+	return 0;
+}
+
 // Determines the number of servers in the monitoring database and returns the
 // value as an int.
 int getMonitoredServersCount() {

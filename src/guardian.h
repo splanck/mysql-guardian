@@ -25,6 +25,7 @@ void commandHelp();
 void initialiseLog();
 void listServers();
 void addNewServer();
+void removeServer(char *serverName);
 void initialiseSetup();
 void cleanUpTasks();
 void getConfig();
