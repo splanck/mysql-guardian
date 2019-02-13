@@ -87,7 +87,7 @@ void processParams() {
 				removeServer(hostname);
 			}
 			else {
-				printf("You must provide the hostname for the server to remove\n");
+				printf("You must provide the hostname for the server to remove.\n");
 				exit(1);
 			}
 		}
@@ -174,7 +174,7 @@ void addNewServer() {
 	}
 	else {
 		printf("Server added successfully.\n");
-		printf("Restart the mysqlgd service for changes to take effect\n");
+		printf("Restart the mysqlgd service for changes to take effect.\n");
 	}	
 }
 
@@ -197,7 +197,7 @@ void removeServer(char *serverName) {
 
 			if(!success) {
 				printf("Server removed from monitoring.\n");
-				printf("Restart the mysqlgd service for changes to take effect\n");
+				printf("Restart the mysqlgd service for changes to take effect.\n");
 			}
 			else {
 				printf("Could not remove server from monitoring.\n");
