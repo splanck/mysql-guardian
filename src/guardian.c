@@ -76,6 +76,9 @@ void processParams() {
 		else if(strcmp(g_argv[1], "--list") == 0 || strcmp(g_argv[1], "-l") == 0) {
 			listServers();
 		}
+		else if(strcmp(g_argv[1], "--status") == 0 || strcmp(g_argv[1], "-s") == 0) {
+			statusServers();
+		}
 		else if(strcmp(g_argv[1], "--add") == 0 || strcmp(g_argv[1], "-a") == 0) {
 			addNewServer();
 		}
@@ -113,9 +116,12 @@ void commandHelp() {
 	printf("--init\t\t\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
 	printf("--gui\t\t\t\tLaunch the MySQL Guardian console control centre application.\n");
 	printf("--demonize\t\t\tLaunch the MySQL Guardian daemon to run in the background.\n");
+	printf("--list\t\t\t\tDisplay a list of servers in monitoring.\n");
+	printf("--status\t\t\tDisplay the status of all servers in monitoring.\n");
 	printf("--add\t\t\t\tAdd a new MySQL or MariaDB database server to monitoring.\n");
 	printf("--remove [hostname]\tRemove a database server from monitoring.\n");
 	printf("--help\t\t\t\tDisplay the help screen.\n");
+	printf("\nPlease view the man page for a complete list of command options.\n");
 	exit(0);
 }
 
@@ -141,6 +147,48 @@ void listServers() {
 	while(pTemp != NULL) {
 		printf("%s\n", pTemp->hostname);
 		pTemp = pTemp->next;
+	}
+}
+
+void statusServers() {
+	getConfig();
+
+	if(pFirst == NULL) 
+		populateMonitoredServersList();
+		
+	struct myserver *pServer = pFirst;
+
+	printf("Server List:\n");
+	printf("\nServer\t\t\t\tServer Online\t\tDatabase Online\n");
+	printf("------------------------------------------------------------\n");
+
+	while(pServer != NULL) {
+		printf("%s", pServer->hostname);
+
+		if(strlen(pServer->hostname) < 6)
+			printf("\t\t\t\t");
+		else if(strlen(pServer->hostname) < 11)
+			printf("\t\t\t");
+		else
+			printf("\t\t");
+
+		int success = pingServer(pServer->hostname);
+
+		if(success)
+			printf("Unreachable\t\t\t");
+		else
+			printf("Online\t\t\t\t");
+
+		success = checkDatabase(pServer, NULL, db_error);
+
+		if(success)
+			printf("Unreachable\t\t\t");
+		else
+			printf("Online\t\t\t\t");
+
+		printf("\n");
+
+		pServer = pServer->next;
 	}
 }
 

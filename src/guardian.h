@@ -24,6 +24,7 @@ void processParams();
 void commandHelp();
 void initialiseLog();
 void listServers();
+void statusServers();
 void addNewServer();
 void removeServer(char *serverName);
 void initialiseSetup();
