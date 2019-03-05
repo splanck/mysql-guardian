@@ -23,11 +23,6 @@ def about():
 def home():
   return render_template("home.html")
 
-@app.route("/guardian_backup_history")
-def guardian_backup_history():
-  get_guardian_backup_history = Guardian_backup_history.query.all()
-  return render_template("guardian_backup_history.html", get_guardian_backup_history = get_guardian_backup_history)
-
 @app.route("/guardian_users")
 def guardian_users():
   get_guardian_users = Guardian_user.query.all()

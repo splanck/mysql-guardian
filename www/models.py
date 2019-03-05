@@ -2,21 +2,6 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
-class Guardian_backup_history(db.Model):
-  __tablename__ = 'backup_history'
-  id = db.Column(db.Integer, primary_key = True)
-  server_id = db.Column(db.Integer)
-  time = db.Column(db.Integer)
-  db_name = db.Column(db.String(100))
-  filename = db.Column(db.String(100))
-
-  def __init__(self, id, server_id, time, db_name, filename):
-    self.id = id
-    self.server_id = server_id
-    self.time = time
-    self.db_name = db_name
-    self.filename = filename
-
 class Guardian_servers(db.Model):
   __tablename__ = 'servers'
   id = db.Column(db.Integer, primary_key = True)
