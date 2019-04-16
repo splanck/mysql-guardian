@@ -91,7 +91,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	fprintf(cfgFile, "DATABASE_BACKUP 1000\n");
 	fprintf(cfgFile, "BACKUP_PATH /tmp\n");
 	fprintf(cfgFile, "EXTENDED_LOGGING 1\n");
-	fprintf(cfgFile, "DESTINATION_EMAIL root@localhost");
+	fprintf(cfgFile, "DESTINATION_EMAIL root@localhost\n");
 	
 	fclose(cfgFile);
 
