@@ -195,7 +195,9 @@ int performIntegrityCheckDB() {
 					syslog(LOG_INFO, "%s %s %s %s", "Checking tables in", pDatabase->dbname, "on", 
 						pServer->hostname);
 
-					performIntegrityCheckTable(pServer, pDatabase);
+					int success = performIntegrityCheckTable(pServer, pDatabase);
+
+					writeCheckResult(pServer->id, 4, success, pDatabase->dbname, NULL);
 				}
 
 				pDatabase = pDatabase->next;
@@ -213,6 +215,7 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 		populateDatabaseTablesList(pServer, pDatabase);	
 
 	struct mytable *pTable = pDatabase->firstTable;
+	int failure = 0;
 		
 	while(pTable != NULL) {
 		int success = checkTable(pServer, pDatabase, pTable);
@@ -225,6 +228,8 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 
 			checkFailure(pServer, pDatabase, pTable, c_integrityCheck, "Integrity Check Failed", 
 				"");
+
+			failure = 1;
 		} 
 		else if(success == 2) {
 			syslog(LOG_INFO, "%s %s", pTable->tblname, 
@@ -237,7 +242,7 @@ int performIntegrityCheckTable(struct myserver *pServer, struct mydatabase *pDat
 		pTable = pTable->next;
 	}
 
-	return 0;
+	return failure;
 }
 
 int performDatabaseBackups() {
