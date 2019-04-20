@@ -1,1 +1,24 @@
 This directory contains the code to configure the MySQL Guardian daemon via your web browser.xxxx
+
+#More command line stuff!?  Yep, grab the following.  Yep, it's python3, get with the times
+
+#Grab mysqldb for python
+sudo apt install python-mysqldb
+
+#Get pip
+sudo apt-get install python3-pip
+
+#Get pymysql
+pip3 install pymysql
+
+#Get flask
+pip3 install flask
+
+#Get SQLAlchemy
+pip3 install Flask-SQLAlchemy
+
+#Get flask_wtf
+pip3 install flask_wtf 
+
+#Now run the web app with 
+python3 routes.py
