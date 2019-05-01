@@ -1,6 +1,6 @@
 This directory contains the code to configure the MySQL Guardian daemon via your web browser.xxxx
 
-##More command line stuff!?  Yep, grab the following.  Yep, it's python3, get with the times
+#More command line stuff!?  Yep, grab the following.  Yep, it's python3, get with the times
 
 #Grab mysqldb for python
 sudo apt install python-mysqldb
