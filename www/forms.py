@@ -12,3 +12,9 @@ class Loginform(Form):
     email = StringField('Email')
     password = PasswordField('Password')
     submit = SubmitField("Sign In")
+
+class AddUser(Form):
+    username = StringField ('Username')
+    password = StringField ('Password')
+    email = StringField('Email')
+    submit = SubmitField ('Sign up')

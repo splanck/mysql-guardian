@@ -5,7 +5,24 @@
     <div class="container">
 
     <h2>This will add users into the database</h2>
+
+    <form method="POST" action="/add_user">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group>">
+        {{ form.username.label }}
+
+        {% if form.username.errors %}
+          {% for error in form.username.errors %}
+          <p class="error-message">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+
+      </div>
+
+    {{ form.submit(class="btn-primary") }}
     
+    </form>
     </div>
   </main>
 {% endblock %}

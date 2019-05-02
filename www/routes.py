@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from models import db, Guardian_user, Guardian_servers
-from forms import SignupForm, Loginform
+from forms import SignupForm, Loginform, AddUser
 import random
 
 app = Flask(__name__)
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://alistair:W@rdyIT01@localhost/mysql_guardian'
 db.init_app(app)
@@ -36,7 +35,18 @@ def guardian_servers():
 
 @app.route("/add_user")
 def add_user():
-  return render_template("add_user.html")
+  form = AddUser()
+
+  if request.method == "POST":
+    if form.validate == False:
+      return render_template('add_user.html', form=form)
+    else:
+      newuser = Guardian_user(form.username.data, form.email.data, form.password.data, admin = 1)
+      db.session.add(newuser)
+      db.session.commit()
+
+  elif request.method == "GET":
+    return render_template("add_user.html", form=form)
 
 @app.route("/signup", methods = ['GET', 'POST'])
 def signup():
