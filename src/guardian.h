@@ -50,6 +50,7 @@ struct gconfig {
 	int slowQueryMonitoring;
 	int databaseBackup;
 	int extendedLogging;
+	int checkRetries;
 	char *backupPath;
 	char *logPath;
 	char *destinationEmail;

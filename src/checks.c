@@ -57,7 +57,17 @@ int checkServersOnline() {
 		if(pServer->online_check == 1) {
 			char *db_err = malloc(200);
 
-			int success = pingServer(pServer->hostname);
+			int retries = 0;
+			int success = 0;
+
+			do {
+				success = pingServer(pServer->hostname);
+
+				if(success == 0 && retries < configSettings.checkRetries)
+					retries++;
+				else
+					break;
+			} while(retries <= configSettings.checkRetries);
 
 			if(!success) {
 				syslog(LOG_INFO, "%s %s", "Server online check succeeded for", pServer->hostname);

@@ -91,6 +91,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	fprintf(cfgFile, "DATABASE_BACKUP 1000\n");
 	fprintf(cfgFile, "BACKUP_PATH /tmp\n");
 	fprintf(cfgFile, "EXTENDED_LOGGING 1\n");
+	fprintf(cfgFile, "CHECK_RETRY_ATTEMPTS 0\n");
 	fprintf(cfgFile, "DESTINATION_EMAIL root@localhost\n");
 	
 	fclose(cfgFile);
@@ -157,6 +158,13 @@ void processConfigKeyValuePair(char *k, char *v) {
 		char *destination_email = malloc(100);
 		strcpy(destination_email, v);
 		configSettings.destinationEmail = destination_email;
+	}
+
+	if(strcmp(k, "CHECK_RETRY_ATTEMPTS") == 0) {
+		int i = atoi(v);
+
+		if(i >= 0 && i < 10)
+			configSettings.checkRetries = i;
 	}
 
 	if(strcmp(k, "ONLINE_CHECK_INTERVAL") == 0) {
