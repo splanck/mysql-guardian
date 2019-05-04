@@ -104,7 +104,17 @@ int checkDatabaseServer() {
 		if(pServer->database_server_check == 1) {
 			char *db_err = malloc(500);
 
-			int success = checkDatabase(pServer, NULL, db_err);
+			int retries = 0;
+			int success = 0;
+
+			do {
+				success = checkDatabase(pServer, NULL, db_err);
+
+                if(success == 0 && retries < configSettings.checkRetries)
+                      retries++;
+                else
+                      break;
+            } while(retries <= configSettings.checkRetries);
 
 			if(!success) {
 				syslog(LOG_INFO, "%s %s", "Database server online check succeeded for", 
