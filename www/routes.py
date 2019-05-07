@@ -51,6 +51,10 @@ def add_user():
   elif request.method == "GET":
     return render_template("add_user.html", form=form)
 
+@app.route("/add_server")
+def add_server():
+  return render_template("add_server.html", form=form)
+
 @app.route("/signup", methods = ['GET', 'POST'])
 def signup():
   form = SignupForm()
