@@ -17,4 +17,4 @@ class AddUser(Form):
     username = StringField ('Username')
     password = StringField ('Password')
     email = StringField('Email')
-    submit = SubmitField ('Sign up')
+    submit = SubmitField ('Add the user')

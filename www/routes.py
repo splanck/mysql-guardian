@@ -33,17 +33,20 @@ def guardian_servers():
   get_guardian_servers = Guardian_servers.query.all()
   return render_template("guardian_servers.html", get_guardian_servers = get_guardian_servers )
 
-@app.route("/add_user")
+@app.route("/add_user", methods = ['GET', 'POST'])
 def add_user():
   form = AddUser()
 
   if request.method == "POST":
-    if form.validate == False:
+    if form.validate() == False:
       return render_template('add_user.html', form=form)
     else:
       newuser = Guardian_user(form.username.data, form.email.data, form.password.data, admin = 1)
       db.session.add(newuser)
       db.session.commit()
+
+      session['email'] = newuser.email
+      return redirect(url_for('guardian_users'))
 
   elif request.method == "GET":
     return render_template("add_user.html", form=form)
