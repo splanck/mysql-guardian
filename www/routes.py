@@ -56,8 +56,8 @@ def add_server():
   form = AddServer()
 
   if request.method == "POST":
-    if form.validate == False:
-      return render_template('add_server.html', form=form)
+    if form.validate() == False:
+      return render_template('guardian_servers.html', form=form)
     else:
       newserver = Guardian_servers(form.hostname.data, form.port.data, form.username.data, form.password.data)
       db.session.add(newserver)

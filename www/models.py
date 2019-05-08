@@ -10,8 +10,7 @@ class Guardian_servers(db.Model):
   username = db.Column(db.String(100))
   password = db.Column(db.String(100))
 
-  def __init__(self, id, hostname, port, username, password):
-    self.id = id
+  def __init__(self, hostname, port, username, password):
     self.hostname = hostname
     self.port = port
     self.username = username
