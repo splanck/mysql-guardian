@@ -63,6 +63,8 @@ def add_server():
       db.session.add(newserver)
       db.session.commit()
 
+      return redirect(url_for('guardian_servers'))
+
   elif request.method == "GET":
     return render_template("add_server.html", form=form)
 
