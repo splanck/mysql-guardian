@@ -18,3 +18,10 @@ class AddUser(Form):
     password = StringField ('Password')
     email = StringField('Email')
     submit = SubmitField ('Add the user')
+
+class AddServer(Form):
+    hostname = StringField ('Hostname')
+    port = StringField ('Port')
+    username = StringField ('Username')
+    password = StringField ('Password')
+    submit = SubmitField ('Add the server into monitoring')

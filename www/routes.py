@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from models import db, Guardian_user, Guardian_servers
-from forms import SignupForm, Loginform, AddUser
+from forms import SignupForm, Loginform, AddUser, AddServer
 import random
 
 app = Flask(__name__)
@@ -51,9 +51,20 @@ def add_user():
   elif request.method == "GET":
     return render_template("add_user.html", form=form)
 
-@app.route("/add_server")
+@app.route("/add_server", methods = ['GET', 'POST'])
 def add_server():
-  return render_template("add_server.html", form=form)
+  form = AddServer()
+
+  if request.method == "POST":
+    if form.validate == False:
+      return render_template('add_server.html', form=form)
+    else:
+      newserver = Guardian_servers(form.hostname.data, form.port.data, form.username.data, form.password.data)
+      db.session.add(newserver)
+      db.session.commit()
+
+  elif request.method == "GET":
+    return render_template("add_server.html", form=form)
 
 @app.route("/signup", methods = ['GET', 'POST'])
 def signup():

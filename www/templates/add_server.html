@@ -9,6 +9,30 @@
         {{ form.hidden_tag() }}
 
         <div class="form-group">
+          {{ form.hostname.label }}
+
+          {% if form.hostname.errors %}
+            {% for error in form.hostname.errors %}
+              <p class="error-message">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+
+          {{ form.hostname }}
+        </div>
+
+        <div class="form-group">
+          {{ form.port.label }}
+
+          {% if form.port.errors %}
+            {% for error in form.port.errors %}
+              <p class="error-message">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+
+          {{ form.port }}
+        </div>
+
+        <div class="form-group">
           {{ form.username.label }}
 
           {% if form.username.errors %}
@@ -18,18 +42,6 @@
           {% endif %}
 
           {{ form.username }}
-        </div>
-
-        <div class="form-group">
-          {{ form.email.label }}
-
-          {% if form.email.errors %}
-            {% for error in form.email.errors %}
-              <p class="error-message">{{ error }}</p>
-            {% endfor %}
-          {% endif %}
-
-          {{ form.email }}
         </div>
 
         <div class="form-group">
@@ -44,7 +56,9 @@
           {{ form.password }}
         </div>
 
-        {{ form.submit(class="btn-primary") }}
+            {{ form.submit(class="btn-primary") }}
+
+
       </form>
     </div>
   </main>
