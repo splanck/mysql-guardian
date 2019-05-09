@@ -109,6 +109,7 @@ void processParams() {
 
 void debugFunc() {
 	getConfigd();
+	initDaemon();
 }
 
 void commandHelp() {
@@ -218,10 +219,10 @@ void addNewServer() {
 	int success = addServerToTable(hostname, port, username, password);
 
 	if(success) {
-		printf("Could not add server to monitoring.\n");
+		printf("\nCould not add server to monitoring.\n");
 	}
 	else {
-		printf("Server added successfully.\n");
+		printf("\nServer added successfully.\n");
 		printf("Restart the mysqlgd service for changes to take effect.\n");
 	}	
 }

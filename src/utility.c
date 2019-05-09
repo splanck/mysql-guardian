@@ -282,16 +282,17 @@ int pingServer(char *hostname) {
 }
 
 int sendEmail(char *message, char *subject) {
-	char *cmd;
+	char cmd[255] = "";
+	int result = 0;
 
-	strcpy(cmd, "echo \"");
+	strcpy(cmd, "sh -c echo \"");
 	strcat(cmd, message);
 	strcat(cmd, "\" | mail -s \"");
 	strcat(cmd, subject);
 	strcat(cmd, "\" ");
 	strcat(cmd, configSettings.destinationEmail);
 
-	int result = system(cmd);
+	result = system(cmd);
 
 	return result;
 }
