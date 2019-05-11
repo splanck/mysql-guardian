@@ -75,5 +75,6 @@ unsigned short checkSum(void *buffer, int len);
 char* reverseDNSLookup(char *ip_addr);
 int pingServer(char *hostname);
 int sendEmail(char *message, char *subject);
+static char *rand_str(char *str, size_t size);
 void ucase(char str[]);
 void getCurrentTime(char *timeStr);

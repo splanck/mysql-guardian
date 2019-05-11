@@ -19,6 +19,7 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -31,6 +32,7 @@
 #include <time.h>
 #include <fcntl.h>
 #include "guardian.h"
+#include "fileio.h"
 #include "utility.h"
 
 struct myserver *pFirst = NULL;
@@ -283,18 +285,48 @@ int pingServer(char *hostname) {
 
 int sendEmail(char *message, char *subject) {
 	char cmd[255] = "";
+	char rstr[21] = "";
+	char filename[100] = "";
 	int result = 0;
 
-	strcpy(cmd, "sh -c echo \"");
-	strcat(cmd, message);
-	strcat(cmd, "\" | mail -s \"");
+	rand_str(rstr, 20);
+
+	strcpy(filename, "/tmp/");
+	strcat(filename, rstr);
+	strcat(filename, ".txt");
+
+	writeMailFile(message, filename);
+
+	strcpy(cmd, "mail -s '");
 	strcat(cmd, subject);
-	strcat(cmd, "\" ");
+	strcat(cmd, "' ");
 	strcat(cmd, configSettings.destinationEmail);
+	strcat(cmd, " < ");
+	strcat(cmd, filename);
 
 	result = system(cmd);
 
+	remove(filename);
+
 	return result;
+}
+
+// Accepts a char pointer and a size. The char pointer is populated with a random string containing
+// the number of characters specified in the size.
+static char *rand_str(char *str, size_t size)
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyz";
+    if (size) {
+        --size;
+
+        for (size_t n = 0; n < size; n++) {
+            int key = rand() % (int) (sizeof charset - 1);
+            str[n] = charset[key];
+        }
+
+        str[size] = '\0';
+    }
+    return str;
 }
 
 // Accepts a character array and converts all letters to uppercase.

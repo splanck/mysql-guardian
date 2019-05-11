@@ -31,6 +31,21 @@
 extern dbserver configServer;           // Struct to store config database server.
 extern guardianconfig configSettings;   // Struct to store configuration settings for daemon.
 
+int writeMailFile(char emailMsg[250], char filename[80]) {
+	FILE *mailFile;
+
+	mailFile = fopen(filename, "w");
+
+	if(!mailFile)
+		return 1;
+
+	fprintf(mailFile, "%s\n", emailMsg);
+
+	fclose(mailFile);
+
+	return 0;
+}
+
 // Writes an entry into the mysql_guardian.log file. It accepts a char array
 // as the string to be written to the log.
 int writeLog(char logEntry[200], char filename[80]) {

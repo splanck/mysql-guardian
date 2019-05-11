@@ -17,6 +17,7 @@
     along with MySQL Guardian. If not, see <https://www.gnu.org/licenses/>.
 */
 
+int writeMailFile(char emailMsg[250], char filename[80]);
 int writeLog(char logEntry[200], char filename[80]);
 int writeToLog(char logEntry[200]);
 int writeToSQLLog(char logEntry[200]);
