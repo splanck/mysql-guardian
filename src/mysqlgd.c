@@ -97,6 +97,9 @@ void startDaemon() {
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
 
+	time_t t;
+    srand((unsigned) time(&t));
+
 	initDaemon();
 }
 
@@ -170,7 +173,7 @@ int doServerCheck() {
 
 	double diff = difftime(time_now, last_server_check);
 
-	if(diff > server_check_delay) {
+	if(diff > server_check_delay && configSettings.onlineCheckInterval > 0) {
 		if(configSettings.extendedLogging == 1)
 			syslog(LOG_INFO, "%s", "Time for server check.");
 
@@ -191,7 +194,7 @@ int doDatabaseServerCheck() {
 
 	double diff = difftime(time_now, last_database_server_check);
 
-	if(diff > database_server_check_delay) {
+	if(diff > database_server_check_delay && configSettings.databaseServerCheckInterval > 0) {
 		if(configSettings.extendedLogging == 1)
 			syslog(LOG_INFO, "%s", "Time for database server check.");
 
@@ -212,7 +215,7 @@ int doDatabaseCheck() {
 
 	double diff = difftime(time_now, last_database_check);
 
-	if(diff > database_check_delay) {
+	if(diff > database_check_delay && configSettings.databaseCheckInterval > 0) {
 		if(configSettings.extendedLogging == 1)
 			syslog(LOG_INFO, "%s", "Time for database online check.");
 
@@ -233,7 +236,7 @@ int doIntegrityCheck() {
 
 	double diff = difftime(time_now, last_integrity_check);
 
-	if(diff > integrity_check_delay) {
+	if(diff > integrity_check_delay && configSettings.integrityCheckInterval > 0) {
 		if(configSettings.extendedLogging == 1)
 			syslog(LOG_INFO, "%s", "Time for integrity checks.");
 
@@ -278,7 +281,9 @@ int doTaskCheck() {
 				exit(EXIT_FAILURE);
 
 			performTaskCheck();
-			syslog(LOG_INFO, "%s", "Task check performed successfully.");
+
+			if(configSettings.extendedLogging == 1)
+				syslog(LOG_INFO, "%s", "Task check performed successfully.");
 	
 			exit(EXIT_SUCCESS);
 		}	
@@ -296,7 +301,7 @@ int doDatabaseBackups() {
 
 	double diff = difftime(time_now, last_backup_check);
 
-	if(diff > backup_check_delay) {
+	if(diff > backup_check_delay && configSettings.databaseBackup > 0) {
 		if(configSettings.extendedLogging == 1)
 			syslog(LOG_INFO, "%s", "Time to perform database backups.");
 	
