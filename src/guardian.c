@@ -24,6 +24,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include <signal.h>
+#include <zconf.h>
 #include "guardian.h"
 #include "utility.h"
 #include "mysql.h"
@@ -154,14 +155,16 @@ void listServers() {
 void statusServers() {
 	getConfig();
 
+	int myuid = geteuid();
+
 	if(pFirst == NULL) 
 		populateMonitoredServersList();
 		
 	struct myserver *pServer = pFirst;
 
 	printf("Server List:\n");
-	printf("\nServer\t\t\t\tServer Online\t\tDatabase Online\n");
-	printf("------------------------------------------------------------\n");
+	printf("\nServer\t\t\t\tServer Online\t\t\tDatabase Online\n");
+	printf("-----------------------------------------------------------------------------\n");
 
 	while(pServer != NULL) {
 		printf("%s", pServer->hostname);
@@ -175,10 +178,17 @@ void statusServers() {
 
 		int success = pingServer(pServer->hostname);
 
-		if(success)
-			printf("Unreachable\t\t\t");
-		else
+		if(success) {
+			if(myuid != 0) {
+				printf("Requires root access\t\t");
+			}
+			else {
+				printf("Unreachable\t\t\t");
+			}
+		}
+		else {
 			printf("Online\t\t\t\t");
+		}
 
 		success = checkDatabase(pServer, NULL, db_error);
 

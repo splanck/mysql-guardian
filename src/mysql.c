@@ -476,15 +476,21 @@ int removeServerFromTable(int server_id) {
   	strcpy(sqlcmd, "DELETE FROM servers WHERE id = ");
   	strcat(sqlcmd, strid);
 
-  	free(strid);
-
 	char errorMsg[100];
     strcpy(errorMsg, "Cannot delete server to database.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
         return 1;
 
+	strcpy(sqlcmd, "DELETE FROM server_checks WHERE id = ");
+	strcat(sqlcmd, strid);
+
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
 	writeToLog("Server removed from monitoring.");
+
+	free(strid);
 	
   	mysql_close(conn);
 
