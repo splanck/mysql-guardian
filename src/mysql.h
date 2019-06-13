@@ -29,6 +29,7 @@ int createConfigTables();
 int writeBackupHistory(int server_id, char *dbname, char *filename);
 int writeCheckResult(int id, int type, int result, char *dbname, char *errorText);
 int addServerToTable(char *hostname, int port, char *username, char *password);
+int includeExcludeFromTable(int server_id, int exclude);
 int removeServerFromTable(int server_id);
 int getMonitoredServersCount();
 int getNextTask(struct mytask *task);

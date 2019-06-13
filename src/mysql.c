@@ -460,6 +460,56 @@ int addServerToTable(char *hostname, int port, char *username, char *password) {
   	mysql_close(conn);
 }
 
+int includeExcludeFromTable(int server_id, int exclude) {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, "mysql_guardian");
+
+    if(conn == NULL)
+        return 1;
+
+  	char sqlcmd[500];
+	char chk_switch[2];
+
+	if(exclude == 1)
+		strcpy(chk_switch, "1");
+	else
+		strcpy(chk_switch, "0");
+
+    int length = snprintf(NULL, 0, "%d", server_id);
+    char* strid = malloc(length + 1);
+    snprintf(strid, length + 1, "%d", server_id);
+
+  	strcpy(sqlcmd, "UPDATE server_checks ");
+	strcat(sqlcmd, "SET online_check = ");
+	strcat(sqlcmd, chk_switch);
+	strcat(sqlcmd, ", database_server_check = ");
+	strcat(sqlcmd, chk_switch);
+	strcat(sqlcmd, ", database_check = ");
+	strcat(sqlcmd, chk_switch);
+	strcat(sqlcmd, ", integrity_check = ");
+	strcat(sqlcmd, chk_switch);
+	strcat(sqlcmd, ", slow_query_monitoring = ");
+	strcat(sqlcmd, chk_switch);
+	strcat(sqlcmd, ", database_backup = ");
+	strcat(sqlcmd, chk_switch);
+	strcat(sqlcmd, " WHERE id = ");
+  	strcat(sqlcmd, strid);
+
+	char errorMsg[100];
+    strcpy(errorMsg, "Cannot exclude server from checks.");
+    
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+	writeToLog("Server excluded from monitoring.");
+
+	free(strid);
+	
+  	mysql_close(conn);
+
+	return 0;
+}
+
 int removeServerFromTable(int server_id) {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
         configServer.password, "mysql_guardian");

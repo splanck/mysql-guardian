@@ -70,7 +70,8 @@ int checkServersOnline() {
 			} while(retries <= configSettings.checkRetries);
 
 			if(!success) {
-				syslog(LOG_INFO, "%s %s", "Server online check succeeded for", pServer->hostname);
+				syslog(LOG_INFO, "%s %s", "Server online check succeeded for", 
+					pServer->hostname);
 				db_err = NULL;
 			}	
 			else {
