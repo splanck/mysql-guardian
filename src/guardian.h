@@ -30,6 +30,7 @@ void removeServer(char *serverName);
 void initialiseSetup();
 void cleanUpTasks();
 void getConfig();
+void guardianHeader();
 void debugFunc();
 
 typedef struct server dbserver;

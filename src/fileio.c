@@ -72,14 +72,14 @@ int writeLog(char logEntry[200], char filename[80]) {
 // Returns true if an error occurred.
 int writeToLog(char logEntry[200])
 {
-	return writeLog(logEntry, "mysql-guardian.log");
+	return writeLog(logEntry, "mysqlgd.log");
 }
 
 // Calls writeLog function to write a log entry to the SQL command log file.
 // Returns true if an error occurred.
 int writeToSQLLog(char logEntry[200])
 {
-	return writeLog(logEntry, "mysql-guardian-sql.log");
+	return writeLog(logEntry, "mysqlgd-sql.log");
 }
 
 // Accepts a hostname, username, and password for the monitoring server and generates a

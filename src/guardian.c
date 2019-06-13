@@ -114,14 +114,15 @@ void debugFunc() {
 }
 
 void commandHelp() {
-	printf("MySQL Guardian v%s\n\n", VERSION);
-	printf("--init\t\t\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
+	guardianHeader();
+
+	printf("\n--init\t\t\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
 	printf("--gui\t\t\t\tLaunch the MySQL Guardian console control centre application.\n");
 	printf("--demonize\t\t\tLaunch the MySQL Guardian daemon to run in the background.\n");
 	printf("--list\t\t\t\tDisplay a list of servers in monitoring.\n");
 	printf("--status\t\t\tDisplay the status of all servers in monitoring.\n");
 	printf("--add\t\t\t\tAdd a new MySQL or MariaDB database server to monitoring.\n");
-	printf("--remove [hostname]\tRemove a database server from monitoring.\n");
+	printf("--remove [hostname]\t\tRemove a database server from monitoring.\n");
 	printf("--help\t\t\t\tDisplay the help screen.\n");
 	printf("\nPlease view the man page for a complete list of command options.\n");
 	exit(0);
@@ -137,6 +138,8 @@ void setupGUITool() {
 }
 
 void listServers() {
+	guardianHeader();
+
 	getConfig();
 
 	if(pFirst == NULL) 
@@ -144,7 +147,7 @@ void listServers() {
 		
 	struct myserver *pTemp = pFirst;
 
-	printf("Server List:\n------------\n");
+	printf("\n\nServer List:\n------------\n");
 
 	while(pTemp != NULL) {
 		printf("%s\n", pTemp->hostname);
@@ -153,6 +156,8 @@ void listServers() {
 }
 
 void statusServers() {
+	guardianHeader();
+
 	getConfig();
 
 	int myuid = geteuid();
@@ -162,11 +167,13 @@ void statusServers() {
 		
 	struct myserver *pServer = pFirst;
 
-	printf("Server List:\n");
-	printf("\nServer\t\t\t\tServer Online\t\t\tDatabase Online\n");
-	printf("-----------------------------------------------------------------------------\n");
+	printf("\n\nServer List:\n");
+	printf("\nID\tServer\t\t\t\tServer Online\t\t\tDatabase Online\n");
+	printf("-----------------------------------------------------------------------------");
+	printf("---------------------\n");
 
 	while(pServer != NULL) {
+		printf("%d\t", pServer->id);
 		printf("%s", pServer->hostname);
 
 		if(strlen(pServer->hostname) < 6)
@@ -211,7 +218,8 @@ void addNewServer() {
 	char *password = malloc(sizeof(char) * 80);
 	int port = 3306;
 
-	printf("MySQL Guardian %s\n\n", VERSION);
+	guardianHeader();
+
 	printf("Add New Server to Monitoring\n\n");
 
 	printf("Server Hostname: ");
@@ -277,7 +285,8 @@ void initialiseSetup() {
 	char *username = malloc(sizeof(char) * 80);
 	char *password = malloc(sizeof(char) * 80);
 
-	printf("MySQL Guardian %s\n\n", VERSION);
+	guardianHeader();
+
 	printf("Configure Monitoring Server\n\n");
 
 	printf("Server Hostname: ");
@@ -319,7 +328,7 @@ void initialiseLog() {
 	strcpy(str, "MySQL Guardian v");
 	strcat(str, VERSION);
 	
-	printf("MySQL Guardian v%s\n\r", VERSION);
+	guardianHeader();
 
 	if(writeToLog("---------------------------------------------------------")) {
 		printf("Could not create log file. Exiting.\n\r");
@@ -342,6 +351,10 @@ void getConfig() {
 
 	configSettings.onlineCheckInterval = 60;
 	configSettings.integrityCheckInterval = 500;
+}
+
+void guardianHeader() {
+	printf("MySQL Guardian v%s\n\r", VERSION);
 }
 
 // Writes shutdown message to log file.
