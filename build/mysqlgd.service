@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/mysql-guardian --demonize
+ExecStart=/usr/bin/mysqlgd --demonize
 Restart=always
 WorkingDirectory=/var/log
 User=root
