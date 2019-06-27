@@ -95,6 +95,22 @@ void processParams() {
 				exit(1);
 			}
 		}
+		else if(strcmp(g_argv[1], "--include") == 0 || strcmp(g_argv[1], "-i") == 0 ||
+			strcmp(g_argv[1], "--exclude") == 0 || strcmp(g_argv[1], "-e") == 0) {
+			if(g_argc > 2) {
+				char *hostname = malloc(sizeof(char) * 80);
+				strcpy(hostname, g_argv[2]);
+
+				if(strcmp(g_argv[1], "--include") == 0 || strcmp(g_argv[1], "-i") == 0) 
+					includeExclude(hostname, 1);
+				else
+					includeExclude(hostname, 0);
+			}
+			else {
+				printf("You must provide the hostname for the server to include.\n");
+				exit(1);
+			}
+		}
 		else if(strcmp(g_argv[1], "--debug") == 0) {
 			debugFunc();
 		}
@@ -116,13 +132,15 @@ void debugFunc() {
 void commandHelp() {
 	guardianHeader();
 
-	printf("\n--init\t\t\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
+	printf("--init\t\t\t\tCreate new /etc/mysqlgd.conf configuration file.\n");
 	printf("--gui\t\t\t\tLaunch the MySQL Guardian console control centre application.\n");
 	printf("--demonize\t\t\tLaunch the MySQL Guardian daemon to run in the background.\n");
 	printf("--list\t\t\t\tDisplay a list of servers in monitoring.\n");
 	printf("--status\t\t\tDisplay the status of all servers in monitoring.\n");
 	printf("--add\t\t\t\tAdd a new MySQL or MariaDB database server to monitoring.\n");
 	printf("--remove [hostname]\t\tRemove a database server from monitoring.\n");
+	printf("--exclude [hostname]\t\tExclude a database server from monitoring.\n");
+	printf("--include [hostname]\t\tInclude a database server in monitoring.\n");
 	printf("--help\t\t\t\tDisplay the help screen.\n");
 	printf("\nPlease view the man page for a complete list of command options.\n");
 	exit(0);
@@ -243,6 +261,48 @@ void addNewServer() {
 		printf("\nServer added successfully.\n");
 		printf("Restart the mysqlgd service for changes to take effect.\n");
 	}	
+}
+
+void includeExclude(char *serverName, int incflag) {
+	getConfig();
+	ucase(serverName);
+
+	if(pFirst == NULL)
+		populateMonitoredServersList();
+	
+	struct myserver *pTemp = pFirst;
+	char *hostname = malloc(sizeof(char) * 80);
+
+	while(pTemp != NULL) {
+		strcpy(hostname, pTemp->hostname);
+		ucase(hostname);		
+
+		if(strcmp(hostname, serverName) == 0) {
+			int success = includeExcludeFromTable(pTemp->id, incflag);
+
+			if(!success) {
+				if(incflag == 0)
+					printf("Server excluded from monitoring.\n");
+				else
+					printf("Server included in monitoring.\n");
+
+				printf("Restart the mysqlgd service for changes to take effect.\n");
+			}
+			else {
+				if(incflag == 0)
+					printf("Could not exclude server from monitoring.\n");
+				else
+					printf("Could not include server in monitoring.\n");
+			}
+	
+			break;
+		}
+
+		pTemp = pTemp->next;
+	}
+
+	free(pTemp);
+	free(hostname);
 }
 
 void removeServer(char *serverName) {

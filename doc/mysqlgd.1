@@ -1,5 +1,5 @@
 .\" manpage for MySQL Guardian
-.TH mysqlgd 1 "13 Jun 2019" "0.1" "MySQL Guardian Man Page"
+.TH mysqlgd 1 "27 Jun 2019" "0.1" "MySQL Guardian Man Page"
 .SH NAME
 MySQL Guardian - Monitors MySQL and MariaDB Database Servers.
 .SH SYNOPSIS
@@ -22,6 +22,12 @@ Add a new MySQL or MariaDB database server to monitoring.
 .TP
 .B -r --remove [hostname]
 Remove a database server from monitoring.
+.TP
+.B -e --exclude [hostname]
+Exclude a database server from monitoring.
+.TP
+.B -i --include [hostname]
+Include a database server in monitoring.
 .TP
 .B -l --list
 List database servers currently in monitoring.

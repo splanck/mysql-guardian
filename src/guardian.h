@@ -26,6 +26,7 @@ void initialiseLog();
 void listServers();
 void statusServers();
 void addNewServer();
+void includeExclude(char *serverName, int incflag);
 void removeServer(char *serverName);
 void initialiseSetup();
 void cleanUpTasks();
