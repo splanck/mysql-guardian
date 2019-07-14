@@ -22,3 +22,17 @@ pip3 install flask_wtf
 
 #Now run the web app with 
 python3 routes.py
+
+
+
+
+#REDHAT/FEDORA/SUSE
+
+sudo yum install MySQL-python
+
+#Depending on your version of redhat/fedora, you may want to use dnf
+sudo dnf install MySQL-python
+
+pip3 install flask
+pip3 install Flask-SQLAlchemy
+pip3 install flask_wtf

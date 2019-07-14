@@ -1,0 +1,12 @@
+2019-7-4 18:35:17: Cannot connect to MySQL Server.
+2019-7-4 18:35:17: Error: Can't connect to MySQL server on '127.0.0.1' (115)
+2019-7-4 18:35:17: MySQL Guardian has stopped.
+2019-7-4 18:35:31: Cannot connect to MySQL Server.
+2019-7-4 18:35:31: Error: Can't connect to MySQL server on '127.0.0.1' (115)
+2019-7-4 18:35:31: MySQL Guardian has stopped.
+2019-7-4 18:35:40: Cannot connect to MySQL Server.
+2019-7-4 18:35:40: Error: Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+2019-7-4 18:35:40: MySQL Guardian has stopped.
+2019-7-4 18:36:13: Created configuration database.
+2019-7-4 18:36:14: Created configuration tables.
+2019-7-4 18:36:14: MySQL Guardian has stopped.

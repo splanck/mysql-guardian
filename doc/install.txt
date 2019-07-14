@@ -47,7 +47,7 @@ sudo make install
 5. Run the mysql-guardian command from the mysql-guardian/build folder to generate a config file and create the required database
 using the following command:
 
-sudo ./mysql-guardian --init
+sudo ./mysqlgd --init
 
 6. Emter the hostname, root username, and password for the MySQL instance you want to use
 to store the mysql-guardian database. This database is where all monitoring data will be
