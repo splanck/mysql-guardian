@@ -227,6 +227,14 @@ int createConfigTables() {
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
 		return 1;
 
+	strcpy(sqlcmd, "CREATE TABLE health_checks(id INT NOT NULL, online_check INT, ");
+	strcat(sqlcmd, "database_server_check INT, database_check INT, ");
+	strcat(sqlcmd, "integrity_check INT, time TIMESTAMP NOT NULL)");
+	strcpy(errorMsg, "Cannot create health_check table in monitoring database.");
+ 
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+		return 1;
+
     strcpy(sqlcmd, "INSERT INTO users(username, password, admin) VALUES('admin','admin',true)");
     strcpy(errorMsg, "Cannot create admin user account.");
     

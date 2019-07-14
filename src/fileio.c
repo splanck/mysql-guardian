@@ -106,6 +106,7 @@ int createConfigFile(char *hostname, char *username, char *password) {
 	fprintf(cfgFile, "DATABASE_BACKUP 1000\n");
 	fprintf(cfgFile, "BACKUP_PATH /tmp\n");
 	fprintf(cfgFile, "EXTENDED_LOGGING 1\n");
+	fprintf(cfgFile, "DAILY_HEALTH_CHECK 1\n");
 	fprintf(cfgFile, "CHECK_RETRY_ATTEMPTS 0\n");
 	fprintf(cfgFile, "DESTINATION_EMAIL root@localhost\n");
 	
@@ -222,6 +223,13 @@ void processConfigKeyValuePair(char *k, char *v) {
 
 		if(i == 0 || i == 1)
 			configSettings.extendedLogging = i;
+	}
+
+	if(strcmp(k, "DAILY_HEALTH_CHECK") == 0) {
+		int i = atoi(v);
+
+		if(i == 0 || i == 1)
+			configSettings.healthCheck = i;
 	}
 
 	if(strcmp(k, "DATABASE_BACKUP") == 0) {

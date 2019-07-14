@@ -47,6 +47,7 @@ time_t last_database_server_check;
 time_t last_slow_query_check;
 time_t last_backup_check;
 time_t last_task_check;
+time_t last_health_check;
 
 double server_check_delay;
 double integrity_check_delay;
@@ -55,6 +56,7 @@ double database_server_check_delay;
 double slow_query_check_delay;
 double backup_check_delay;
 double task_check_delay;
+double health_check_delay;
 
 extern dbserver configServer;			// Struct to store config database server.
 extern guardianconfig configSettings;	// Struct to store configuration settings for daemon.
@@ -125,6 +127,7 @@ void setupTimers() {
 	backup_check_delay = configSettings.databaseBackup;
 	slow_query_check_delay = 60;
 	task_check_delay = 30;
+	health_check_delay = 2000;
 
 	time(&last_server_check);
 	time(&last_integrity_check);
@@ -133,6 +136,7 @@ void setupTimers() {
 	time(&last_backup_check);
 	time(&last_slow_query_check);
 	time(&last_task_check);
+	time(&last_health_check);
 }
 
 // Sets up handling of SIGTERM termination signal from kernel, sets intervals for checks,
