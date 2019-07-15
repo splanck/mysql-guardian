@@ -32,6 +32,8 @@ void startDaemon();
 void getConfigd();
 void setupTimers();
 int initDaemon();
+int doHealthCheck();
+int isHealthCheckTime();
 int doServerCheck();
 int doDatabaseServerCheck();
 int doDatabaseCheck();

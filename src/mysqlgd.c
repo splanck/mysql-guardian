@@ -127,7 +127,7 @@ void setupTimers() {
 	backup_check_delay = configSettings.databaseBackup;
 	slow_query_check_delay = 60;
 	task_check_delay = 30;
-	health_check_delay = 2000;
+	health_check_delay = 5000;
 
 	time(&last_server_check);
 	time(&last_integrity_check);
@@ -150,6 +150,7 @@ int initDaemon() {
 	setupTimers();
 
 	while(1) {
+		doHealthCheck();
 		doServerCheck();
 		doDatabaseServerCheck();
 		doDatabaseCheck();
@@ -165,6 +166,28 @@ int initDaemon() {
 		waitpid(-1, NULL, WNOHANG);
 	}
 
+	return 0;
+}
+
+int doHealthCheck() {
+	time_t time_now;
+	time(&time_now);
+
+	double diff = difftime(time_now, last_health_check);
+
+	if(diff > health_check_delay && configSettings.healthCheck > 0) {
+		if(configSettings.extendedLogging == 1)
+			syslog(LOG_INFO, "%s", "Time to check if health checks are due..");
+
+		isHealthCheckTime();
+
+		time(&last_health_check);
+	}
+
+	return 0;
+}
+
+int isHealthCheckTime() {
 	return 0;
 }
 
