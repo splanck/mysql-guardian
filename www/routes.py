@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://alistair:W@rdyIT01@localhost/mysql_guardian'
 db.init_app(app)
 
-#this protects against xss
+#this protects against xsx
 app.secret_key = "development-key"
 
 @app.route("/")
