@@ -10,3 +10,9 @@
 2019-7-4 18:36:13: Created configuration database.
 2019-7-4 18:36:14: Created configuration tables.
 2019-7-4 18:36:14: MySQL Guardian has stopped.
+2019-7-27 11:54:5: Cannot connect to MySQL Server.
+2019-7-27 11:54:5: Error: Access denied for user 'root'@'localhost'
+2019-7-27 11:54:5: MySQL Guardian has stopped.
+2019-7-27 11:54:17: Created configuration database.
+2019-7-27 11:54:17: Created configuration tables.
+2019-7-27 11:54:17: MySQL Guardian has stopped.

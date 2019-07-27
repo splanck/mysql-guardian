@@ -13,3 +13,19 @@
 2019-7-4 18:36:14: CREATE TABLE tasks(id INT PRIMARY KEY AUTO_INCREMENT, task_id INT NOT NULL, server_id INT, db_name TEXT, param TEXT, status INT NOT NULL, time TIMESTAMP NOT NULL)
 2019-7-4 18:36:14: CREATE TABLE check_result_errors(id INT NOT NULL, error_msg TEXT)
 2019-7-4 18:36:14: INSERT INTO users(username, password, admin) VALUES('admin','admin',true)
+2019-7-27 11:54:17: DROP DATABASE IF EXISTS mysql_guardian
+2019-7-27 11:54:17: CREATE DATABASE mysql_guardian
+2019-7-27 11:54:17: DROP TABLE IF EXISTS servers
+2019-7-27 11:54:17: DROP TABLE IF EXISTS users
+2019-7-27 11:54:17: DROP TABLE IF EXISTS check_results
+2019-7-27 11:54:17: DROP TABLE IF EXISTS check_result_errors
+2019-7-27 11:54:17: DROP TABLE IF EXISTS tasks
+2019-7-27 11:54:17: CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT NOT NULL, port INT NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL)
+2019-7-27 11:54:17: CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, username TEXT, password TEXT, email TEXT, admin BOOLEAN)
+2019-7-27 11:54:17: CREATE TABLE server_checks(id INT NOT NULL, online_check INT, database_server_check INT, database_check INT, integrity_check INT, slow_query_monitoring INT, database_backup INT)
+2019-7-27 11:54:17: CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, server_id INT NOT NULL, time timestamp NOT NULL, check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)
+2019-7-27 11:54:17: CREATE TABLE backup_history(id INT PRIMARY KEY AUTO_INCREMENT, server_id INT NOT NULL, time timestamp NOT NULL, db_name TEXT, filename TEXT)
+2019-7-27 11:54:17: CREATE TABLE tasks(id INT PRIMARY KEY AUTO_INCREMENT, task_id INT NOT NULL, server_id INT, db_name TEXT, param TEXT, status INT NOT NULL, time TIMESTAMP NOT NULL)
+2019-7-27 11:54:17: CREATE TABLE check_result_errors(id INT NOT NULL, error_msg TEXT)
+2019-7-27 11:54:17: CREATE TABLE health_checks(time TIMESTAMP NOT NULL)
+2019-7-27 11:54:17: INSERT INTO users(username, password, admin) VALUES('admin','admin',true)
