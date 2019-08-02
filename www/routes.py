@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from models import db, Guardian_user, Guardian_servers
+from models import db, Guardian_user, Guardian_servers, Guardian_history
 from forms import SignupForm, Loginform, AddUser, AddServer
 import random
 
@@ -35,7 +35,8 @@ def guardian_servers():
 
 @app.route("/guardian_checks")
 def guardian_checks():
-  return render_template("guardian_checks.html")
+  get_guardian_backup_history = Guardian_history.query.all()
+  return render_template("guardian_checks.html", get_guardian_backup_history = get_guardian_backup_history)
 
 @app.route("/add_user", methods = ['GET', 'POST'])
 def add_user():

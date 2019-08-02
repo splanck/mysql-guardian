@@ -29,3 +29,17 @@ class Guardian_user(db.Model):
     self.email = email
     self.password = password 
     self.admin = admin
+
+class Guardian_history(db.Model):
+  __tablename__ = 'backup_history'
+  id = db.Column(db.Integer, primary_key = True)
+  server_id = db.Column(db.Integer)
+  time = db.Column(db.String(200))
+  db_name = db.Column(db.String(100))
+  filename = db.Column(db.String(100))
+
+  def __init__(self, server_id, time, db_name, filename):
+    self.server_id = server_id
+    self.time = time
+    self.db_name = db_name
+    self.filename = filename
