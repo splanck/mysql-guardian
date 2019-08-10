@@ -188,7 +188,9 @@ int doHealthCheck() {
 }
 
 int isHealthCheckTime() {
-	return 0;
+	if(timeForHealthCheck() == 1) {
+		// perform health checkf
+	}
 }
 
 // Checks to see if its time to perform server online checks, and if so, it calls the
