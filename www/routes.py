@@ -2,9 +2,12 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from models import db, Guardian_user, Guardian_servers, Guardian_backup, Guardian_health_check
 from forms import SignupForm, Loginform, AddUser, AddServer
 import random
+ 
+#"""*******************************************"""
+#Start of Flask and setup 
+#"""*******************************************"""
 
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://alistair:W@rdyIT01@localhost/mysql_guardian'
 db.init_app(app)
 
@@ -23,10 +26,13 @@ def about():
 def home():
   return render_template("home.html")
 
+#"""*******************************************"""
+#End of Flask setup
+#"""*******************************************"""
 
-"""
-These are the main checks users perform from the home page 
-"""
+#"""*******************************************"""
+#These are the main checks users perform from the home page 
+#"""*******************************************"""
 
 @app.route("/guardian_users")
 def guardian_users():
@@ -48,10 +54,9 @@ def guardian_health_check():
   get_guardian_health_check = Guardian_health_check.query.all()
   return render_template("guardian_health_check.html", get_guardian_health_check = get_guardian_health_check)
 
-
-"""
-End of user checks
-"""
+#"""*******************************************"""
+#End of user checks
+#"""*******************************************"""
 
 @app.route("/add_user", methods = ['GET', 'POST'])
 def add_user():
