@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from models import db, Guardian_user, Guardian_servers, Guardian_history
+from models import db, Guardian_user, Guardian_servers, Guardian_backup, Guardian_health_check
 from forms import SignupForm, Loginform, AddUser, AddServer
 import random
 
@@ -23,6 +23,11 @@ def about():
 def home():
   return render_template("home.html")
 
+
+"""
+These are the main checks users perform from the home page 
+"""
+
 @app.route("/guardian_users")
 def guardian_users():
   get_guardian_users = Guardian_user.query.all()
@@ -33,10 +38,20 @@ def guardian_servers():
   get_guardian_servers = Guardian_servers.query.all()
   return render_template("guardian_servers.html", get_guardian_servers = get_guardian_servers )
 
-@app.route("/guardian_checks")
-def guardian_checks():
-  get_guardian_backup_history = Guardian_history.query.all()
-  return render_template("guardian_checks.html", get_guardian_backup_history = get_guardian_backup_history)
+@app.route("/guardian_backup_check")
+def guardian_backup_check():
+  get_guardian_backup_check = Guardian_backup.query.all()
+  return render_template("guardian_backup_check.html", get_guardian_backup_check = get_guardian_backup_check)
+
+@app.route("/guardian_health_check")
+def guardian_health_check():
+  get_guardian_health_check = Guardian_health_check.query.all()
+  return render_template("guardian_health_check.html", get_guardian_health_check = get_guardian_health_check)
+
+
+"""
+End of user checks
+"""
 
 @app.route("/add_user", methods = ['GET', 'POST'])
 def add_user():
