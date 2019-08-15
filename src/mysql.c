@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
-//#include <my_global.h>
 #include <mysql.h>
 #include "utility.h"
 #include "guardian.h"
@@ -893,6 +892,64 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
 	}
 	
     return checkresult;
+}
+
+int timeForHealthCheck() {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username,
+        configServer.password, "mysql_guardian");
+
+    if(conn == NULL)
+        return -1;
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "SELECT * FROM health_checks WHERE time >= CURDATE();");
+    
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot determine if health check is due.");
+
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return -1;
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    if(result == NULL) {
+        handleDBError(conn, errorMsg, NULL);
+
+        return -1;
+    }
+
+    int num_rows = mysql_num_rows(result);
+    
+    mysql_free_result(result);
+    mysql_close(conn);
+
+    if(num_rows > 0)
+        return 1;
+    else
+        return 0;
+}
+
+int recordHealthCheck() {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username, 
+        configServer.password, NULL);
+
+    if(conn == NULL)
+        return 1;
+
+    char sqlcmd[50];
+    char errorMsg[50];
+
+    strcpy(sqlcmd, "INSERT INTO health_checks VALUES();");
+    strcpy(errorMsg, "Cannot write health check to database.");
+
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return 1;
+
+    mysql_close(conn);
+    
+    writeToLog("Health check written to database.");
+
+    return 0;
 }
 
 // Accepts a usernamd and password as parameters and attempts to authenticate these

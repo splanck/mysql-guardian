@@ -12,6 +12,7 @@ install: all
 	cp -f ../build/mysqlgd /usr/bin/mysqlgd
 	chmod 755 /usr/bin/mysqlgd
 	cp -f ../build/mysqlgd.service /etc/systemd/system/mysqlgd.service
+	mkdir -p /usr/local/man/man1
 	cp -f ../doc/mysqlgd.1 /usr/local/man/man1/mysqlgd.1
 	gzip -f /usr/local/man/man1/mysqlgd.1
 
