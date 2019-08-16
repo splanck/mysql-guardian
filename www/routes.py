@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from models import db, Guardian_user, Guardian_servers, Guardian_backup, Guardian_health_check
+from models import db, Guardian_user, Guardian_servers, Guardian_backup, Guardian_health_check, Guardian_tasks
 from forms import SignupForm, Loginform, AddUser, AddServer
 import random
  
@@ -53,6 +53,11 @@ def guardian_backup_check():
 def guardian_health_check():
   get_guardian_health_check = Guardian_health_check.query.all()
   return render_template("guardian_health_check.html", get_guardian_health_check = get_guardian_health_check)
+
+@app.route("/guardian_tasks")
+def guardian_tasks():
+  get_guardian_tasks = Guardian_tasks.query.all()
+  return render_template("guardian_tasks.html", get_guardian_tasks = get_guardian_tasks)
 
 #"""*******************************************"""
 #End of user checks

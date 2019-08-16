@@ -4,15 +4,17 @@
   <main class="hero-section">
     <div class="container">
       <br>
-      <h1>What do you want to do?</h1>
+      <h1>Control Panel</h1>
       <br>
-       <a href="{{ url_for('guardian_users') }}" class="btn-primary">Get Users</a>
+       <a href="{{ url_for('guardian_users') }}" class="btn-primary">Show users</a>
 
-       <a href="{{ url_for('guardian_servers') }}" class="btn-primary">Get Servers</a>
+       <a href="{{ url_for('guardian_servers') }}" class="btn-primary">Show servers</a>
 
-       <a href="{{ url_for('guardian_backup_check') }}" class="btn-primary">Run a check</a>
+       <a href="{{ url_for('guardian_backup_check') }}" class="btn-primary">Check backup status</a>
 
        <a href="{{ url_for('guardian_health_check') }}" class="btn-primary">Run a health check</a> 
+
+       <a href="{{ url_for('guardian_tasks') }}" class="btn-primary">Set a task</a>
 
     </div>
   </main>

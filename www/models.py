@@ -44,6 +44,25 @@ class Guardian_backup(db.Model):
     self.db_name = db_name
     self.filename = filename
 
+class Guardian_tasks(db.Model):
+  __tablename__ = 'tasks'
+  id = db.Column(db.Integer, primary_key = True)
+  task_id = db.Column(db.Integer)
+  server_id = db.Column(db.Integer)
+  db_name = db.Column(db.String(100))
+  param = db.Column(db.String(100))
+  status = db.Column(db.Integer)
+  time = db.Column(db.Time)
+
+  def __init__(self, id, task_id, server_id, db_name, param, status, time):
+    self.id = id
+    self.task_id = task_id
+    self.server_id = server_id
+    self.db_name = db_name
+    self.param = param
+    self.status = status
+    self.time = time
+
 class Guardian_health_check(db.Model):
   __tablename__ = 'health_checks'
   time = db.Column(db.Time, primary_key = True)
