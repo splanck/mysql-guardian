@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2018 - Stephen Planck and Alistair Packer
+    Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
 
     utility.c - Contains utility functions used throughout the code.
 
@@ -37,8 +37,31 @@
 
 struct myserver *pFirst = NULL;
 struct myserver *pLast = NULL;
+struct myhealthcheck *pFirstHC = NULL;
+struct myhealthcheck *pLastHC = NULL;
 
 extern guardianconfig configSettings;   // Struct to store configuration settings for daemon.
+
+void addHealthCheck(int id, char *hostname, int ol_chk, int db_chk, int int_chk, int bck_chk) {
+	struct myhealthcheck *pNewNode = malloc(sizeof(struct myhealthcheck));
+
+	strcpy(pNewNode->hostname, hostname);
+
+	pNewNode->id = id;
+	pNewNode->server_online = ol_chk;
+	pNewNode->database_online = db_chk;
+	pNewNode->recent_backup = bck_chk;
+	pNewNode->recent_integrity_check = int_chk;
+	pNewNode->next = NULL;
+
+	if(pFirstHC == NULL) {
+        pFirstHC = pLastHC = pNewNode;
+    }
+    else {
+        pLastHC->next = pNewNode;
+        pLastHC = pNewNode;
+    }
+}
 
 // Adds a server to the end of the linked list based on the parameters passed.
 void addServerNode(int id, char *hostname, int port, char *username, char *password,

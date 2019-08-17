@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2018 - Stephen Planck and Alistair Packer
+	Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
 
 	This file is part of MySQL Guardian.
 
@@ -62,11 +62,22 @@ struct mytask {
     int status;
 };
 
+struct myhealthcheck {
+	int id;
+	char hostname[50];
+	int server_online;
+	int database_online;
+	int recent_backup;
+	int recent_integrity_check;	
+	struct myhealthcheck *next;
+};
+
 struct ping_packet {
     struct icmphdr hdr;
     char msg[PING_PKT_S-sizeof(struct icmphdr)];
 };
 
+void addHealthCheck(int id, char *hostname, int ol_chk, int db_chk, int int_chk, int bck_chk);
 void addServerNode(int id, char *hostname, int port, char *username, char *password, int ol_chk, int db_svr_chk, int db_chk, int int_chk, int slow, int db_backup);
 void addDatabaseNode(struct myserver *svr, char *dbname);
 void addTableNode(struct mydatabase *db, char *tblname);

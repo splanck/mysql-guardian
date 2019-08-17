@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2018 - Stephen Planck and Alistair Packer
+    Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
     
     mysqlgd.c - Main source file for the mysqlgd daemon process.
     
@@ -63,6 +63,8 @@ extern guardianconfig configSettings;	// Struct to store configuration settings 
 
 extern struct myserver *pFirst;
 extern struct myserver *pLast;
+extern struct myhealthcheck *pFirstHC;
+extern struct myhealthcheck *pLastHC;
 
 // Forked the current process to create the daemon process, writes successful start up
 // to the system log, sets the current working directory, closes standard input, output
@@ -189,7 +191,19 @@ int doHealthCheck() {
 
 int isHealthCheckTime() {
 	if(timeForHealthCheck() == 1) {
-		// perform health checkf
+		if(pFirst == NULL)
+			populateMonitoredServersList();
+
+		struct myserver *pServer = pFirst;
+
+		while(pServer != NULL) {
+			struct myhealthcheck *pHC = malloc(sizeof(struct myhealthcheck));	
+
+			strcpy(pHC->hostname, pServer->hostname);
+			pHC->id = pServer->id;
+
+			pServer = pServer->next;
+		}
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2018 - Stephen Planck and Alistair Packer
+	Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
 
 	fileio.c - Contains functions that read and write to the filesystem.
 

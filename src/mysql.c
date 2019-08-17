@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2018 - Stephen Planck and Alistair Packer
+    Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
     
     mysql.c - Contains functions that directly interact with the database.
     
