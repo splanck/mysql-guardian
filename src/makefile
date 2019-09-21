@@ -6,7 +6,7 @@ DEPS = guardian.h mysql.h fileio.h interface.h utility.h mysqlgd.h checks.h
 	$(CC) -g -c -o $@ $< $(CFLAGS)
 	
 mysql-guardian: guardian.c
-	$(CC) -g -o ../build/mysqlgd guardian.c mysql.c fileio.c interface.c utility.c mysqlgd.c checks.c $(CFLAGS) 
+	$(CC) -g -o ../build/mysqlgd guardian.c mysql.c fileio.c interface.c utility.c mysqlgd.c checks.c healthcheck.c $(CFLAGS) 
 
 install: all
 	cp -f ../build/mysqlgd /usr/bin/mysqlgd

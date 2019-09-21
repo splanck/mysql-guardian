@@ -37,6 +37,7 @@
 #include "mysql.h"
 #include "mysqlgd.h"
 #include "checks.h"
+#include "healthcheck.h"
 
 pid_t parent_pid;
 
@@ -187,24 +188,6 @@ int doHealthCheck() {
 	}
 
 	return 0;
-}
-
-int isHealthCheckTime() {
-	if(timeForHealthCheck() == 1) {
-		if(pFirst == NULL)
-			populateMonitoredServersList();
-
-		struct myserver *pServer = pFirst;
-
-		while(pServer != NULL) {
-			struct myhealthcheck *pHC = malloc(sizeof(struct myhealthcheck));	
-
-			strcpy(pHC->hostname, pServer->hostname);
-			pHC->id = pServer->id;
-
-			pServer = pServer->next;
-		}
-	}
 }
 
 // Checks to see if its time to perform server online checks, and if so, it calls the
