@@ -21,3 +21,4 @@
 
 int isHealthCheckTime();
 int hcServerOnline(struct myhealthcheck *pHC);
+int hcDatabaseServerOnline(struct myhealthcheck *pHC, char *db_err, struct myserver *pServer);

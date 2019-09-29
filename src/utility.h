@@ -67,6 +67,7 @@ struct myhealthcheck {
 	char hostname[50];
 	int server_online;
 	int database_online;
+	char database_online_err[500];
 	int recent_backup;
 	int recent_integrity_check;	
 	struct myhealthcheck *next;
@@ -77,7 +78,7 @@ struct ping_packet {
     char msg[PING_PKT_S-sizeof(struct icmphdr)];
 };
 
-void addHealthCheck(int id, char *hostname, int ol_chk, int db_chk, int int_chk, int bck_chk);
+void addHealthCheck(struct myhealthcheck *pNewNode);
 void addServerNode(int id, char *hostname, int port, char *username, char *password, int ol_chk, int db_svr_chk, int db_chk, int int_chk, int slow, int db_backup);
 void addDatabaseNode(struct myserver *svr, char *dbname);
 void addTableNode(struct mydatabase *db, char *tblname);

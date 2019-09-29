@@ -55,10 +55,22 @@ int isHealthCheckTime() {
 
 		while(pServer != NULL) {
 			struct myhealthcheck *pHC = malloc(sizeof(struct myhealthcheck));	
+			char *db_err = malloc(500);
 
 			strcpy(pHC->hostname, pServer->hostname);
+
 			pHC->id = pServer->id;
 			pHC->server_online = hcServerOnline(pHC);
+			pHC->database_online = hcDatabaseServerOnline(pHC, db_err, pServer);
+
+			if(pHC->database_online == 0 && strcmp(db_err, NULL) == 1) {
+				strcpy(pHC->database_online_err, db_err);
+				strcpy(db_err, NULL);
+			}
+
+			addHealthCheck(pHC);
+
+			free(db_err);
 
 			pServer = pServer->next;
 		}
@@ -71,6 +83,25 @@ int hcServerOnline(struct myhealthcheck *pHC) {
 
 	do {
 		success = pingServer(pHC->hostname);
+
+		if(success == 0 && retries < configSettings.checkRetries)
+			retries++;
+		else
+			break;
+	} while(retries <= configSettings.checkRetries);
+
+	if(success)
+		return 1;
+	else
+		return 0;
+}
+
+int hcDatabaseServerOnline(struct myhealthcheck *pHC, char *db_err, struct myserver *pServer) {
+	int success = 0;
+	int retries = 0;
+
+	do {
+		success = checkDatabase(pServer, NULL, db_err);
 
 		if(success == 0 && retries < configSettings.checkRetries)
 			retries++;

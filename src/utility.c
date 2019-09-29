@@ -42,16 +42,7 @@ struct myhealthcheck *pLastHC = NULL;
 
 extern guardianconfig configSettings;   // Struct to store configuration settings for daemon.
 
-void addHealthCheck(int id, char *hostname, int ol_chk, int db_chk, int int_chk, int bck_chk) {
-	struct myhealthcheck *pNewNode = malloc(sizeof(struct myhealthcheck));
-
-	strcpy(pNewNode->hostname, hostname);
-
-	pNewNode->id = id;
-	pNewNode->server_online = ol_chk;
-	pNewNode->database_online = db_chk;
-	pNewNode->recent_backup = bck_chk;
-	pNewNode->recent_integrity_check = int_chk;
+void addHealthCheck(struct myhealthcheck *pNewNode) {
 	pNewNode->next = NULL;
 
 	if(pFirstHC == NULL) {
