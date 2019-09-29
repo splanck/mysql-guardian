@@ -290,9 +290,9 @@ int performDatabaseBackups() {
 						pDatabase->dbname, "database on", pServer->hostname);
 
 					backupDatabase(pServer, pDatabase);
-
-					pDatabase = pDatabase->next;
 				}	
+
+				pDatabase = pDatabase->next;
 			}
 		}
 
