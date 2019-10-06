@@ -69,7 +69,9 @@ struct myhealthcheck {
 	int database_online;
 	char database_online_err[500];
 	int recent_backup;
+    char recent_backup_err[500];
 	int recent_integrity_check;	
+    char recent_integrity_check_err[500];
 	struct myhealthcheck *next;
 };
 

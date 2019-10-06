@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
     
-    mysqlgd.c - Main source file for the mysqlgd daemon process.
+    healthcheck.c - Main source file for the mysqlgd daemon process.
     
     This file is part of MySQL Guardian.
 
@@ -113,4 +113,13 @@ int hcDatabaseServerOnline(struct myhealthcheck *pHC, char *db_err, struct myser
 		return 1;
 	else
 		return 0;
+}
+
+int hcRecentBackup(struct myhealthcheck *pHC, struct myserver *pServer) {
+    int success = 0;
+
+    if(success)
+        return 1;
+    else
+        return 0;
 }

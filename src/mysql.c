@@ -894,6 +894,49 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
     return checkresult;
 }
 
+int checkRecentBackup(int server_id, char *dbname) {
+    MYSQL *conn = connectDB(configServer.hostname, configServer.username,
+        configServer.password, "mysql_guardian");
+
+    if(conn == NULL)
+        return -1;
+
+	int length = snprintf(NULL, 0, "%d", server_id);
+    char* str_server_id = malloc(length + 1);
+    snprintf(str_server_id, length + 1, "%d", server_id);
+
+    char sqlcmd[500];
+    strcpy(sqlcmd, "SELECT * FROM backup_history WHERE server_id = ");
+    strcat(sqlcmd, str_server_id);
+    strcat(sqlcmd, " AND db_name = '");
+    strcat(sqlcmd, dbname);
+    strcat(sqlcmd, "';");
+    
+    char errorMsg[100];
+    strcpy(errorMsg, "Cannot determine if recent backups have been taken.");
+
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        return -1;
+
+    MYSQL_RES *result = mysql_store_result(conn);
+
+    if(result == NULL) {
+        handleDBError(conn, errorMsg, NULL);
+
+        return -1;
+    }
+
+    int num_rows = mysql_num_rows(result);
+    
+    mysql_free_result(result);
+    mysql_close(conn);
+
+    if(num_rows > 0)
+        return 1;
+    else
+        return 0;
+}
+
 int timeForHealthCheck() {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username,
         configServer.password, "mysql_guardian");
