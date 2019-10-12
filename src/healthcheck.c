@@ -68,6 +68,8 @@ int isHealthCheckTime() {
 				strcpy(db_err, NULL);
 			}
 
+            pHC->recent_backup = hcRecentBackup(pHC, pServer);
+
 			addHealthCheck(pHC);
 
 			free(db_err);
@@ -117,9 +119,21 @@ int hcDatabaseServerOnline(struct myhealthcheck *pHC, char *db_err, struct myser
 
 int hcRecentBackup(struct myhealthcheck *pHC, struct myserver *pServer) {
     int success = 0;
+    int backup_found = 1;
 
-    if(success)
-        return 1;
-    else
-        return 0;
+    if(pServer->firstDatabase == NULL)
+        populateServerDatabasesList(pServer);
+
+    struct mydatabase *pDatabase = pServer->firstDatabase;
+
+    while(pDatabase != NULL) {
+        int backup = checkRecentBackup(pServer->id, pDatabase->dbname);
+
+        if(backup != 1)
+            success = 0; 
+
+        pDatabase = pDatabase->next;
+    }
+
+    return success;
 }

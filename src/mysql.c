@@ -908,6 +908,7 @@ int checkRecentBackup(int server_id, char *dbname) {
     char sqlcmd[500];
     strcpy(sqlcmd, "SELECT * FROM backup_history WHERE server_id = ");
     strcat(sqlcmd, str_server_id);
+    strcat(sqlcmd, " AND time > SUBDATE(NOW(), 2) ");
     strcat(sqlcmd, " AND db_name = '");
     strcat(sqlcmd, dbname);
     strcat(sqlcmd, "';");
