@@ -29,3 +29,19 @@
 2019-7-27 11:54:17: CREATE TABLE check_result_errors(id INT NOT NULL, error_msg TEXT)
 2019-7-27 11:54:17: CREATE TABLE health_checks(time TIMESTAMP NOT NULL)
 2019-7-27 11:54:17: INSERT INTO users(username, password, admin) VALUES('admin','admin',true)
+2020-3-27 15:50:33: DROP DATABASE IF EXISTS mysql_guardian
+2020-3-27 15:50:33: CREATE DATABASE mysql_guardian
+2020-3-27 15:50:33: DROP TABLE IF EXISTS servers
+2020-3-27 15:50:33: DROP TABLE IF EXISTS users
+2020-3-27 15:50:33: DROP TABLE IF EXISTS check_results
+2020-3-27 15:50:33: DROP TABLE IF EXISTS check_result_errors
+2020-3-27 15:50:33: DROP TABLE IF EXISTS tasks
+2020-3-27 15:50:33: CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, hostname TEXT NOT NULL, port INT NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL)
+2020-3-27 15:50:33: CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, username TEXT, password TEXT, email TEXT, admin BOOLEAN)
+2020-3-27 15:50:33: CREATE TABLE server_checks(id INT NOT NULL, online_check INT, database_server_check INT, database_check INT, integrity_check INT, slow_query_monitoring INT, database_backup INT)
+2020-3-27 15:50:33: CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, server_id INT NOT NULL, time timestamp NOT NULL, check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)
+2020-3-27 15:50:33: CREATE TABLE backup_history(id INT PRIMARY KEY AUTO_INCREMENT, server_id INT NOT NULL, time timestamp NOT NULL, db_name TEXT, filename TEXT)
+2020-3-27 15:50:33: CREATE TABLE tasks(id INT PRIMARY KEY AUTO_INCREMENT, task_id INT NOT NULL, server_id INT, db_name TEXT, param TEXT, status INT NOT NULL, time TIMESTAMP NOT NULL)
+2020-3-27 15:50:33: CREATE TABLE check_result_errors(id INT NOT NULL, error_msg TEXT)
+2020-3-27 15:50:33: CREATE TABLE health_checks(time TIMESTAMP NOT NULL)
+2020-3-27 15:50:33: INSERT INTO users(username, password, admin) VALUES('admin','admin',true)
