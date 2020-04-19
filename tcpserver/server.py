@@ -1,16 +1,26 @@
 import socket
 import select
 
+class Client():
+    client_socket = None
+    username = None
+    authenticated = False
+
+    def __init__(self, cs):
+        self.client_socket = cs
+
 class Server():
     header_length = 10
 
     IP = "127.0.0.1"
     port = 1234
     sockets_list = [] 
-    clients = {}
+    clients = []
 
     def __init__(self):
         print("Starting server.")
+
+    def Start(self):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
@@ -20,9 +30,9 @@ class Server():
         self.sockets_list.append(server_socket)
 
         print("Listening for connections.")
-        self.ProcessIncomingData(server_socket)
+        self.GetIncomingData(server_socket)
 
-    def ProcessIncomingData(self, server_socket):
+    def GetIncomingData(self, server_socket):
         while True:
             read_sockets, _, exception_sockets = select.select(
                 self.sockets_list, [], self.sockets_list)
@@ -40,7 +50,11 @@ class Server():
                         continue
 
                     self.sockets_list.append(client_socket)
-                    self.clients[client_socket] = user
+                    # self.clients[client_socket] = user
+
+                    c = Client(client_socket)
+                    c.username = user
+                    self.clients.append(c)
 
                     print("New connection")
 
@@ -49,11 +63,8 @@ class Server():
 
                     if message is False:
                         print("disconnected")
-                        #sockets_list.remove(notified_socket)
-                        #del clients[notified_socket]
                         continue
 
-                    user = self.clients[notified_socket]
                     username = user['data'].decode('utf-8')
                     msg = message['data'].decode('utf-8')
 
@@ -61,13 +72,29 @@ class Server():
                     print(username)
                     print(msg)
 
-                    for client_socket in self.clients:
-                        client_socket.send(user['header'] + user['data'] + 
-                                           message['header'] + message['data'])
+                    client = self.GetClientFromSocket(notified_socket)
+                    self.ProcessCommand(client, msg)
 
             for notified_socket in exception_sockets:
                 self.sockets_list.remove(notified_socket)
-                del self.clients[notified_socket]
+                #del self.clients[notified_socket]
+
+                for c in clients:
+                    if c.client_socket == notified_socket:
+                        self.clients.remove(c)
+
+    def ProcessCommand(self, client, command):
+        cmd = command[0:2]
+
+        print(cmd)
+        if cmd == "10":
+            for c in self.clients:
+                self.send_message(c, command)
+
+    def send_message(self, client, message):
+        msg = message.encode("utf-8")
+        message_header = f"{len(msg):<{self.header_length}}".encode("utf-8")
+        client.client_socket.send(message_header + msg)
 
     def receive_message(self, client_socket):
         try:
@@ -77,11 +104,21 @@ class Server():
                 return False
 
             message_length = int(message_header.decode('utf-8'))
+            message = client_socket.recv(message_length)
 
-            return {'header': message_header, 'data': 
-                    client_socket.recv(message_length)}
+            return {'header': message_header, 'data': message}
 
         except:
             return False
 
+    def GetClientFromSocket(self, client_socket):
+        myclient = None
+
+        for c in self.clients:
+            if c.client_socket == client_socket:
+                myclient = c
+
+        return myclient
+
 server = Server()
+server.Start()
