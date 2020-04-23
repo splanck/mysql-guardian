@@ -2,22 +2,22 @@ import socket
 import select
 
 class Client():
-    client_socket = None
-    username = None
-    authenticated = False
-
     def __init__(self, cs):
         self.client_socket = cs
+        self.username = None
+        self.hostname = None
+        self.authenticated = False
 
 class Server():
     header_length = 10
 
     IP = "127.0.0.1"
     port = 1234
-    sockets_list = [] 
-    clients = []
 
     def __init__(self):
+        self.sockets_list = []
+        self.clients = []
+        
         print("Starting server.")
 
     def Start(self):
@@ -86,10 +86,16 @@ class Server():
     def ProcessCommand(self, client, command):
         cmd = command[0:2]
 
+        if cmd == "00":
+            self.hostname = cmd[2:]
+            return
+        
         print(cmd)
         if cmd == "10":
             for c in self.clients:
                 self.send_message(c, command)
+
+            return
 
     def send_message(self, client, message):
         msg = message.encode("utf-8")
