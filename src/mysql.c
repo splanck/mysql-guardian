@@ -894,6 +894,11 @@ int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl)
     return checkresult;
 }
 
+int checkRecentIntegrityCheck(int server_id, char *dbname) {
+    // Needs to be implemented.
+    return 0;
+}
+
 int checkRecentBackup(int server_id, char *dbname) {
     MYSQL *conn = connectDB(configServer.hostname, configServer.username,
         configServer.password, "mysql_guardian");

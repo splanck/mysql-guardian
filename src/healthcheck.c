@@ -137,3 +137,23 @@ int hcRecentBackup(struct myhealthcheck *pHC, struct myserver *pServer) {
 
     return success;
 }
+
+int hcIntegrityCheck(struct myhealthcheck *pHC, struct myserver *pServer) {
+    int success = 0;
+
+    if(pServer->firstDatabase == NULL)
+        populateServerDatabasesList(pServer);
+
+    struct mydatabase *pDatabase = pServer->firstDatabase;
+
+    while(pDatabase != NULL) {
+        int integrity = checkRecentIntegrityCheck(pServer->id, pDatabase->dbname);
+
+        if(integrity != 1)
+            success = 0; 
+
+        pDatabase = pDatabase->next;
+    }
+
+    return success;
+}

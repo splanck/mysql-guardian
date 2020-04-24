@@ -39,6 +39,7 @@ int populateServerDatabasesList(struct myserver *);
 int populateDatabaseTablesList(struct myserver *, struct mydatabase *);
 int checkDatabase(struct myserver *svr, struct mydatabase *db, char *db_err);
 int checkTable(struct myserver *svr, struct mydatabase *db, struct mytable *tbl);
+int checkRecentIntegrityCheck(int server_id, char *dbname);
 int checkRecentBackup(int server_id, char *dbname);
 int timeForHealthCheck();
 int recordHealthCheck();
