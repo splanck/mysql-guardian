@@ -8,3 +8,4 @@ build/mysql-guardian.log
 build/mysql-guardian-sql.log
 build/.mysql-guardian_rc
 .vscode
+build/mysqlgd

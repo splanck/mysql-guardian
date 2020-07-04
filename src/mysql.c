@@ -49,10 +49,13 @@ MYSQL* connectDB(char *hostname, char *username, char *password, char *database)
         
         writeToLog("Cannot connect to MySQL Server.");
         
-        char log[200];
+        char *log = malloc(200);
+
         strcpy(log, "Error: ");
         strcat(log, db_error);
         writeToLog(log);
+
+        free(log);
 
         return NULL;
     }  
@@ -90,11 +93,14 @@ void handleDBError(MYSQL *conn, char *errorMsg, char *sql) {
     if(sql != NULL)
         writeToSQLLog(sql);
 
-    char log[200];
+    char *log = malloc(200);
+
     strcpy(log, "Error: ");
     strcat(log, db_error);
 
     writeToLog(log);
+
+    free(log);
 }
 
 // Creates configuration database on the monitoring server.
@@ -105,23 +111,34 @@ int createConfigDB() {
     if(conn == NULL)
         return 1;
 
-    char sqlcmd[500];
-    char errorMsg[100];
+    char *sqlcmd = malloc(500);
+    char *errorMsg = malloc(100);
 
     strcpy(sqlcmd, "DROP DATABASE IF EXISTS mysql_guardian");
     strcpy(errorMsg, "Cannot create configuration database.");
 
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
     strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
   	
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
   	mysql_close(conn);
   	
   	writeToLog("Created configuration database.");
+
+    free(sqlcmd);
+    free(errorMsg);
 
   	return 0;
 }
@@ -133,28 +150,43 @@ int enableSlowQueryLogging() {
     if(conn == NULL)
         return 1;
 
-    char sqlcmd[500];
-    char errorMsg[100];
+    char *sqlcmd = malloc(500);
+    char *errorMsg = malloc(100);
 
     strcpy(sqlcmd, "SET GLOBAL slow_query_log = 1;");
     strcpy(errorMsg, "Cannot enable slow query logging.");
   	
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
 	strcpy(sqlcmd, "SET GLOBAL log_output = \"TABLE\";");
 
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "SET GLOBAL long_query_time = 5;");
 
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
   	mysql_close(conn);
   	
   	writeToLog("Enabled slow query logging.");
+    
+    free(sqlcmd);
+    free(errorMsg);
 
   	return 0;
 }
@@ -169,23 +201,31 @@ int createConfigTables() {
     if(conn == NULL)
         return 1;
   	
-    char sqlcmd[500];
-    char errorMsg[100];
-    
+    char *sqlcmd = malloc(500);
+    char *errorMsg = malloc(100);
+
   	strcpy(sqlcmd, "CREATE TABLE servers(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "hostname TEXT NOT NULL, port INT NOT NULL, username TEXT NOT NULL, ");
 	strcat(sqlcmd, "password TEXT NOT NULL)");
     strcpy(errorMsg, "Cannot create server table in monitoring database.");
     
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
     strcpy(sqlcmd, "CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, username TEXT, ");
 	strcat(sqlcmd, "password TEXT, email TEXT, admin BOOLEAN)");
     strcpy(errorMsg, "Cannot create users table in monitoring database.");
     
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
 	strcpy(sqlcmd, "CREATE TABLE server_checks(id INT NOT NULL, online_check INT, ");
 	strcat(sqlcmd, "database_server_check INT, database_check INT, ");
@@ -193,8 +233,12 @@ int createConfigTables() {
 	strcat(sqlcmd, "database_backup INT)");
 	strcpy(errorMsg, "Cannot create server_checks table in monitoring database.");
 
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "CREATE TABLE check_results(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "server_id INT NOT NULL, ");
@@ -202,45 +246,71 @@ int createConfigTables() {
 	strcat(sqlcmd, "check_type INT NOT NULL, check_result INT NOT NULL, db_name TEXT)");
 	strcpy(errorMsg, "Cannot create check_results table in monitoring database.");
     
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "CREATE TABLE backup_history(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "server_id INT NOT NULL, time timestamp NOT NULL, ");
 	strcat(sqlcmd, "db_name TEXT, filename TEXT)");
 
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "CREATE TABLE tasks(id INT PRIMARY KEY AUTO_INCREMENT, task_id INT NOT NULL, ");
 	strcat(sqlcmd, "server_id INT, db_name TEXT, param TEXT, status INT NOT NULL, ");
 	strcat(sqlcmd, "time TIMESTAMP NOT NULL)");
 	strcpy(errorMsg, "Cannot create taska table in monitoring database.");
 
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "CREATE TABLE check_result_errors(id INT NOT NULL, error_msg TEXT)");
 	strcpy(errorMsg, "Cannot create check_result_errors table in monitoring database.");
     
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "CREATE TABLE health_checks(time TIMESTAMP NOT NULL)");
 	strcpy(errorMsg, "Cannot create health_check table in monitoring database.");
  
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
     strcpy(sqlcmd, "INSERT INTO users(username, password, admin) VALUES('admin','admin',true)");
     strcpy(errorMsg, "Cannot create admin user account.");
     
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
   	writeToLog("Created configuration tables.");
 
   	mysql_close(conn);
+    free(sqlcmd);
+    free(errorMsg);
 }
 
 int dropOldTables() {
@@ -250,33 +320,53 @@ int dropOldTables() {
     if(conn == NULL)
         return 1;
   	
-    char sqlcmd[500];
-    char errorMsg[100];
-    
+    char *sqlcmd = malloc(500);
+    char *errorMsg = malloc(100);
+     
     strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
 
-    if(executeQuery(conn, sqlcmd, NULL) == 1)
+    if(executeQuery(conn, sqlcmd, NULL) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
     strcpy(sqlcmd, "DROP TABLE IF EXISTS users");
 
-    if(executeQuery(conn, sqlcmd, NULL) == 1)
+    if(executeQuery(conn, sqlcmd, NULL) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
         return 1;
+    }
 
 	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_results");
 
-	if(executeQuery(conn, sqlcmd, NULL) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, NULL) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_result_errors");
 
-	if(executeQuery(conn, sqlcmd, NULL) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, NULL) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
 	strcpy(sqlcmd, "DROP TABLE IF EXISTS tasks");
 
-	if(executeQuery(conn, sqlcmd, NULL) == 1)
-		return 1;
+	if(executeQuery(conn, sqlcmd, NULL) == 1) {
+        free(sqlcmd);
+        free(errorMsg);
+        
+        return 1;
+    }
 
   	mysql_close(conn);
 
