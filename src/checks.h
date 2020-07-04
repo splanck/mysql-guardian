@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
+    Copyright (c) 2018-20 - Stephen Planck and Alistair Packer
     
     check.c - Header file for the checks.c source file.
     

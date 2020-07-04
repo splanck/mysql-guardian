@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
+    Copyright (c) 2018-20 - Stephen Planck and Alistair Packer
     
     mysql.c - Contains functions that directly interact with the database.
     
@@ -238,6 +238,7 @@ int createConfigTables() {
 	strcpy(sqlcmd, "CREATE TABLE backup_history(id INT PRIMARY KEY AUTO_INCREMENT, ");
 	strcat(sqlcmd, "server_id INT NOT NULL, time timestamp NOT NULL, ");
 	strcat(sqlcmd, "db_name TEXT, filename TEXT)");
+    strcpy(errorMsg, "Cannot create backup_history table in monitoring database.");
 
 	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
         free(sqlcmd);

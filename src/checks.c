@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2018-19 - Stephen Planck and Alistair Packer
+    Copyright (c) 2018-20 - Stephen Planck and Alistair Packer
     
     checks.c - Source file that performs the checks for the daemon. 
     
