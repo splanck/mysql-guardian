@@ -113,25 +113,18 @@ int createConfigDB() {
 
     char *sqlcmd = malloc(500);
     char *errorMsg = malloc(100);
+    int errorCode = 0;
 
     strcpy(sqlcmd, "DROP DATABASE IF EXISTS mysql_guardian");
     strcpy(errorMsg, "Cannot create configuration database.");
 
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) 
+        errorCode = 1;
 
     strcpy(sqlcmd, "CREATE DATABASE mysql_guardian");
   	
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) 
+        errorCode = 1;
 
   	mysql_close(conn);
   	
@@ -140,7 +133,7 @@ int createConfigDB() {
     free(sqlcmd);
     free(errorMsg);
 
-  	return 0;
+  	return errorCode;
 }
 
 int enableSlowQueryLogging() {
@@ -152,34 +145,23 @@ int enableSlowQueryLogging() {
 
     char *sqlcmd = malloc(500);
     char *errorMsg = malloc(100);
+    int errorCode = 0;
 
     strcpy(sqlcmd, "SET GLOBAL slow_query_log = 1;");
     strcpy(errorMsg, "Cannot enable slow query logging.");
   	
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) 
+        errorCode = 1;
 
 	strcpy(sqlcmd, "SET GLOBAL log_output = \"TABLE\";");
 
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1) 
+        errorCode = 1;
 
 	strcpy(sqlcmd, "SET GLOBAL long_query_time = 5;");
 
-	if(executeQuery(conn, sqlcmd, errorMsg) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+	if(executeQuery(conn, sqlcmd, errorMsg) == 1)
+        errorCode = 1;
 
   	mysql_close(conn);
   	
@@ -188,7 +170,7 @@ int enableSlowQueryLogging() {
     free(sqlcmd);
     free(errorMsg);
 
-  	return 0;
+  	return errorCode;
 }
 
 // Creates the servers table on the monitoring server.
@@ -322,55 +304,39 @@ int dropOldTables() {
   	
     char *sqlcmd = malloc(500);
     char *errorMsg = malloc(100);
+    int errorCode = 0;
      
     strcpy(sqlcmd, "DROP TABLE IF EXISTS servers");
 
-    if(executeQuery(conn, sqlcmd, NULL) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+    if(executeQuery(conn, sqlcmd, NULL) == 1) 
+        errorCode = 1;
 
     strcpy(sqlcmd, "DROP TABLE IF EXISTS users");
 
-    if(executeQuery(conn, sqlcmd, NULL) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+    if(executeQuery(conn, sqlcmd, NULL) == 1) 
+        errorCode = 1;
 
 	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_results");
 
-	if(executeQuery(conn, sqlcmd, NULL) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+	if(executeQuery(conn, sqlcmd, NULL) == 1)
+        errorCode = 1;
 
 	strcpy(sqlcmd, "DROP TABLE IF EXISTS check_result_errors");
 
-	if(executeQuery(conn, sqlcmd, NULL) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+	if(executeQuery(conn, sqlcmd, NULL) == 1) 
+        errorCode = 1;
 
 	strcpy(sqlcmd, "DROP TABLE IF EXISTS tasks");
 
-	if(executeQuery(conn, sqlcmd, NULL) == 1) {
-        free(sqlcmd);
-        free(errorMsg);
-        
-        return 1;
-    }
+	if(executeQuery(conn, sqlcmd, NULL) == 1) 
+        errorCode = 1;
 
   	mysql_close(conn);
 
-	return 0;
+    free(sqlcmd);
+    free(errorMsg);
+
+	return errorCode;
 }	
 
 int writeBackupHistory(int server_id, char *dbname, char *filename) {
@@ -380,7 +346,9 @@ int writeBackupHistory(int server_id, char *dbname, char *filename) {
     if(conn == NULL)
         return 1;
 
-  	char sqlcmd[500];
+    char *sqlcmd = malloc(500);
+    char *errorMsg = malloc(100);
+    int errorCode = 0;
 
     int length = snprintf(NULL, 0, "%d", server_id);
     char* strid = malloc(length + 1);
@@ -397,13 +365,16 @@ int writeBackupHistory(int server_id, char *dbname, char *filename) {
 
 	free(strid);
 
-	char errorMsg[100];
     strcpy(errorMsg, "Cannot record database backup result.");
     
-    if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-        return 1;
+    if(executeQuery(conn, sqlcmd, errorMsg) == 1) 
+        errorCode = 1;
 
   	mysql_close(conn);
+    free(sqlcmd).
+    free(errorMsg);
+
+    return errorCode;
 }
 
 int writeCheckResult(int id, int type, int result, char *dbname, char *errorText) {
@@ -413,7 +384,9 @@ int writeCheckResult(int id, int type, int result, char *dbname, char *errorText
     if(conn == NULL)
         return 1;
 
-  	char sqlcmd[500];
+    char *sqlcmd = malloc(500);
+    char *errorMsg = malloc(100);
+    int errorCode = 0;
 
     int length = snprintf(NULL, 0, "%d", id);
     char* strid = malloc(length + 1);
@@ -448,7 +421,6 @@ int writeCheckResult(int id, int type, int result, char *dbname, char *errorText
 	free(strtype);
 	free(strresult);
 
-    char errorMsg[100];
     strcpy(errorMsg, "Cannot record check result to database.");
     
     if(executeQuery(conn, sqlcmd, errorMsg) == 1)
@@ -483,10 +455,15 @@ int writeCheckResult(int id, int type, int result, char *dbname, char *errorText
 		free(strid);
 
 		if(executeQuery(conn, sqlcmd, errorMsg) == 1)
-			return 1;
+			errorCode = 1;
 	}
 
   	mysql_close(conn);
+
+    free(sqlcmd);
+    free(errorMsg);
+
+    return errorCode;
 }
 
 // Adds a new server into the servers table on the monitoring server.
