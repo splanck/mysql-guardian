@@ -372,7 +372,7 @@ int writeBackupHistory(int server_id, char *dbname, char *filename) {
         errorCode = 1;
 
   	mysql_close(conn);
-    free(sqlcmd).
+    free(sqlcmd);
     free(errorMsg);
 
     return errorCode;
